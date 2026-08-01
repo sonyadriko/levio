@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Levio
 
-## Getting Started
+Satu platform untuk semua rutinitas self-improvement: **belajar HSK**, bahasa lain (Jepang/Inggris), dan **kesehatan** (gym daily tracking).
 
-First, run the development server:
+Rencana produk lengkap: [`PLAN.md`](./PLAN.md).
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Fitur Saat Ini (V1)
+
+- 📚 **Kurikulum HSK 1–6** — daftar level + kosakata per level (`/learn`); **HSK 1 lengkap (150 kata resmi) + HSK 2 lengkap (156 kata baru) + HSK 3 lengkap (287 kata baru) + HSK 4 lengkap (598 kata baru), sesuai daftar resmi HSK 2.0**
+- 🎓 **Pelajaran interaktif** per level — exposure → retrieval practice pilihan ganda → feedback langsung; kata salah diuji ulang, kata benar dijadwalkan SRS besok (metode berbasis riset, terdokumentasi di kode)
+- 🔒 **Gating antar level** — lulus **tes kelulusan** HSK N (skor ≥ 60%) untuk membuka HSK N+1; level terkunci menampilkan tes kelulusannya
+- 🀄 **Latihan Kalimat** — baca kalimat HSK 1 utuh (hanzi + pinyin), pilih artinya dari konteks
+- 🃏 **Flashcards + SRS** — ketuk untuk membalik kartu, nilai hafalan (`/practice`)
+- 📝 **Mock Test HSK** — simulasi ujian: 4 tipe pilihan ganda, timer, skor, analisis per tipe & review jawaban salah (`/mock-test`)
+- 📊 **Statistik** — progress **harian, mingguan, bulanan, tahunan**: heatmap 12 minggu, bar chart XP, streak, kata dikuasai, hasil mock test (`/stats`)
+- 📈 **Grafik progress per level** — kosakata direview vs dikuasai per level HSK di halaman Statistik
+- 🏅 **Badge & penghargaan** — 10 badge otomatis (streak 7/30 hari, XP, kosakata, tes) di halaman Profil
+- 🔔 **Pengingat harian** — notifikasi web saat waktunya belajar (jam bisa diatur); kirim otomatis bila hari ini belum ada aktivitas
+- 🌐 **Bilingual (ID/EN)** — ganti bahasa UI kapan saja via halaman Profil; pilihan tersimpan di browser
+- 🌗 **Tema terang/gelap/otomatis** — dari halaman Profil; tanpa flash saat reload
+- ⚡ **XP, level, streak** — tersimpan di browser (localStorage), muncul di dashboard
+- ☁️ **Akun & sync cloud** — login email/password, progress otomatis di-upload/download; tetap jalan offline tanpa koneksi
+- ✅ **Checklist harian** — target kosakata, review SRS, XP harian, & mock test dalam satu halaman
+- 🏷️ **Versioning** — versi aplikasi & "Yang Baru" tampil di Profil (`lib/version.ts` + `CHANGELOG.md`)
+- 🎞️ **Animasi halus** — kartu, transisi halaman (View Transitions), mikro-interaksi — tanpa dependensi tambahan
+- 📱 **Mobile-first responsive** — bottom nav di hp, sidebar di desktop, PWA-ready
+
+Menu: **Home · Belajar · Gym · Statistik · Profil** (flashcard & mock test berada dalam alur Belajar).
+
+## Tech Stack
+
+- **Next.js 16** (App Router, Turbopack) + **TypeScript**
+- **Tailwind CSS v4** — mobile-first responsive
+- **Supabase** — backend (PostgreSQL + Auth email/password, sync cloud); berjalan offline bila belum dikonfigurasi
+- Deploy: **Vercel**
+
+## Dokumentasi
+
+| Dokumen | Isi |
+|---|---|
+| [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) | Struktur kode, alur data, prinsip desain |
+| [`docs/data-model.md`](./docs/data-model.md) | Skema DB (target) & state localStorage |
+| [`docs/hsk-curriculum.md`](./docs/hsk-curriculum.md) | Standar & cara menambah kosakata HSK |
+| [`docs/modules.md`](./docs/modules.md) | Pola menambah bahasa/modul baru |
+| [`CHANGELOG.md`](./CHANGELOG.md) | Riwayat rilis per versi |
+| [`CONTRIBUTING.md`](./CONTRIBUTING.md) | Aturan berkontribusi |
+
+## Struktur
+
+```
+app/           → routing (hub belajar `/learn/hsk`, practice, gym, stats, profile)
+components/    → app-shell, sidebar, bottom-nav, flashcards, dll.
+lib/           → logic murni: progress + data HSK
+docs/          → dokumentasi teknis
+PLAN.md        → roadmap produk & fitur
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Menjalankan
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Buka [http://localhost:3000](http://localhost:3000).
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
+| Script | Fungsi |
+| --- | --- |
+| `npm run dev` | Development server (Turbopack) |
+| `npm run build` | Production build + type-check |
+| `npm run start` | Jalankan hasil build |
+| `npm run lint` | ESLint |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Environment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Salin `.env.example` → `.env.local` lalu isi kredensial Supabase. Langkah lengkap
+(setup proyek, SQL migration, aktifkan Email provider) ada di
+[`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md#mengaktifkan-backend).
+Tanpa `.env.local`, aplikasi tetap berjalan penuh dalam mode offline.
 
-## Deploy on Vercel
+## Roadmap Singkat
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **V1:** HSK + gamifikasi + habit ✅ (dasar; kosakata lengkap menyusul)
+- **V2:** Bahasa Jepang (JLPT) + modul Gym
+- **V3:** English + polish + monetisasi
