@@ -49,6 +49,12 @@ const paths: Record<IconName, React.ReactNode> = {
   star: (
     <path d="m12 3 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.1l1-5.8L3.5 9.2l5.9-.9L12 3Z" />
   ),
+  volume: (
+    <>
+      <path d="M11 5 6 9H3v6h3l5 4V5Z" />
+      <path d="M15.5 8.5a5 5 0 0 1 0 7M18.4 5.6a8.5 8.5 0 0 1 0 12.8" />
+    </>
+  ),
 };
 
 export function Icon({

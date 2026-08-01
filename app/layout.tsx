@@ -5,6 +5,7 @@ import { AuthProvider } from "@/components/auth-provider";
 import { ProgressProvider } from "@/components/progress-provider";
 import { LanguageProvider } from "@/components/language-provider";
 import { SettingsProvider } from "@/components/settings-provider";
+import { ServiceWorkerRegister } from "@/components/service-worker-register";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -50,6 +51,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full">
+        <ServiceWorkerRegister />
         <AuthProvider>
           <ProgressProvider>
             <LanguageProvider>

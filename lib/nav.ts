@@ -11,7 +11,8 @@ export type IconName =
   | "moon"
   | "lock"
   | "trophy"
-  | "star";
+  | "star"
+  | "volume";
 
 export interface NavItem {
   labelKey: string;

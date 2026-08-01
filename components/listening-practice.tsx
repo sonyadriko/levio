@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/components/language-provider";
 import { Icon } from "@/components/icons";
 import {
@@ -10,32 +10,57 @@ import {
 import { generateListeningQuestions } from "@/lib/hsk/exercises";
 import type { VocabWord } from "@/lib/hsk/types";
 
-// Mainkan hanzi dengan Web Speech API (lang zh-CN).
+// Mainkan suara kata: audio native lewat proxy TTS (/api/tts), fallback ke
+// Web Speech API (speechSynthesis) bila audio native gagal (mis. offline).
 function useSpeech() {
-  const supported =
-    typeof window !== "undefined" && "speechSynthesis" in window;
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [fallback, setFallback] = useState(false);
+
+  const speakNative = useCallback((text: string) => {
+    const audio = audioRef.current ?? new Audio();
+    audioRef.current = audio;
+    audio.pause();
+    audio.src = `/api/tts?tl=zh-CN&text=${encodeURIComponent(text)}`;
+    audio.onerror = () => setFallback(true);
+    audio.play().catch(() => setFallback(true));
+  }, []);
+
+  const speakFallback = useCallback((text: string) => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = "zh-CN";
+    utter.rate = 0.8;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utter);
+  }, []);
+
   const speak = useCallback(
     (text: string) => {
-      if (!supported) return;
-      const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = "zh-CN";
-      utter.rate = 0.8;
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(utter);
+      if (!text) return;
+      if (fallback) {
+        speakFallback(text);
+      } else {
+        speakNative(text);
+      }
     },
-    [supported],
+    [fallback, speakFallback, speakNative],
   );
+
   useEffect(() => {
     return () => {
-      if (supported) window.speechSynthesis.cancel();
+      audioRef.current?.pause();
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
     };
-  }, [supported]);
-  return { speak, supported };
+  }, []);
+
+  return { speak, supported: true };
 }
 
 export function ListeningPractice() {
   const { t } = useLanguage();
-  const { speak, supported } = useSpeech();
+  const { speak } = useSpeech();
   const autoPlayed = useRef<string | null>(null);
 
   const handleQuestionChange = useCallback(
@@ -61,11 +86,8 @@ export function ListeningPractice() {
             className="mx-auto mt-4 flex h-14 w-14 items-center justify-center rounded-full bg-teal-700 text-white shadow-lg transition-colors hover:bg-teal-800 active:scale-95"
             aria-label={t("listen.replay")}
           >
-            <Icon name="check" className="h-6 w-6" />
+            <Icon name="volume" className="h-6 w-6" />
           </button>
-          {!supported && (
-            <p className="mt-2 text-xs text-stone-400">{t("listen.unsupported")}</p>
-          )}
         </div>
       )}
       onQuestionChange={handleQuestionChange}

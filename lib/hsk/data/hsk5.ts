@@ -178,7 +178,7 @@ export const hsk5Words: VocabWord[] = [
   { id: "hsk5-169", hanzi: "醋", pinyin: "cù", meaning: "cuka", hsk: 5, example: "吃饺子要蘸醋。", examplePinyin: "Chī jiǎozi yào zhàn cù.", exampleMeaning: "Makan pangsit harus dicelupkan cuka." },
   { id: "hsk5-170", hanzi: "催", pinyin: "cuī", meaning: "mendesak; menyuruh cepat", hsk: 5, example: "他催我快点。", examplePinyin: "Tā cuī wǒ kuài diǎn.", exampleMeaning: "Dia mendesakku cepat." },
   { id: "hsk5-171", hanzi: "存在", pinyin: "cúnzài", meaning: "ada; eksistensi", hsk: 5, example: "这个问题一直存在。", examplePinyin: "Zhège wèntí yìzhí cúnzài.", exampleMeaning: "Masalah ini selalu ada." },
-  { id: "hsk5-172", hanzi: "措施", pinyin: "cuòshī", meaning: "langkah; tindakan", hsk: 5, example: "我们采取了一些措施。", examplePinyin: "Wǒmen cǎiqǔ le yìxiē cuòshī.", exampleMeaning: "Kami mengambil beberapa tindakan." },
+  { id: "hsk5-172", hanzi: "措施", pinyin: "cuòshī", meaning: "langkah; tindakan", hsk: 5, example: "这个措施很有效。", examplePinyin: "Zhège cuòshī hěn yǒuxiào.", exampleMeaning: "Langkah ini sangat efektif." },
   { id: "hsk5-173", hanzi: "答应", pinyin: "dāying", meaning: "menyetujui; menjawab", hsk: 5, example: "他答应了我们的要求。", examplePinyin: "Tā dāying le wǒmen de yāoqiú.", exampleMeaning: "Dia menyetujui permintaan kami." },
   { id: "hsk5-174", hanzi: "达到", pinyin: "dádào", meaning: "mencapai", hsk: 5, example: "他终于达到了目标。", examplePinyin: "Tā zhōngyú dádào le mùbiāo.", exampleMeaning: "Dia akhirnya mencapai sasaran." },
   { id: "hsk5-175", hanzi: "打工", pinyin: "dǎgōng", meaning: "kerja sampingan", hsk: 5, example: "他在外面打工赚钱。", examplePinyin: "Tā zài wàimiàn dǎgōng zhuànqián.", exampleMeaning: "Dia bekerja sampingan mencari uang di luar." },
