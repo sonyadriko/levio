@@ -6,7 +6,7 @@ Rencana produk lengkap: [`PLAN.md`](./PLAN.md).
 
 ## Fitur Saat Ini (V1)
 
-- 📚 **Kurikulum HSK 1–6** — daftar level + kosakata per level (`/learn`); **HSK 1 lengkap (150 kata resmi) + HSK 2 lengkap (156 kata baru) + HSK 3 lengkap (287 kata baru) + HSK 4 lengkap (598 kata baru), sesuai daftar resmi HSK 2.0**
+- 📚 **Kurikulum HSK 1–6** — daftar level + kosakata per level (`/learn`); **HSK 1–6 lengkap sesuai daftar resmi HSK 2.0 (150/156/287/598/1300/2499 kata baru per level, total 4990 kata)**
 - 🎓 **Pelajaran interaktif** per level — exposure → retrieval practice pilihan ganda → feedback langsung; kata salah diuji ulang, kata benar dijadwalkan SRS besok (metode berbasis riset, terdokumentasi di kode)
 - 🔒 **Gating antar level** — lulus **tes kelulusan** HSK N (skor ≥ 60%) untuk membuka HSK N+1; level terkunci menampilkan tes kelulusannya
 - 🀄 **Latihan Kalimat** — baca kalimat HSK 1 utuh (hanzi + pinyin), pilih artinya dari konteks

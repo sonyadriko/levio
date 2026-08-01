@@ -20,6 +20,16 @@ selalu disinkronkan saat rilis (lihat `docs/CONTRIBUTING` tidak ada; aturan ada 
 
 ---
 
+## [0.5.0] — 2026-08-01
+
+### Ditambahkan
+- Kosakata **HSK 6** lengkap (**2499 kata baru**, di luar HSK 1–5, sesuai daftar resmi HSK 2.0 dari XLS chinesetest.cn) di `lib/hsk/data.ts`.
+- **HSK 5 dibangun ulang** mengikuti daftar resmi HSK 2.0: dari 1235 kata (dengan 53% kesalahan) menjadi **1300 kata resmi**; 366 kata lama yang ternyata HSK 6 dipindahkan ke level yang benar.
+- Semua arti HSK 5 & HSK 6 dalam **Bahasa Indonesia** ditulis ulang/dilengkapi; pinyin & hanzi mengikuti daftar resmi.
+
+### Perubahan
+- Total kosakata aplikasi: **4.990 kata** (HSK 1: 150, HSK 2: 156, HSK 3: 287, HSK 4: 598, HSK 5: 1300, HSK 6: 2499).
+
 ## [0.4.0] — 2026-08-01
 
 ### Ditambahkan

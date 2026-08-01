@@ -26,10 +26,12 @@ Level HSK mengikuti daftar kosakata resmi **HSK (Hanyu Shuiping Kaoshi)**:
 > - ✅ **HSK 4 — lengkap (598 kata baru, di luar HSK 1–3, sesuai daftar resmi HSK 2.0)** di `lib/hsk/data.ts`.
 >   Daftar resmi HSK 4 memuat 600 kata baru; 得 & 等 sudah ada di HSK 2, jadi
 >   tersimpan 598 kata.
-> - ✅ **HSK 5 — lengkap (1235 kata baru, di luar HSK 1–4, sesuai daftar resmi HSK 2.0)** di `lib/hsk/data.ts`.
->   Daftar resmi HSK 5 memuat 1300 kata baru; setelah dedup terhadap HSK 1–4
->   (kata yang hanzi-nya sudah ada di level bawah dibuang), tersimpan 1235 kata.
-> - ⏳ HSK 6 belum diisi. Daftar resmi lengkap menyusul — ikuti panduan di bawah ini.
+> - ✅ **HSK 5 — lengkap (1300 kata baru, di luar HSK 1–4, sesuai daftar resmi HSK 2.0)** di `lib/hsk/data.ts`.
+>   Daftar resmi HSK 5 memuat 1300 kata baru; tidak ada yang bertabrakan dengan
+>   HSK 1–4, jadi tersimpan 1300 kata (v0.5.0).
+> - ✅ **HSK 6 — lengkap (2499 kata baru, di luar HSK 1–5, sesuai daftar resmi HSK 2.0)** di `lib/hsk/data.ts`.
+>   Daftar resmi HSK 6 memuat 2500 kata baru; 1 kata sudah ada di level bawah,
+>   jadi tersimpan 2499 kata (v0.5.0).
 >
 > Catatan leveling: setiap level hanya memuat **kata yang belum ada di level
 > sebelumnya** (HSK 2 = kata baru HSK 2, HSK 3 = kata baru HSK 3, bukan gabungan
