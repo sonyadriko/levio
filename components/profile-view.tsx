@@ -13,22 +13,11 @@ import { XP_PER_LEVEL } from "@/lib/progress";
 import { summarize, totalsToday } from "@/lib/stats";
 import { getBadges } from "@/lib/badges";
 import { APP_VERSION, latestRelease } from "@/lib/version";
-import type { ThemeMode } from "@/lib/settings";
 import type { Locale } from "@/lib/i18n";
 
 const LANGUAGE_OPTIONS: { locale: Locale; labelKey: string }[] = [
   { locale: "id", labelKey: "profile.langId" },
   { locale: "en", labelKey: "profile.langEn" },
-];
-
-const THEME_OPTIONS: {
-  theme: ThemeMode;
-  labelKey: string;
-  icon: "sun" | "moon" | "chart";
-}[] = [
-  { theme: "light", labelKey: "profile.themeLight", icon: "sun" },
-  { theme: "dark", labelKey: "profile.themeDark", icon: "moon" },
-  { theme: "auto", labelKey: "profile.themeAuto", icon: "chart" },
 ];
 
 function TargetStepper({
@@ -78,10 +67,10 @@ function TargetStepper({
 }
 
 export function ProfileView() {
-  const { user, ready, configured, signIn, signUp, signOut } = useAuth();
+  const { user, ready, configured, signIn, signUp, signInWithGoogle, signOut } = useAuth();
   const { progress, resetProgress, importProgress } = useProgress();
   const { locale, setLocale, t } = useLanguage();
-  const { settings, setName, setDailyTargets, setTheme } = useSettings();
+  const { settings, setName, setDailyTargets } = useSettings();
   const [confirmingReset, setConfirmingReset] = useState(false);
   const [notice, setNotice] = useState<{
     message: string;
@@ -162,8 +151,6 @@ export function ProfileView() {
           settings={settings}
           setName={setName}
           setDailyTargets={setDailyTargets}
-          theme={settings.theme}
-          setTheme={setTheme}
           locale={locale}
           setLocale={setLocale}
           summary={summary}
@@ -194,7 +181,9 @@ export function ProfileView() {
   }
 
   if (!user) {
-    return <AuthCard t={t} signIn={signIn} signUp={signUp} />;
+    return (
+      <AuthCard t={t} signIn={signIn} signUp={signUp} signInWithGoogle={signInWithGoogle} />
+    );
   }
 
   return (
@@ -222,8 +211,6 @@ export function ProfileView() {
         settings={settings}
         setName={setName}
         setDailyTargets={setDailyTargets}
-        theme={settings.theme}
-        setTheme={setTheme}
         locale={locale}
         setLocale={setLocale}
         summary={summary}
@@ -248,10 +235,12 @@ function AuthCard({
   t,
   signIn,
   signUp,
+  signInWithGoogle,
 }: {
   t: (key: string, vars?: Record<string, string | number>) => string;
   signIn: (email: string, password: string) => Promise<AuthResult>;
   signUp: (email: string, password: string) => Promise<AuthResult>;
+  signInWithGoogle: () => Promise<AuthResult>;
 }) {
   const [mode, setMode] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
@@ -266,6 +255,7 @@ function AuthCard({
       ? "auth.errorLink"
       : null;
   });
+  const [googleSubmitting, setGoogleSubmitting] = useState(false);
 
   useEffect(() => {
     if (new URLSearchParams(window.location.search).get("auth") === "error") {
@@ -337,6 +327,46 @@ function AuthCard({
         >
           {t("auth.registerTab")}
         </button>
+      </div>
+
+      <button
+        type="button"
+        disabled={googleSubmitting}
+        onClick={async () => {
+          setError(null);
+          setNotice(null);
+          setGoogleSubmitting(true);
+          const result = await signInWithGoogle();
+          setGoogleSubmitting(false);
+          if (!result.ok) setError(result.error ?? "auth.errorNetwork");
+        }}
+        className="mx-auto mt-5 flex h-12 w-full max-w-xs items-center justify-center gap-2.5 rounded-xl border border-stone-200 bg-white text-sm font-semibold text-stone-700 shadow-sm transition-colors hover:border-teal-300 hover:text-teal-700 active:scale-[0.97] disabled:opacity-60 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:hover:border-teal-700 dark:hover:text-teal-300"
+      >
+        <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            fill="#4285F4"
+            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1Z"
+          />
+          <path
+            fill="#34A853"
+            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23Z"
+          />
+          <path
+            fill="#FBBC05"
+            d="M5.84 14.1A6.6 6.6 0 0 1 5.5 12c0-.73.13-1.43.34-2.1V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84Z"
+          />
+          <path
+            fill="#EA4335"
+            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15A10.97 10.97 0 0 0 12 1a11 11 0 0 0-9.82 6.06l3.66 2.84C6.71 7.3 9.14 5.38 12 5.38Z"
+          />
+        </svg>
+        {googleSubmitting ? "…" : t("auth.signInGoogle")}
+      </button>
+
+      <div className="mx-auto mt-5 flex max-w-xs items-center gap-3">
+        <span className="h-px flex-1 bg-stone-200 dark:bg-stone-800" />
+        <span className="text-xs text-stone-400">{t("auth.or")}</span>
+        <span className="h-px flex-1 bg-stone-200 dark:bg-stone-800" />
       </div>
 
       <form onSubmit={handleSubmit} className="mx-auto mt-5 flex max-w-xs flex-col gap-3">
@@ -413,8 +443,6 @@ function ProfileSections({
   settings,
   setName,
   setDailyTargets,
-  theme,
-  setTheme,
   locale,
   setLocale,
   summary,
@@ -435,8 +463,6 @@ function ProfileSections({
   settings: ReturnType<typeof useSettings>["settings"];
   setName: (name: string) => void;
   setDailyTargets: (targets: Partial<{ vocab: number; reviews: number; xp: number }>) => void;
-  theme: ThemeMode;
-  setTheme: (theme: ThemeMode) => void;
   locale: Locale;
   setLocale: (locale: Locale) => void;
   summary: ReturnType<typeof summarize>;
@@ -605,29 +631,6 @@ function ProfileSections({
                   {locale === option.locale && (
                     <Icon name="check" className="h-4 w-4" />
                   )}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-stone-400">
-              {t("profile.appearance")}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {THEME_OPTIONS.map((option) => (
-                <button
-                  key={option.theme}
-                  type="button"
-                  onClick={() => setTheme(option.theme)}
-                  className={`flex h-9 items-center gap-2 rounded-lg px-4 text-sm font-medium transition-colors active:scale-[0.97] ${
-                    theme === option.theme
-                      ? "bg-teal-700 text-white"
-                      : "border border-stone-200 bg-white text-stone-600 hover:border-teal-300 dark:border-stone-800 dark:bg-stone-950 dark:text-stone-400"
-                  }`}
-                >
-                  <Icon name={option.icon} className="h-4 w-4" />
-                  {t(option.labelKey)}
                 </button>
               ))}
             </div>

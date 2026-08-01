@@ -6,7 +6,8 @@ import { useLanguage } from "@/components/language-provider";
 import { Icon } from "@/components/icons";
 import { ProgressBar } from "@/components/progress-bar";
 import { Pill } from "@/components/pill";
-import { getWordsByLevel } from "@/lib/hsk";
+import { countWordsByLevel } from "@/lib/hsk";
+import { useLevelWords } from "@/lib/hsk/use-level-words";
 import { allLevels, getLevelMeta } from "@/lib/hsk/levels";
 import { todayKey } from "@/lib/date";
 import type { HskLevel, VocabWord } from "@/lib/hsk/types";
@@ -33,16 +34,19 @@ export function FlashcardDeck() {
     xp: number;
   } | null>(null);
 
+  const words = useLevelWords(level);
+
   const dueWords = useMemo(() => {
     const today = todayKey();
-    return getWordsByLevel(level).filter((w) => {
+    return words.filter((w) => {
       const wp = progress.words[w.id];
       return !wp || !wp.nextReview || wp.nextReview <= today;
     });
-  }, [level, progress]);
+  }, [words, progress]);
 
   const startSession = (reviewAll = false) => {
-    const deck = shuffle(reviewAll ? getWordsByLevel(level) : dueWords);
+    const deck = shuffle(reviewAll ? words : dueWords);
+    if (deck.length === 0) return;
     setSession({ deck, index: 0, correct: 0, xp: 0 });
     setFlipped(false);
   };
@@ -72,7 +76,7 @@ export function FlashcardDeck() {
             <Pill
               key={l}
               selected={level === l}
-              disabled={getWordsByLevel(l).length === 0}
+              disabled={countWordsByLevel(l) === 0}
               onClick={() => setLevel(l)}
             >
               HSK {l}
@@ -80,7 +84,14 @@ export function FlashcardDeck() {
           ))}
         </div>
 
-        {dueWords.length === 0 ? (
+        {words.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-8 text-center dark:border-stone-700 dark:bg-stone-950">
+            <Icon name="pen" className="mx-auto h-8 w-8 animate-pulse-soft text-stone-400" />
+            <p className="mt-3 text-sm font-medium text-stone-500 dark:text-stone-400">
+              {t("common.loading")}
+            </p>
+          </div>
+        ) : dueWords.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-8 text-center dark:border-stone-700 dark:bg-stone-950">
             <Icon name="pen" className="mx-auto h-8 w-8 text-stone-400" />
             <p className="mt-3 text-sm font-medium text-stone-600 dark:text-stone-300">

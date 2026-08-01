@@ -7,7 +7,7 @@ import { useLanguage } from "@/components/language-provider";
 import { useSettings } from "@/components/settings-provider";
 import { Icon } from "@/components/icons";
 import { ProgressBar } from "@/components/progress-bar";
-import { getWordsByLevel } from "@/lib/hsk";
+import { useLevelWords } from "@/lib/hsk/use-level-words";
 import type { HskLevel, VocabWord } from "@/lib/hsk/types";
 
 /**
@@ -82,7 +82,7 @@ export function Lesson({ level }: { level: HskLevel }) {
   const [picked, setPicked] = useState<{ option: string; correct: boolean } | null>(null);
   const recorded = useRef<Set<string>>(new Set());
 
-  const pool = useMemo(() => getWordsByLevel(level), [level]);
+  const pool = useLevelWords(level);
   const newWords = useMemo(
     () => pool.filter((w) => !progress.words[w.id]),
     [pool, progress.words],

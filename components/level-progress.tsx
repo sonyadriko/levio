@@ -2,19 +2,30 @@
 
 import { useProgress } from "@/components/progress-provider";
 import type { HskLevel } from "@/lib/hsk/types";
-import { countWordsByLevel, getWordsByLevel } from "@/lib/hsk";
+import { countWordsByLevel } from "@/lib/hsk";
+
+function levelWordsFromProgress(
+  progress: ReturnType<typeof useProgress>["progress"],
+  level: HskLevel,
+): { reviewed: number; mastered: number } {
+  const prefix = `hsk${level}-`;
+  let reviewed = 0;
+  let mastered = 0;
+  for (const [id, wp] of Object.entries(progress.words)) {
+    if (!id.startsWith(prefix)) continue;
+    reviewed += 1;
+    if (wp.mastered) mastered += 1;
+  }
+  return { reviewed, mastered };
+}
 
 export function LevelProgress({ level }: { level: HskLevel }) {
   const { progress } = useProgress();
 
   const total = countWordsByLevel(level);
-  const learned = progress
-    ? getWordsByLevel(level).filter((w) => progress.words[w.id]).length
-    : 0;
-  const mastered = progress
-    ? getWordsByLevel(level).filter((w) => progress.words[w.id]?.mastered)
-        .length
-    : 0;
+  const { reviewed, mastered } = progress
+    ? levelWordsFromProgress(progress, level)
+    : { reviewed: 0, mastered: 0 };
   const masteredPct = total === 0 ? 0 : Math.round((mastered / total) * 100);
 
   return (
@@ -28,7 +39,7 @@ export function LevelProgress({ level }: { level: HskLevel }) {
           />
         </div>
         <span className="text-xs font-medium text-stone-400">
-          {learned}/{total}
+          {reviewed}/{total}
         </span>
       </div>
     </div>

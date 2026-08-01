@@ -27,6 +27,7 @@ interface AuthContextValue {
   configured: boolean;
   signIn: (email: string, password: string) => Promise<AuthResult>;
   signUp: (email: string, password: string) => Promise<AuthResult>;
+  signInWithGoogle: () => Promise<AuthResult>;
   signOut: () => Promise<void>;
 }
 
@@ -134,9 +135,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await client?.auth.signOut();
   }, []);
 
+  const signInWithGoogle = useCallback(async () => {
+    const client = getSupabaseBrowserClient();
+    if (!client) return { ok: false, error: "auth.errorNetwork" };
+    const { error } = await client.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    if (error) return { ok: false, error: mapAuthError(error) };
+    return { ok: true, error: null };
+  }, []);
+
   return (
     <AuthContext.Provider
-      value={{ user, ready, configured: isSupabaseConfigured(), signIn, signUp, signOut }}
+      value={{
+        user,
+        ready,
+        configured: isSupabaseConfigured(),
+        signIn,
+        signUp,
+        signInWithGoogle,
+        signOut,
+      }}
     >
       {children}
     </AuthContext.Provider>

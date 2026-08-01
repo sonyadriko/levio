@@ -7,6 +7,7 @@ import { Icon } from "@/components/icons";
 import { useProgress } from "@/components/progress-provider";
 import { useLanguage } from "@/components/language-provider";
 import { ProgressBar } from "@/components/progress-bar";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { XP_PER_LEVEL } from "@/lib/progress";
 
 export function Sidebar() {
@@ -50,12 +51,15 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="mt-auto rounded-lg bg-stone-50 p-3 text-xs text-stone-500 dark:bg-stone-900 dark:text-stone-400">
+      <div className="mt-auto flex flex-col gap-3">
+        <ThemeToggle compact />
+        <div className="rounded-lg bg-stone-50 p-3 text-xs text-stone-500 dark:bg-stone-900 dark:text-stone-400">
         <span key={level} className="inline-block animate-pop">
           {t("common.level")} {level} · {progress.xp} {t("common.xp")}
         </span>
         <div className="mt-2">
           <ProgressBar value={pct} />
+        </div>
         </div>
       </div>
     </aside>

@@ -6,7 +6,7 @@ import { useLanguage } from "@/components/language-provider";
 import { Icon } from "@/components/icons";
 import { StatCard } from "@/components/stat-card";
 import { XP_PER_LEVEL } from "@/lib/progress";
-import { getWordsByLevel } from "@/lib/hsk";
+import { countWordsByLevel } from "@/lib/hsk";
 import { allLevels } from "@/lib/hsk/levels";
 import {
   dailySeries,
@@ -106,10 +106,15 @@ function LevelProgress() {
   const { t } = useLanguage();
   const levels = allLevels()
     .map((level) => {
-      const words = getWordsByLevel(level);
-      const reviewed = words.filter((w) => progress.words[w.id]).length;
-      const mastered = words.filter((w) => progress.words[w.id]?.mastered).length;
-      return { level, total: words.length, reviewed, mastered };
+      const prefix = `hsk${level}-`;
+      let reviewed = 0;
+      let mastered = 0;
+      for (const [id, wp] of Object.entries(progress.words)) {
+        if (!id.startsWith(prefix)) continue;
+        reviewed += 1;
+        if (wp.mastered) mastered += 1;
+      }
+      return { level, total: countWordsByLevel(level), reviewed, mastered };
     })
     .filter((l) => l.total > 0);
 

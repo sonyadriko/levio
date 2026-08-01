@@ -8,7 +8,7 @@ import { Lesson } from "@/components/lesson";
 import { LevelTest } from "@/components/level-test";
 import { SentencePractice } from "@/components/sentence-practice";
 import { WordList } from "@/components/word-list";
-import { getWordsByLevel } from "@/lib/hsk";
+import { useLevelWords } from "@/lib/hsk/use-level-words";
 import { MAX_HSK_LEVEL } from "@/lib/progress";
 import type { HskLevel } from "@/lib/hsk/types";
 
@@ -17,6 +17,7 @@ import type { HskLevel } from "@/lib/hsk/types";
 export function LevelContent({ level }: { level: HskLevel }) {
   const { progress, recordLevelPass } = useProgress();
   const { t } = useLanguage();
+  const words = useLevelWords(level);
 
   const locked = level > progress.unlockedUpTo;
 
@@ -51,7 +52,7 @@ export function LevelContent({ level }: { level: HskLevel }) {
     <div className="flex flex-col gap-6">
       <Lesson level={level} />
       <SentencePractice level={level} />
-      <WordList words={getWordsByLevel(level)} />
+      <WordList words={words} />
 
       {frontier && (
         <div className="flex flex-col gap-3">

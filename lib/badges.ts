@@ -1,4 +1,4 @@
-import { getWordsByLevel } from "./hsk";
+import { countWordsByLevel } from "./hsk";
 import type { HskLevel } from "./hsk/types";
 import type { IconName } from "./nav";
 import type { ProgressState } from "./progress";
@@ -23,9 +23,12 @@ interface BadgeDef {
 }
 
 function masteredInLevel(progress: ProgressState, level: HskLevel): number {
-  return getWordsByLevel(level).filter(
-    (w) => progress.words[w.id]?.mastered,
-  ).length;
+  const prefix = `hsk${level}-`;
+  let count = 0;
+  for (const [id, wp] of Object.entries(progress.words)) {
+    if (id.startsWith(prefix) && wp.mastered) count += 1;
+  }
+  return count;
 }
 
 const badges: BadgeDef[] = [
@@ -83,7 +86,7 @@ const badges: BadgeDef[] = [
     titleKey: "badge.masterHsk1",
     descKey: "badge.masterHsk1Desc",
     value: (p) => masteredInLevel(p, 1),
-    target: getWordsByLevel(1).length,
+    target: countWordsByLevel(1),
   },
   {
     id: "master-hsk2",
@@ -91,7 +94,7 @@ const badges: BadgeDef[] = [
     titleKey: "badge.masterHsk2",
     descKey: "badge.masterHsk2Desc",
     value: (p) => masteredInLevel(p, 2),
-    target: getWordsByLevel(2).length,
+    target: countWordsByLevel(2),
   },
   {
     id: "graduate-1",

@@ -1,13 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useProgress } from "@/components/progress-provider";
 import { useLanguage } from "@/components/language-provider";
 import { Icon } from "@/components/icons";
 import { ProgressBar } from "@/components/progress-bar";
 import { Pill } from "@/components/pill";
 import { testXp } from "@/lib/progress";
-import { getWordsByLevel } from "@/lib/hsk";
+import { countWordsByLevel } from "@/lib/hsk";
+import { useLevelWords } from "@/lib/hsk/use-level-words";
 import { allLevels, getLevelMeta } from "@/lib/hsk/levels";
 import {
   generateMockTest,
@@ -157,7 +158,7 @@ export function MockTest() {
   const [result, setResult] = useState<QuizResult | null>(null);
   const deadline = useRef<number | null>(null);
 
-  const words = useMemo(() => getWordsByLevel(level), [level]);
+  const words = useLevelWords(level);
   const submitted = useRef(false);
 
   const submitQuiz = useCallback(() => {
@@ -221,7 +222,7 @@ export function MockTest() {
           </label>
           <div className="flex flex-wrap gap-2">
             {allLevels().map((l) => {
-              const available = getWordsByLevel(l).length > 0;
+              const available = countWordsByLevel(l) > 0;
               return (
                 <Pill
                   key={l}
@@ -278,9 +279,10 @@ export function MockTest() {
           <p className="mt-1 text-xs text-stone-400">{t("mock.typesHint")}</p>
           <button
             onClick={startQuiz}
-            className="mt-4 h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 active:scale-[0.97] sm:w-auto sm:px-8"
+            disabled={words.length === 0}
+            className="mt-4 h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto sm:px-8"
           >
-            {t("mock.start")}
+            {words.length === 0 ? t("common.loading") : t("mock.start")}
           </button>
         </div>
       </div>

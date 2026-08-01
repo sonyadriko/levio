@@ -6,7 +6,7 @@ import { useLanguage } from "@/components/language-provider";
 import { Icon } from "@/components/icons";
 import { ProgressBar } from "@/components/progress-bar";
 import { MIN_PASS_PCT, MAX_HSK_LEVEL, testXp } from "@/lib/progress";
-import { getWordsByLevel } from "@/lib/hsk";
+import { useLevelWords } from "@/lib/hsk/use-level-words";
 import {
   generateMockTest,
   type MockQuestion,
@@ -37,6 +37,7 @@ export function LevelTest({
 }) {
   const { recordTest } = useProgress();
   const { t } = useLanguage();
+  const words = useLevelWords(level);
 
   const [questions, setQuestions] = useState<MockQuestion[] | null>(null);
   const [index, setIndex] = useState(0);
@@ -47,7 +48,7 @@ export function LevelTest({
   const nextLevel = Math.min(MAX_HSK_LEVEL, level + 1) as HskLevel;
 
   const start = () => {
-    const quiz = generateMockTest(getWordsByLevel(level), TEST_COUNT);
+    const quiz = generateMockTest(words, TEST_COUNT);
     if (quiz.length === 0) return;
     submitted.current = false;
     setQuestions(quiz);
@@ -139,9 +140,10 @@ export function LevelTest({
         </p>
         <button
           onClick={start}
-          className="mt-4 h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 active:scale-[0.97] sm:w-auto sm:px-8"
+          disabled={words.length === 0}
+          className="mt-4 h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto sm:px-8"
         >
-          {t("levelTest.start")}
+          {words.length === 0 ? t("common.loading") : t("levelTest.start")}
         </button>
       </div>
     );
