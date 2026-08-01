@@ -6,6 +6,7 @@ import { useLanguage } from "@/components/language-provider";
 import { Icon } from "@/components/icons";
 import { ProgressBar } from "@/components/progress-bar";
 import { Pill } from "@/components/pill";
+import { Confetti } from "@/components/confetti";
 import { countWordsByLevel } from "@/lib/hsk";
 import { useLevelWords } from "@/lib/hsk/use-level-words";
 import { allLevels, getLevelMeta } from "@/lib/hsk/levels";
@@ -85,11 +86,13 @@ export function FlashcardDeck() {
         </div>
 
         {words.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-8 text-center dark:border-stone-700 dark:bg-stone-950">
-            <Icon name="pen" className="mx-auto h-8 w-8 animate-pulse-soft text-stone-400" />
-            <p className="mt-3 text-sm font-medium text-stone-500 dark:text-stone-400">
-              {t("common.loading")}
-            </p>
+          <div className="flex flex-col gap-3" aria-busy="true">
+            <div className="relative h-14 overflow-hidden rounded-xl border border-stone-200 bg-stone-100 dark:border-stone-800 dark:bg-stone-900">
+              <span className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-stone-200/80 to-transparent dark:via-stone-800" />
+            </div>
+            <div className="relative h-72 overflow-hidden rounded-2xl border border-stone-200 bg-stone-100 dark:border-stone-800 dark:bg-stone-900">
+              <span className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-stone-200/80 to-transparent dark:via-stone-800" />
+            </div>
           </div>
         ) : dueWords.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-8 text-center dark:border-stone-700 dark:bg-stone-950">
@@ -130,8 +133,12 @@ export function FlashcardDeck() {
     const total = session.deck.length;
     const pct = total > 0 ? Math.round((session.correct / total) * 100) : 0;
     return (
-      <div className="rounded-2xl border border-stone-200 bg-white p-8 text-center dark:border-stone-800 dark:bg-stone-950">
-        <p className="text-lg font-bold">{t("deck.done")}</p>
+      <div className="animate-card-in rounded-2xl border border-stone-200 bg-white p-8 text-center dark:border-stone-800 dark:bg-stone-950">
+        <Confetti />
+        <p className="text-2xl font-black tracking-tight text-teal-600 dark:text-teal-400">
+          {pct}%
+        </p>
+        <p className="mt-2 text-lg font-bold">{t("deck.done")}</p>
         <p className="mt-2 text-sm text-stone-500 dark:text-stone-400">
           {t("deck.summary", {
             c: session.correct,

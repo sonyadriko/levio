@@ -108,13 +108,13 @@ Levio
 ### V3 — English + Sempurnakan (bulan ke-9–12)
 - [ ] Modul English (kosakata, listening, grammar)
 - [ ] Bahasa Jepang lanjut ke JLPT N4
-- [ ] Integrasi audio TTS / kata yang diucapkan native
+- [ ] Audio native speaker rekaman (sekarang: proxy TTS di `app/api/tts` ✅ V1)
 - [ ] Leaderboard mingguan
 - [ ] Import/export data, backup
 
 ### Mobile Responsive (Sejak V1)
 - **Mobile-first design:** UI di-desain dan diuji untuk layar kecil (iPhone/Android) lebih dulu, lalu di-scale ke desktop.
-- **PWA (Progressive Web App):** bisa di-install ke home screen hp seperti aplikasi native, dengan offline mode (belajar tanpa internet).
+- **PWA (Progressive Web App):** bisa di-install ke home screen hp seperti aplikasi native, dengan offline mode (belajar tanpa internet). (✅ V1: manifest + service worker `public/sw.js` untuk app-shell offline.)
 - **Bottom navigation** di mobile (Home / Belajar / Statistik / Profil) → pindah ke sidebar di desktop.
 - Touch-friendly: tombol besar, swipe antar kartu flashcards, dukungan landscape & portrait.
 - Satu codebase (web) → nanti tinggal bungkus jadi app store lewat Capacitor/PWA.

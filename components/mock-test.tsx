@@ -6,6 +6,8 @@ import { useLanguage } from "@/components/language-provider";
 import { Icon } from "@/components/icons";
 import { ProgressBar } from "@/components/progress-bar";
 import { Pill } from "@/components/pill";
+import { Confetti } from "@/components/confetti";
+import { useCountUp } from "@/lib/use-count-up";
 import { testXp } from "@/lib/progress";
 import { countWordsByLevel } from "@/lib/hsk";
 import { useLevelWords } from "@/lib/hsk/use-level-words";
@@ -38,22 +40,6 @@ function formatTime(totalSeconds: number): string {
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
-function useCountUp(target: number, duration = 600) {
-  const [value, setValue] = useState(0);
-  useEffect(() => {
-    let raf = 0;
-    const start = performance.now();
-    const tick = (now: number) => {
-      const t = Math.min(1, (now - start) / duration);
-      setValue(Math.round(target * (1 - Math.pow(1 - t, 3))));
-      if (t < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [target, duration]);
-  return value;
-}
-
 function ResultView({
   result,
   onRetake,
@@ -78,8 +64,12 @@ function ResultView({
 
   return (
     <div className="flex flex-col gap-4">
+      {pct >= 60 && <Confetti count={32} />}
       <div className="animate-slide-up rounded-2xl border border-stone-200 bg-white p-6 text-center dark:border-stone-800 dark:bg-stone-950">
-        <p className="text-lg font-bold">
+        <p className="text-4xl font-black tracking-tight text-teal-600 dark:text-teal-400">
+          {shownPct}%
+        </p>
+        <p className="mt-2 text-sm font-medium">
           {t("mock.score", {
             p: shownPct,
             c: result.correct,

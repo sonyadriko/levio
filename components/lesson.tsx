@@ -7,6 +7,8 @@ import { useLanguage } from "@/components/language-provider";
 import { useSettings } from "@/components/settings-provider";
 import { Icon } from "@/components/icons";
 import { ProgressBar } from "@/components/progress-bar";
+import { Confetti } from "@/components/confetti";
+import { ProgressRing } from "@/components/progress-ring";
 import { useLevelWords } from "@/lib/hsk/use-level-words";
 import type { HskLevel, VocabWord } from "@/lib/hsk/types";
 
@@ -254,9 +256,21 @@ export function Lesson({ level }: { level: HskLevel }) {
   }
 
   if (session.phase === "done") {
+    const donePct = session.words.length > 0
+      ? Math.round((firstTryCorrect / session.words.length) * 100)
+      : 0;
     return (
       <section className="animate-slide-up rounded-2xl border border-stone-200 bg-white p-6 text-center dark:border-stone-800 dark:bg-stone-950">
-        <p className="text-lg font-bold">{t("lesson.doneTitle")}</p>
+        <Confetti />
+        <div className="mx-auto flex justify-center">
+          <ProgressRing
+            value={donePct}
+            size={96}
+            stroke={8}
+            className="text-teal-600 dark:text-teal-400"
+          />
+        </div>
+        <p className="mt-4 text-lg font-bold">{t("lesson.doneTitle")}</p>
         <p className="mt-2 text-sm text-stone-500 dark:text-stone-400">
           {t("lesson.doneScore", {
             c: firstTryCorrect,

@@ -5,9 +5,11 @@ import { useProgress } from "@/components/progress-provider";
 import { useLanguage } from "@/components/language-provider";
 import { ProgressBar } from "@/components/progress-bar";
 import { Pill } from "@/components/pill";
+import { Confetti } from "@/components/confetti";
 import { allLevels } from "@/lib/hsk/levels";
 import { countWordsByLevel } from "@/lib/hsk";
 import { useLevelWords } from "@/lib/hsk/use-level-words";
+import { useCountUp } from "@/lib/use-count-up";
 import type { HskLevel } from "@/lib/hsk/types";
 
 export const SESSION_SIZE = 8;
@@ -70,6 +72,10 @@ export function ChoicePracticeSession({
   const words = useLevelWords(level);
 
   const activeQuestion = session?.[index];
+  const doneCorrect = done ? correct : 0;
+  const doneXp = done ? xpEarned : 0;
+  const shownCorrect = useCountUp(doneCorrect);
+  const shownXp = useCountUp(doneXp);
 
   useEffect(() => {
     if (activeQuestion && session && !done) {
@@ -156,11 +162,16 @@ export function ChoicePracticeSession({
   };
 
   if (done) {
+    const pct = session.length > 0 ? Math.round((correct / session.length) * 100) : 0;
     return (
-      <section className="rounded-2xl border border-stone-200 bg-white p-5 text-center dark:border-stone-800 dark:bg-stone-950">
+      <section className="animate-card-in rounded-2xl border border-stone-200 bg-white p-5 text-center dark:border-stone-800 dark:bg-stone-950">
+        <Confetti />
         <p className="text-base font-bold">{t(doneKey)}</p>
+        <p className="mt-2 text-4xl font-black tracking-tight text-teal-600 dark:text-teal-400">
+          {pct}%
+        </p>
         <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
-          {t(scoreKey, { c: correct, t: session.length, xp: xpEarned })}
+          {t(scoreKey, { c: shownCorrect, t: session.length, xp: shownXp })}
         </p>
         <button
           onClick={start}

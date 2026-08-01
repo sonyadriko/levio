@@ -3,6 +3,7 @@
 import { useProgress } from "@/components/progress-provider";
 import { useLanguage } from "@/components/language-provider";
 import { Icon } from "@/components/icons";
+import { useCountUp } from "@/lib/use-count-up";
 import { XP_PER_LEVEL } from "@/lib/progress";
 
 export function HomeStats() {
@@ -17,16 +18,18 @@ export function HomeStats() {
     ? Object.values(progress.words).filter((w) => w.mastered).length
     : 0;
   const pct = Math.round((levelXp / XP_PER_LEVEL) * 100);
+  const shownXp = useCountUp(xp, 800);
+  const shownLevelXp = useCountUp(levelXp, 800);
 
   return (
     <section className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1 rounded-full bg-orange-50 px-3 py-1.5 text-sm font-semibold text-orange-700 dark:bg-orange-500/10 dark:text-orange-400">
-          <Icon name="flame" className="h-4 w-4 animate-pulse-soft" />
+          <Icon name="flame" className="h-4 w-4 animate-flame" />
           {t("homeStats.streak", { n: streak })}
         </div>
         <span className="text-sm font-medium text-stone-500 dark:text-stone-400">
-          {xp} {t("common.xp")}
+          {shownXp} {t("common.xp")}
         </span>
       </div>
 
@@ -36,7 +39,7 @@ export function HomeStats() {
             {t("common.level")} {level}
           </span>
           <span>
-            {levelXp} / {XP_PER_LEVEL} {t("common.xp")}
+            {shownLevelXp} / {XP_PER_LEVEL} {t("common.xp")}
           </span>
         </div>
         <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/20">

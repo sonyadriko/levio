@@ -46,6 +46,10 @@ body {
   --animate-shake: shake 420ms ease-in-out both;
   --animate-pulse-soft: pulse-soft 1.6s ease-in-out infinite;
   --animate-bar-grow: bar-grow 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-shimmer: shimmer 1.4s ease-in-out infinite;
+  --animate-flame: flame 1.8s ease-in-out infinite;
+  --animate-ring-fill: ring-fill 700ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  --animate-confetti: confetti-fall 2.4s linear forwards;
 
   @keyframes fade-in {
     from {
@@ -138,6 +142,53 @@ body {
     }
     to {
       transform: scaleY(1);
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes flame {
+    0%,
+    100% {
+      transform: scale(1) rotate(-2deg);
+      opacity: 1;
+    }
+    30% {
+      transform: scale(1.12) rotate(2deg);
+    }
+    60% {
+      transform: scale(0.94) rotate(-1deg);
+      opacity: 0.9;
+    }
+  }
+
+  @keyframes ring-fill {
+    from {
+      stroke-dashoffset: var(--ring-circumference);
+    }
+    to {
+      stroke-dashoffset: var(--ring-offset);
+    }
+  }
+
+  @keyframes confetti-fall {
+    0% {
+      transform: translateY(-10vh) rotate(0deg);
+      opacity: 1;
+    }
+    80% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(105vh) rotate(720deg);
+      opacity: 0;
     }
   }
 }

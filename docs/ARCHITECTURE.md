@@ -15,13 +15,15 @@ Dokumen ini menjelaskan arsitektur teknis aplikasi **Levio**: struktur kode, alu
 │  docs/            → dokumentasi              │
 ├──────────────────────────────────────────────┤
 │  State lokal      → localStorage (offline-first)│
+│  Audio            → proxy TTS (/api/tts) + SW │
 │  Backend          → Supabase (Auth + PostgreSQL)│
 └──────────────────────────────────────────────┘
 ```
 
 > **Offline-first.** Tanpa `.env` Supabase, aplikasi tetap berfungsi penuh
 > (mode offline). Saat env terisi dan user login, data lokal disinkronkan
-> ke cloud (pull saat login, push debounce saat berubah).
+> ke cloud (pull saat login, push debounce saat berubah). Service worker
+> (`public/sw.js`) meng-cache shell aplikasi agar tetap bisa dibuka offline.
 
 ## Prinsip
 
@@ -34,10 +36,11 @@ Dokumen ini menjelaskan arsitektur teknis aplikasi **Levio**: struktur kode, alu
 
 ```
 app/
-├── layout.tsx            → root layout (font, metadata, viewport, provider)
+├── layout.tsx            → root layout (font, metadata, viewport, provider, SW register)
 ├── manifest.ts           → PWA manifest
-├── globals.css           → Tailwind v4 + CSS global
+├── globals.css           → Tailwind v4 + CSS global (termasuk keyframe animasi)
 ├── page.tsx              → Home / dashboard (streak, XP, checklist)
+├── api/tts/route.ts      → proxy audio TTS (Google Translate TTS → MP3, cache in-memory)
 ├── learn/
 │   ├── page.tsx          → hub modul (saat ini: HSK) — siap untuk bahasa lain
 │   ├── hsk/
@@ -81,6 +84,10 @@ components/
 ├── reminder-card.tsx     → pengaturan pengingat harian (toggle + jam) (client)
 ├── daily-reminder.tsx    → mesin pengingat: polling & kirim Notification API (client)
 ├── sync-banner.tsx       → banner status sinkronisasi cloud (client)
+├── listening-practice.tsx → latihan listening: audio native (/api/tts) + fallback Web Speech (client)
+├── service-worker-register.tsx → daftarkan /sw.js untuk offline (client, production only)
+├── confetti.tsx          → efek confetti ringan (CSS keyframe, tanpa dependensi)
+├── progress-ring.tsx     → lingkaran progress SVG (stroke-dashoffset)
 └── placeholder-page.tsx  → UI "dalam pengembangan"
 
 lib/
@@ -93,6 +100,7 @@ lib/
 ├── badges.ts             → definisi & derivasi badge dari ProgressState (tanpa storage baru)
 ├── reminder.ts           → pengaturan pengingat harian (enabled/time, localStorage)
 ├── version.ts            → APP_VERSION + catatan rilis singkat (Profil → "Yang Baru")
+├── use-count-up.ts       → hook animasi angka (rAF, easeOutCubic) — untuk counter XP/skor
 └── hsk/
     ├── types.ts          → VocabWord, HskLevel, HskLevelMeta
     ├── levels.ts         → metadata level HSK 1–6
@@ -245,6 +253,47 @@ selalu konsisten dengan data nyata dan tidak bisa "curang":
   lalu tandai `lastSentKey = hari ini`.
 - Batasan: notifikasi aktif hanya saat tab aplikasi terbuka. Notifikasi saat app
   tertutup (mobile) butuh Service Worker push — rencana V2/PWA lanjutan.
+
+## Audio & PWA Offline
+
+### Audio native (listening)
+
+- `app/api/tts/route.ts` → proxy GET `/api/tts?text=...&tl=zh-CN`. Mengambil audio MP3
+  dari Google Translate TTS (tanpa API key), lalu mengembalikannya dengan
+  `Content-Type: audio/mpeg` + `Cache-Control` lama. Cache in-memory (`Map`) 7 hari
+  untuk menghindari request berulang ke upstream; batas 200 karakter per teks.
+- `components/listening-practice.tsx` → `useSpeech()` memutar `<audio>` dari proxy
+  TTS (suara native, konsisten antar browser). Bila audio gagal (offline/error),
+  otomatis fallback ke **Web Speech API** (`speechSynthesis`, lang `zh-CN`, rate 0.8).
+- Tombol putar ulang memakai ikon `volume` (ditambahkan ke `lib/nav.ts` + `components/icons.tsx`).
+
+### PWA & offline
+
+- `app/manifest.ts` → PWA installable (name, icons 192/512, display standalone).
+- `public/sw.js` → service worker (network-first untuk navigasi, cache-first untuk
+  aset statis hashed, di-skip untuk `/api/*` dan origin lain). Precache `/`,
+  manifest, dan ikon.
+- `components/service-worker-register.tsx` → mendaftarkan `/sw.js` hanya di
+  production (`process.env.NODE_ENV === "production"`) agar tidak mengganggu dev.
+- Dampak: setelah kunjungan pertama, shell aplikasi + aset JS/CSS yang sudah dimuat
+  tersedia offline (belajar & latihan tetap jalan tanpa internet). Audio TTS tetap
+  butuh koneksi — fallback Web Speech menanganinya saat offline.
+
+## Animasi
+
+Semua animasi murni CSS + sedikit React hook, **tanpa dependensi eksternal**:
+
+- `app/globals.css` `@theme` → keyframe: `fade-in`, `card-in`, `slide-up/down`,
+  `pop`, `shake`, `pulse-soft`, `bar-grow`, plus `shimmer` (loading skeleton),
+  `flame` (streak), `ring-fill` (progress ring), `confetti-fall`.
+- `components/confetti.tsx` → efek selebrasi pada layar selesai latihan.
+- `components/progress-ring.tsx` → lingkaran progress SVG (`stroke-dashoffset`
+  animasi `ring-fill`); dipakai di layar selesai pelajaran.
+- `lib/use-count-up.ts` → hook counter angka (rAF, easing easeOutCubic); dipakai
+  untuk XP total, skor %, dll. (juga di mock test via hook yang sama).
+- Sudah ada sebelumnya: flip kartu flashcards (CSS `perspective`/`rotateY`),
+  view transitions antar halaman (`experimental.viewTransition`), dan
+  stagger list pada `word-list`.
 
 ## Routing & Rendering
 

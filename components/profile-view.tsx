@@ -563,7 +563,7 @@ function ProfileSections({
               key={badge.id}
               className={`flex flex-col gap-1.5 rounded-xl border p-3 transition-colors ${
                 badge.earned
-                  ? "border-amber-200 bg-amber-50/70 dark:border-amber-800 dark:bg-amber-500/10"
+                  ? "animate-pop border-amber-200 bg-amber-50/70 dark:border-amber-800 dark:bg-amber-500/10"
                   : "border-stone-200 bg-stone-50/70 dark:border-stone-800 dark:bg-stone-900/40"
               }`}
             >
