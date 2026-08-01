@@ -20,6 +20,20 @@ selalu disinkronkan saat rilis (lihat `docs/CONTRIBUTING` tidak ada; aturan ada 
 
 ---
 
+## [0.6.0] — 2026-08-02
+
+### Ditambahkan
+- **Kalimat contoh lengkap untuk seluruh kosakata**: setiap kata HSK 1–6 (4.990 kata) kini memiliki contoh kalimat (hanzi + pinyin + arti Bahasa Indonesia) untuk latihan Susun Kalimat & Reading.
+- Latihan **Susun Kalimat** dan **Reading** kini berfungsi untuk **HSK 2–6** (sebelumnya hanya HSK 1 yang memiliki data kalimat).
+
+### Perbaikan
+- Memperbaiki kalimat contoh HSK 6 yang salah/kosong di banyak entry, termasuk blok kata 2251–2300 yang bergeser secara sistematis (+10) dan melengkapi 80 entry yang hilang (kata 671–750).
+
+### Perubahan
+- `lib/hsk/data.ts` dipecah menjadi per-level di `lib/hsk/data/`; contoh kalimat disimpan sebagai field `example*` di setiap kata (`lib/hsk/data/hsk*.ts`) dan digabung dengan bank statis `lib/hsk/sentences.ts` oleh `buildSentenceSource()` di `lib/hsk/exercises.ts`.
+
+---
+
 ## [0.5.0] — 2026-08-01
 
 ### Ditambahkan
