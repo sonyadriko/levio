@@ -20,6 +20,22 @@ selalu disinkronkan saat rilis (lihat `docs/CONTRIBUTING` tidak ada; aturan ada 
 
 ---
 
+## [0.7.0] — 2026-08-02
+
+### Ditambahkan
+- **Audio native** untuk latihan Mendengarkan: proxy TTS di `app/api/tts` (Google Translate TTS → MP3, cache in-memory) diputar lewat `<audio>`, dengan fallback otomatis ke Web Speech API saat offline. Tombol putar ulang kini memakai ikon speaker.
+- **Mode offline (PWA):** service worker `public/sw.js` (network-first untuk navigasi, cache-first untuk aset) + registrasi production-only. Setelah kunjungan pertama, shell aplikasi bisa dibuka tanpa internet.
+- **Paket animasi tanpa dependensi:** confetti pada layar selesai latihan, lingkaran progress SVG (`progress-ring`), counter angka animasi (`useCountUp`) untuk XP & skor, skeleton shimmer saat memuat kartu, efek flame pada streak, dan pop pada badge yang baru diraih.
+
+### Perbaikan
+- Kalimat contoh HSK 5 yang duplikat (`hsk5-172` 措施 kini "这个措施很有效。").
+
+### Perubahan
+- Ikon baru `volume` ditambahkan ke whitelist `IconName` (`lib/nav.ts`) + SVG di `components/icons.tsx`.
+- `lib/use-count-up.ts` menggantikan `useCountUp` lokal di `mock-test`.
+
+---
+
 ## [0.6.0] — 2026-08-02
 
 ### Ditambahkan
