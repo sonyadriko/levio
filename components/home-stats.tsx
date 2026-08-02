@@ -2,16 +2,19 @@
 
 import { useProgress } from "@/components/progress-provider";
 import { useLanguage } from "@/components/language-provider";
+import { useGym } from "@/components/gym/use-gym";
 import { Icon } from "@/components/icons";
 import { useCountUp } from "@/lib/use-count-up";
-import { XP_PER_LEVEL } from "@/lib/progress";
+import { emptyProgress, XP_PER_LEVEL } from "@/lib/progress";
+import { overallStreak } from "@/lib/habits";
 
 export function HomeStats() {
   const { progress } = useProgress();
   const { t } = useLanguage();
+  const { gym } = useGym();
 
   const xp = progress?.xp ?? 0;
-  const streak = progress?.streak ?? 0;
+  const streak = overallStreak(progress ?? emptyProgress(), gym);
   const level = Math.floor(xp / XP_PER_LEVEL) + 1;
   const levelXp = xp % XP_PER_LEVEL;
   const mastered = progress
