@@ -99,10 +99,15 @@ Levio
 ### V2 — Modularitas + Jepang + Kesehatan (bulan ke-5–8)
 - [ ] Refactor modul bahasa → generic "Language Module" (konfigurasi skrip, audio, deck per bahasa)
 - [ ] Bahasa Jepang: kurikulum JLPT N5 (kana → kosakata → kanji)
-- [ ] **Modul Gym (MVP):**
-  - Log workout harian (latihan, set, repetisi, durasi)
-  - Template rutinitas (Push/Pull/Legs, Upper/Lower)
-  - Streak latihan masuk ke sistem XP & kalender yang sama
+- [ ] **Modul Gym (MVP → paritas kompetitor):**
+  - [x] Log workout sesi (latihan, set per-row: beban/reps/done)
+  - [x] Template rutinitas (Push/Pull/Legs PPL, Upper/Lower, Full Body)
+  - [x] Streak latihan masuk ke sistem XP & kalender yang sama (10 XP/sesi, maks 30/hari)
+  - [x] Rest timer per latihan (auto-start, skip, beep + vibrate, durasi pilihan)
+  - [x] Database latihan (56 latihan: browse/cari/filter muscle group) + halaman detail
+  - [x] Grafik progress per latihan (1RM/beban/volume) — rilis 0.10.0
+  - [ ] Sinkronisasi gym ke cloud (Supabase) — saat ini lokal
+  - [ ] Checklist harian "gym" (item workout di Daily Checklist)
 - [ ] Homepage unified: satu checklist "bahasa + gym" per hari
 
 ### V3 — English + Sempurnakan (bulan ke-9–12)
@@ -132,16 +137,26 @@ Levio
 
 ## 6. Fitur Modul Gym (Detail V2)
 
-- **Daily Workout Log:** tanggal, jenis latihan, muscle group, set × reps, beban, durasi, catatan.
-- **Rutinitas template:** buat sendiri atau pakai template (PPL, Upper/Lower, Full Body).
-- **Volume tracker:** total volume mingguan per muscle group (grafik).
-- **Streak gym** terpisah dari streak belajar, tapi XP-nya masuk satu akun.
-- **Reminder:** "Jangan lupa workout hari ini 🔥"
-- Contoh flow:
-  1. Buka dashboard → lihat checklist hari ini
-  2. Ceklis "Latihan 10 kosakata HSK2" ✅
-  3. Ceklis "Gym: Push Day" → form log set/reps/beban → save
-  4. XP masuk, streak naik, kalender terisi
+Status: **MVP selesai (0.9.0) + paritas inti (0.10.0: DB latihan, rest timer, grafik progress).**
+
+✅ **Sudah jalan:**
+- **Workout sesi:** mulai dari template (PPL, Upper/Lower, Full Body) atau sesi bebas; tiap latihan punya set per-row (beban kg, repetisi, centang done).
+- **Rest timer per latihan:** auto-start saat set selesai, durasi pilihan (45–180 dtk, default dari DB), tombol skip, beep (Web Audio) + vibrate saat habis.
+- **Database latihan:** 56 latihan, browse + cari + filter muscle group; halaman detail per latihan (PR, sesi, set, volume, grafik 1RM/beban/volume).
+- **Volume tracker:** total volume mingguan per muscle group.
+- **Streak gym** terpisah dari streak belajar, tapi XP-nya masuk satu akun (10/sesi, maks 30/hari).
+
+⏭️ **Berikutnya (V2 lanjutan):**
+- Sync gym ke cloud (Supabase) bersama XP-nya.
+- Item "Gym" di Daily Checklist + reminder "Jangan lupa workout hari ini 🔥".
+- Program workout terstruktur (durasi, jumlah set/reps target).
+- Grafik volume mingguan per muscle group di dashboard gym.
+
+Contoh flow:
+1. Buka dashboard → lihat checklist hari ini
+2. Ceklis "Latihan 10 kosakata HSK2" ✅
+3. Ceklis "Gym: Push Day" → form log set/reps/beban → save
+4. XP masuk, streak naik, kalender terisi
 
 ---
 

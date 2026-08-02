@@ -40,14 +40,19 @@ app/<route>/           → halaman
 
 > Target desain: **komponen belajar tidak peduli bahasanya**. Mereka hanya menerima `{ id, script, reading, meaning }[]` + callback. Perbedaan bahasa hanya di data & label UI.
 
-## Contoh: Tambah Modul Gym (V2)
+## Contoh: Modul Gym (V2)
 
-1. **Data**: `lib/gym/types.ts` → `WorkoutLog`, `Exercise`, `Routine`. (Skema DB di `docs/data-model.md`.)
-2. **Halaman**: `app/gym/` sudah ada sebagai placeholder → isi dengan:
-   - Log workout harian (form set/reps/beban)
-   - Template rutinitas (Push/Pull/Legs)
-   - Volume tracker
-3. **Integrasi XP**: biarkan `applyReview` untuk kata; untuk gym, panggil `setProgress(...)` via provider dengan XP award sendiri (mis. +20 XP per sesi). Tambahkan API baru di `lib/progress.ts` seperti `applyWorkout(state, log)`.
+Modul gym **sudah berjalan** (rilis 0.9.0–0.10.0). Pola yang dipakai:
+
+1. **Data**: `lib/gym.ts` (model sesi + logika murni) + `lib/gym-exercises.ts` (master data latihan). Skema DB target di `docs/data-model.md`.
+2. **State**: `components/gym/use-gym.ts` — hook `useSyncExternalStore` di atas localStorage `levio.gym.v2` (sesi aktif tersimpan aman saat refresh).
+3. **Halaman**: `app/gym/` (sesi + template + riwayat + volume mingguan), `app/gym/exercises/` (database latihan), `app/gym/exercises/[id]/` (detail + grafik progress).
+4. **Komponen**: `gym-session-form.tsx` (editor sesi: set per-row, rest timer, pemilih latihan dari DB), `gym-log.tsx` (riwayat expandable), `exercise-chart.tsx` (LineChart SVG tanpa dependensi).
+5. **Integrasi XP**: `applyGymXp` di `lib/progress.ts` — 10 XP/sesi (maks 30/hari) masuk ke pool XP **tanpa** menyentuh streak belajar; streak gym dihitung terpisah di `gymStreak`.
+
+Pola menambah modul baru (Jepang, modul kesehatan lain) tetap sama: `lib/<domain>/`
+(logika murni) → `app/<route>/` (halaman) → `components/<domain>-*` (UI client),
+dengan i18n id+en untuk semua teks baru dan `npm run lint`/`build`/`test` lolos.
 
 ## Refactor V2: Generic Language Module
 

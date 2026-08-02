@@ -183,6 +183,65 @@ interface ReminderSettings {
 
 Disimpan lokal (tidak di-sync ke cloud). `components/daily-reminder.tsx` memeriksa tiap 60 detik dan mengirim `Notification` hanya bila sudah lewat `time`, belum dikirim hari ini, dan `activityByDate` hari ini kosong.
 
+### Modul Gym (`levio.gym.v2`)
+
+Disimpan lokal (belum di-sync ke cloud). Sumber kode: `lib/gym.ts`.
+
+```ts
+interface GymState {
+  activeSession: GymSession | null;
+  sessions: GymSession[];
+  xpByDate: Record<string, number>; // XP gym per tanggal ("YYYY-MM-DD") — anti-farming
+}
+
+interface GymSession {
+  id: string;
+  title: string;
+  templateId?: string;        // "push" | "pull" | "legs" | "upper" | "lower" | "full"
+  date: string;               // "YYYY-MM-DD"
+  startedAt: number;          // epoch ms
+  completedAt: number | null;
+  exercises: GymExerciseLog[];
+}
+
+interface GymExerciseLog {
+  id: string;                 // id lokal (UUID)
+  name: string;
+  muscles: MuscleGroup[];     // chest|back|shoulders|arms|legs|core
+  sets: GymSet[];
+  notes: string;
+  exerciseId?: string;        // referensi ke EXERCISE_DB (opsional, data lama tanpa ini)
+  restSeconds?: number;       // durasi istirahat per latihan (opsional)
+}
+
+interface GymSet {
+  weightKg: number;
+  reps: number;
+  done: boolean;
+}
+```
+
+Aturan:
+- **XP gym:** `completeSession` memberi 10 XP/sesi (`GYM_XP_PER_SESSION`), maks 30/hari (`MAX_GYM_XP_PER_DAY`) di `xpByDate`. XP dikirim ke akun via `applyGymXp` (tanpa menyentuh streak belajar).
+- **Estimasi 1RM:** `estOneRepMax(set)` = Epley `weightKg × (1 + reps/30)`, reps di-clamp 0–30.
+- **Progress per latihan:** `exerciseProgressPoints(state, key)` mengagregasi per tanggal sesi (`topWeight`/`est1RM`/`volume`/`sets`); `key` = `exerciseId` **atau** nama bebas-text (case-insensitive) untuk data lama. `topWeight` hanya menghitung set valid (`reps > 0 && weightKg > topWeight`).
+
+#### Database latihan (`lib/gym-exercises.ts`)
+
+Master data 56 latihan (`EXERCISE_DB`), tiap entry:
+
+```ts
+interface ExerciseDef {
+  id: string;         // "bench-press", "squat", dst — dipakai sebagai exerciseId di log
+  nameKey: string;    // kunci i18n "gym.exercise.*"
+  muscles: MuscleGroup[];
+  restSeconds: number; // 45–180 dtk (default rest timer)
+}
+```
+
+- `getExerciseDef(id)` → `ExerciseDef | undefined`; `defaultRestSeconds(def)` → rest dari DB, fallback `DEFAULT_REST_SECONDS = 90`.
+- Template rutin (`ROUTINE_TEMPLATES`) memetakan tiap latihan ke `exerciseId`; `templateSessionDraft` mengisi `exerciseId` + `restSeconds` dari DB saat sesi dimulai.
+
 ## Kontrak Data Kosakata (kode)
 
 ```ts

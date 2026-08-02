@@ -20,6 +20,24 @@ selalu disinkronkan saat rilis (lihat `docs/CONTRIBUTING` tidak ada; aturan ada 
 
 ---
 
+## [0.10.0] — 2026-08-02
+
+### Ditambahkan
+- **Database latihan (56 latihan):** halaman `/gym/exercises` untuk browse + cari + filter muscle group (Dada/Punggung/Bahu/Lengan/Kaki/Perut), menampilkan total sesi & PR (best est. 1RM) per latihan; halaman detail `/gym/exercises/[id]` dengan 4 kartu stat (PR + tanggal, jumlah sesi, total set, volume total), tab metrik **1RM / Beban / Volume**, grafik garis, dan daftar sesi terbaru.
+- **Grafik progress per latihan:** `LineChart` SVG kustom (area gradient + garis teal + titik data, tanpa dependensi) memakai `estOneRepMax` (Epley `beban × (1 + reps/30)`, reps ≤ 30) dan `exerciseProgressPoints` yang mengagregasi per tanggal sesi — key = `exerciseId` atau nama bebas-text (case-insensitive, cocok untuk data lama tanpa exerciseId).
+- **Rest timer per latihan:** durasi istirahat per latihan (45–180 dtk, default dari DB), **auto-start** saat satu set ditandai selesai, countdown mm:ss, tombol **skip**, dan **beep** (Web Audio) + **vibrate** (`navigator.vibrate`) saat waktu habis.
+- **Pemilih latihan dari DB** di form sesi ("Tambah Latihan"): cari + filter muscle group + tombol "Latihan kustom" — latihan ditambahkan dengan `exerciseId` + rest default dari `EXERCISE_DB`.
+- **Link riwayat ke detail:** nama latihan di riwayat sesi kini menaut ke `/gym/exercises/[exerciseId]` + label muscle group.
+
+### Teknis
+- `lib/gym-exercises.ts` (baru): `EXERCISE_DB` (56 entry dengan `id`, `nameKey`, `muscles`, `restSeconds` 45–180), `getExerciseDef`, `defaultRestSeconds` (`DEFAULT_REST_SECONDS = 90`).
+- `GymExerciseLog` mendapat field opsional `exerciseId?: string` & `restSeconds?: number` — data `levio.gym.v2` lama tetap valid (backward-compat; `normalizeExercise` hanya menyimpan `restSeconds` bila > 0).
+- `RoutineExercise` kini wajib punya `exerciseId`; `templateSessionDraft` memetakan `exerciseId` + `restSeconds` dari DB.
+- `lib/gym.ts` + `use-gym.ts`: `addExerciseFromDb`, `setExerciseRest`, `estOneRepMax`, `exerciseProgressPoints`.
+- Perbaikan bug yang ditemukan saat E2E: `exerciseProgressPoints` kini menghitung `topWeight` hanya untuk set valid (`reps > 0 && weightKg > topWeight`) — sebelumnya `topWeight` hanya menjumlah set `done` padahal `est1RM` menghitung semua set.
+
+---
+
 ## [0.9.0] — 2026-08-02
 
 ### Ditambahkan

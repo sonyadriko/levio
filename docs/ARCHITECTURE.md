@@ -49,7 +49,9 @@ app/
 │   └── [level]/page.tsx  → redirect lama /learn/1 → /learn/hsk/1
 ├── practice/page.tsx     → latihan flashcards + link mock test
 ├── mock-test/page.tsx    → simulasi ujian HSK
-├── gym/ page.tsx         → placeholder (V2)
+├── gym/ page.tsx         → modul gym (sesi, template, riwayat, volume mingguan)
+│   ├── exercises/page.tsx   → database latihan (cari + filter muscle group)
+│   └── exercises/[id]/page.tsx → detail per latihan (stat + grafik progress)
 ├── stats/page.tsx        → dashboard statistik (harian/mingguan/bulanan/tahunan)
 └── profile/page.tsx      → profil + preferensi + data (bahasa UI, ekspor/impor/reset)
 
@@ -88,7 +90,12 @@ components/
 ├── service-worker-register.tsx → daftarkan /sw.js untuk offline (client, production only)
 ├── confetti.tsx          → efek confetti ringan (CSS keyframe, tanpa dependensi)
 ├── progress-ring.tsx     → lingkaran progress SVG (stroke-dashoffset)
-└── placeholder-page.tsx  → UI "dalam pengembangan"
+├── placeholder-page.tsx  → UI "dalam pengembangan"
+└── gym/
+    ├── use-gym.ts        → hook state gym (useSyncExternalStore localStorage `levio.gym.v2`)
+    ├── gym-session-form.tsx → editor sesi: ExerciseCard, rest timer, AddExerciseSheet (pemilih DB)
+    ├── gym-log.tsx       → riwayat sesi expandable + link ke halaman detail latihan
+    └── exercise-chart.tsx  → LineChart SVG kustom (tanpa dependensi) untuk progress per latihan
 
 lib/
 ├── nav.ts                → daftar menu navigasi (labelKey — diterjemahkan via i18n)
@@ -101,6 +108,8 @@ lib/
 ├── reminder.ts           → pengaturan pengingat harian (enabled/time, localStorage)
 ├── version.ts            → APP_VERSION + catatan rilis singkat (Profil → "Yang Baru")
 ├── use-count-up.ts       → hook animasi angka (rAF, easeOutCubic) — untuk counter XP/skor
+├── gym.ts                → model & logika murni modul gym (sesi, set, XP, 1RM, progress points)
+├── gym-exercises.ts      → database latihan (EXERCISE_DB: 56 latihan + rest default)
 └── hsk/
     ├── types.ts          → VocabWord, HskLevel, HskLevelMeta
     ├── levels.ts         → metadata level HSK 1–6
@@ -340,11 +349,15 @@ npm run test:watch
 
 Unit test (Vitest) mencakup logika murni di `lib/`: `progress.ts` (merge,
 sanitize, XP tes & cap harian, SRS), `reminder.ts`, `settings.ts`, `badges.ts`,
-dan `date.ts`. Test file di `tests/*.test.ts`; konfigurasi di
-`vitest.config.mts` (alias `@/*` → root proyek).
+`date.ts`, dan `gym.ts` (sesi, template→DB mapping, 1RM Epley, progress points).
+Test file di `tests/*.test.ts`; konfigurasi di `vitest.config.mts` (alias `@/*`
+→ root proyek).
 
 ## Jalan Menuju V2 (Modularitas)
 
 - Refactor domain bahasa ke antarmuka generic (`docs/modules.md`).
 - Perluas sync Supabase ke reset (DELETE cloud) saat user reset progress.
-- Tambah modul gym dengan pola yang sama: `lib/gym/` + halaman + komponen.
+- Modul gym sudah berjalan (sesi, template, rest timer, database latihan,
+  grafik progress per latihan); berikutnya: sinkronisasi gym ke cloud,
+  program/checklist harian gym, dan volume tracker per muscle group yang
+  sudah berjalan dilengkapi grafik mingguan.
