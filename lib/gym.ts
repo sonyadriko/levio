@@ -1,4 +1,5 @@
 import { dateKeyOf, mondayOf, todayKey } from "./date";
+import { defaultRestSeconds, getExerciseDef } from "./gym-exercises";
 
 export const GYM_STORAGE_KEY = "levio.gym.v2";
 export const GYM_XP_PER_SESSION = 10;
@@ -33,6 +34,8 @@ export interface GymExerciseLog {
   muscles: MuscleGroup[];
   sets: GymSet[];
   notes: string;
+  exerciseId?: string;
+  restSeconds?: number;
 }
 
 export interface GymSession {
@@ -58,6 +61,7 @@ export interface MuscleVolume {
 
 export interface RoutineExercise {
   exerciseKey: string;
+  exerciseId: string;
   muscles: MuscleGroup[];
   defaultSets: number;
 }
@@ -115,12 +119,15 @@ function normalizeExercise(raw: Partial<GymExerciseLog>): GymExerciseLog {
         MUSCLE_GROUPS.includes(m as MuscleGroup),
       )
     : [];
+  const restSeconds = toNumber(raw.restSeconds);
   return {
     id: typeof raw.id === "string" ? raw.id : makeId(),
     name: typeof raw.name === "string" ? raw.name : "",
     muscles: Array.from(new Set(muscles)),
     sets,
     notes: typeof raw.notes === "string" ? raw.notes : "",
+    exerciseId: typeof raw.exerciseId === "string" ? raw.exerciseId : undefined,
+    restSeconds: restSeconds > 0 ? restSeconds : undefined,
   };
 }
 
@@ -227,6 +234,8 @@ export function templateSessionDraft(
       muscles: [...ex.muscles],
       sets: Array.from({ length: ex.defaultSets }, emptySet),
       notes: "",
+      exerciseId: ex.exerciseId,
+      restSeconds: defaultRestSeconds(getExerciseDef(ex.exerciseId)),
     })),
   };
 }
@@ -257,6 +266,41 @@ export function addExercise(state: GymState): GymState {
   return updateActive(state, (session) => ({
     ...session,
     exercises: [...session.exercises, emptyExercise()],
+  }));
+}
+
+export function addExerciseFromDb(
+  state: GymState,
+  exerciseId: string,
+  name: string,
+  muscles: MuscleGroup[],
+  restSeconds: number,
+): GymState {
+  return updateActive(state, (session) => ({
+    ...session,
+    exercises: [
+      ...session.exercises,
+      {
+        id: makeId(),
+        name,
+        muscles: Array.from(new Set(muscles)),
+        sets: [emptySet()],
+        notes: "",
+        exerciseId,
+        restSeconds: restSeconds > 0 ? restSeconds : undefined,
+      },
+    ],
+  }));
+}
+
+export function setExerciseRest(
+  state: GymState,
+  exerciseId: string,
+  restSeconds: number,
+): GymState {
+  return updateExercise(state, exerciseId, (ex) => ({
+    ...ex,
+    restSeconds: restSeconds > 0 ? restSeconds : undefined,
   }));
 }
 
@@ -391,6 +435,73 @@ export function exerciseVolume(exercise: GymExerciseLog): number {
   );
 }
 
+// Estimasi 1RM (Epley: beban × (1 + reps/30)). Reps dibatasi agar stabil di
+// rentang repetisi tinggi. Kembali 0 bila set tidak valid/berat nol.
+export function estOneRepMax(set: GymSet): number {
+  const reps = Math.min(Math.max(0, set.reps), 30);
+  if (reps <= 0 || set.weightKg <= 0) return 0;
+  return set.weightKg * (1 + reps / 30);
+}
+
+export interface ExerciseProgressPoint {
+  date: string;
+  topWeight: number;
+  est1RM: number;
+  volume: number;
+  sets: number;
+}
+
+function matchesExercise(exercise: GymExerciseLog, key: string): boolean {
+  if (exercise.exerciseId) return exercise.exerciseId === key;
+  return exercise.name.trim().toLowerCase() === key.trim().toLowerCase();
+}
+
+// Poin progress per tanggal sesi untuk satu latihan. `key` = exerciseId atau
+// nama bebas-text (case-insensitive). Set kosong diabaikan.
+export function exerciseProgressPoints(
+  state: GymState,
+  key: string,
+): ExerciseProgressPoint[] {
+  const trimmed = key.trim();
+  if (!trimmed) return [];
+
+  const byDate = new Map<string, ExerciseProgressPoint>();
+  for (const session of state.sessions) {
+    const matched = session.exercises.filter((ex) => matchesExercise(ex, trimmed));
+    if (matched.length === 0) continue;
+
+    let topWeight = 0;
+    let best1RM = 0;
+    let volume = 0;
+    let sets = 0;
+
+    for (const exercise of matched) {
+      for (const set of exercise.sets) {
+        if (set.weightKg > 0 || set.reps > 0 || set.done) {
+          volume += set.weightKg * set.reps;
+          sets += 1;
+        }
+        const oneRM = estOneRepMax(set);
+        if (oneRM > best1RM) best1RM = oneRM;
+        if (set.reps > 0 && set.weightKg > topWeight) topWeight = set.weightKg;
+      }
+    }
+
+    const previous = byDate.get(session.date);
+    if (previous) {
+      topWeight = Math.max(previous.topWeight, topWeight);
+      best1RM = Math.max(previous.est1RM, best1RM);
+      volume += previous.volume;
+      sets += previous.sets;
+    }
+    byDate.set(session.date, { date: session.date, topWeight, est1RM: best1RM, volume, sets });
+  }
+
+  return Array.from(byDate.values()).sort((a, b) =>
+    a.date.localeCompare(b.date),
+  );
+}
+
 export function sessionVolume(session: GymSession): number {
   return session.exercises.reduce(
     (sum, ex) => sum + exerciseVolume(ex),
@@ -466,66 +577,66 @@ export const ROUTINE_TEMPLATES: RoutineTemplate[] = [
     id: "push",
     nameKey: "gym.template.push",
     exercises: [
-      { exerciseKey: "gym.exercise.benchPress", muscles: ["chest"], defaultSets: 3 },
-      { exerciseKey: "gym.exercise.shoulderPress", muscles: ["shoulders"], defaultSets: 3 },
-      { exerciseKey: "gym.exercise.inclinePress", muscles: ["chest"], defaultSets: 3 },
-      { exerciseKey: "gym.exercise.tricepsExtension", muscles: ["arms"], defaultSets: 3 },
-      { exerciseKey: "gym.exercise.lateralRaise", muscles: ["shoulders"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.benchPress", exerciseId: "bench-press", muscles: ["chest"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.shoulderPress", exerciseId: "shoulder-press", muscles: ["shoulders"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.inclinePress", exerciseId: "incline-press", muscles: ["chest"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.tricepsExtension", exerciseId: "triceps-extension", muscles: ["arms"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.lateralRaise", exerciseId: "lateral-raise", muscles: ["shoulders"], defaultSets: 3 },
     ],
   },
   {
     id: "pull",
     nameKey: "gym.template.pull",
     exercises: [
-      { exerciseKey: "gym.exercise.deadlift", muscles: ["back"], defaultSets: 3 },
-      { exerciseKey: "gym.exercise.latPulldown", muscles: ["back"], defaultSets: 3 },
-      { exerciseKey: "gym.exercise.rows", muscles: ["back"], defaultSets: 3 },
-      { exerciseKey: "gym.exercise.bicepsCurl", muscles: ["arms"], defaultSets: 3 },
-      { exerciseKey: "gym.exercise.facePull", muscles: ["shoulders"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.deadlift", exerciseId: "deadlift", muscles: ["back"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.latPulldown", exerciseId: "lat-pulldown", muscles: ["back"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.rows", exerciseId: "barbell-rows", muscles: ["back"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.bicepsCurl", exerciseId: "biceps-curl", muscles: ["arms"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.facePull", exerciseId: "face-pull", muscles: ["shoulders"], defaultSets: 3 },
     ],
   },
   {
     id: "legs",
     nameKey: "gym.template.legs",
     exercises: [
-      { exerciseKey: "gym.exercise.squat", muscles: ["legs"], defaultSets: 3 },
-      { exerciseKey: "gym.exercise.legPress", muscles: ["legs"], defaultSets: 3 },
-      { exerciseKey: "gym.exercise.romanianDeadlift", muscles: ["legs"], defaultSets: 3 },
-      { exerciseKey: "gym.exercise.lunges", muscles: ["legs"], defaultSets: 3 },
-      { exerciseKey: "gym.exercise.calfRaise", muscles: ["legs"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.squat", exerciseId: "squat", muscles: ["legs"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.legPress", exerciseId: "leg-press", muscles: ["legs"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.romanianDeadlift", exerciseId: "romanian-deadlift", muscles: ["legs"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.lunges", exerciseId: "lunges", muscles: ["legs"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.calfRaise", exerciseId: "calf-raise", muscles: ["legs"], defaultSets: 3 },
     ],
   },
   {
     id: "upper",
     nameKey: "gym.template.upper",
     exercises: [
-      { exerciseKey: "gym.exercise.benchPress", muscles: ["chest"], defaultSets: 3 },
-      { exerciseKey: "gym.exercise.latPulldown", muscles: ["back"], defaultSets: 3 },
-      { exerciseKey: "gym.exercise.shoulderPress", muscles: ["shoulders"], defaultSets: 3 },
-      { exerciseKey: "gym.exercise.bicepsCurl", muscles: ["arms"], defaultSets: 3 },
-      { exerciseKey: "gym.exercise.tricepsExtension", muscles: ["arms"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.benchPress", exerciseId: "bench-press", muscles: ["chest"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.latPulldown", exerciseId: "lat-pulldown", muscles: ["back"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.shoulderPress", exerciseId: "shoulder-press", muscles: ["shoulders"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.bicepsCurl", exerciseId: "biceps-curl", muscles: ["arms"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.tricepsExtension", exerciseId: "triceps-extension", muscles: ["arms"], defaultSets: 3 },
     ],
   },
   {
     id: "lower",
     nameKey: "gym.template.lower",
     exercises: [
-      { exerciseKey: "gym.exercise.squat", muscles: ["legs"], defaultSets: 3 },
-      { exerciseKey: "gym.exercise.romanianDeadlift", muscles: ["legs"], defaultSets: 3 },
-      { exerciseKey: "gym.exercise.lunges", muscles: ["legs"], defaultSets: 3 },
-      { exerciseKey: "gym.exercise.calfRaise", muscles: ["legs"], defaultSets: 3 },
-      { exerciseKey: "gym.exercise.plank", muscles: ["core"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.squat", exerciseId: "squat", muscles: ["legs"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.romanianDeadlift", exerciseId: "romanian-deadlift", muscles: ["legs"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.lunges", exerciseId: "lunges", muscles: ["legs"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.calfRaise", exerciseId: "calf-raise", muscles: ["legs"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.plank", exerciseId: "plank", muscles: ["core"], defaultSets: 3 },
     ],
   },
   {
     id: "full",
     nameKey: "gym.template.full",
     exercises: [
-      { exerciseKey: "gym.exercise.squat", muscles: ["legs"], defaultSets: 3 },
-      { exerciseKey: "gym.exercise.benchPress", muscles: ["chest"], defaultSets: 3 },
-      { exerciseKey: "gym.exercise.rows", muscles: ["back"], defaultSets: 3 },
-      { exerciseKey: "gym.exercise.shoulderPress", muscles: ["shoulders"], defaultSets: 3 },
-      { exerciseKey: "gym.exercise.plank", muscles: ["core"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.squat", exerciseId: "squat", muscles: ["legs"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.benchPress", exerciseId: "bench-press", muscles: ["chest"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.rows", exerciseId: "barbell-rows", muscles: ["back"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.shoulderPress", exerciseId: "shoulder-press", muscles: ["shoulders"], defaultSets: 3 },
+      { exerciseKey: "gym.exercise.plank", exerciseId: "plank", muscles: ["core"], defaultSets: 3 },
     ],
   },
 ];

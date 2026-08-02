@@ -1,11 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
   addExercise,
+  addExerciseFromDb,
   addSet,
   cancelSession,
   completeSession,
   deleteSession,
   emptyGym,
+  estOneRepMax,
+  exerciseProgressPoints,
   exerciseVolume,
   gymStreak,
   groupSessionsByDate,
@@ -19,6 +22,7 @@ import {
   sessionsThisWeek,
   setActiveSessionTitle,
   setExerciseMuscles,
+  setExerciseRest,
   startSession,
   templateSessionDraft,
   toggleMuscle,
@@ -29,6 +33,7 @@ import {
   type GymState,
 } from "../lib/gym";
 import { GYM_XP_PER_SESSION } from "../lib/gym";
+import { getExerciseDef } from "../lib/gym-exercises";
 
 function exercise(name: string, sets: Partial<GymSet>[] = []): GymExerciseLog {
   return {
@@ -84,6 +89,31 @@ describe("startSession", () => {
   it("templateSessionDraft tanpa template menghasilkan draf kosong", () => {
     const draft = templateSessionDraft(undefined, (key) => key);
     expect(draft.exercises).toEqual([]);
+  });
+
+  it("templateSessionDraft memetakan exerciseId & restSeconds dari database", () => {
+    const draft = templateSessionDraft("push", (key) => key);
+    expect(draft.exercises[0].exerciseId).toBe("bench-press");
+    expect(draft.exercises[0].restSeconds).toBe(
+      getExerciseDef("bench-press")?.restSeconds,
+    );
+  });
+
+  it("addExerciseFromDb membuat latihan dari entri database", () => {
+    const state = addExerciseFromDb(startedSession(), "squat", "Squat", ["legs"], 180);
+    const added = state.activeSession!.exercises[2];
+    expect(added.exerciseId).toBe("squat");
+    expect(added.name).toBe("Squat");
+    expect(added.muscles).toEqual(["legs"]);
+    expect(added.restSeconds).toBe(180);
+    expect(added.sets).toHaveLength(1);
+  });
+
+  it("setExerciseRest mengubah durasi istirahat latihan", () => {
+    const state = startedSession();
+    const exId = state.activeSession!.exercises[0].id;
+    const updated = setExerciseRest(state, exId, 120);
+    expect(updated.activeSession!.exercises[0].restSeconds).toBe(120);
   });
 });
 
@@ -218,6 +248,76 @@ describe("volume", () => {
     const volumes = weeklyVolume(done);
     const chest = volumes.find((v) => v.muscleGroup === "chest");
     expect(chest?.volume).toBe(60 * 10 + 60 * 8);
+  });
+});
+
+describe("estOneRepMax / exerciseProgressPoints", () => {
+  it("estOneRepMax menerapkan rumus Epley", () => {
+    expect(estOneRepMax({ weightKg: 100, reps: 10, done: true })).toBeCloseTo(100 * (1 + 10 / 30));
+    expect(estOneRepMax({ weightKg: 100, reps: 0, done: true })).toBe(0);
+    expect(estOneRepMax({ weightKg: 0, reps: 10, done: true })).toBe(0);
+  });
+
+  it("exerciseProgressPoints menggabungkan latihan per tanggal (via exerciseId)", () => {
+    const base: GymState = {
+      activeSession: null,
+      xpByDate: {},
+      sessions: [
+        {
+          id: makeId(),
+          title: "A",
+          date: "2026-08-01",
+          startedAt: 0,
+          completedAt: 0,
+          exercises: [
+            { ...exercise("Bench Press", [{ weightKg: 60, reps: 10, done: true }]), exerciseId: "bench-press" },
+          ],
+        },
+        {
+          id: makeId(),
+          title: "B",
+          date: "2026-08-03",
+          startedAt: 0,
+          completedAt: 0,
+          exercises: [
+            { ...exercise("Bench Press", [{ weightKg: 70, reps: 5, done: true }]), exerciseId: "bench-press" },
+          ],
+        },
+      ],
+    };
+    const points = exerciseProgressPoints(base, "bench-press");
+    expect(points).toHaveLength(2);
+    expect(points[0].date).toBe("2026-08-01");
+    expect(points[0].topWeight).toBe(60);
+    expect(points[0].est1RM).toBeCloseTo(60 * (1 + 10 / 30));
+    expect(points[1].date).toBe("2026-08-03");
+    expect(points[1].topWeight).toBe(70);
+    expect(points[1].volume).toBe(70 * 5);
+    expect(points[1].sets).toBe(1);
+  });
+
+  it("exerciseProgressPoints mencocokkan nama bebas-text (tanpa exerciseId)", () => {
+    const base: GymState = {
+      activeSession: null,
+      xpByDate: {},
+      sessions: [
+        {
+          id: makeId(),
+          title: "A",
+          date: "2026-08-01",
+          startedAt: 0,
+          completedAt: 0,
+          exercises: [exercise("squat", [{ weightKg: 100, reps: 5, done: true }])],
+        },
+      ],
+    };
+    const points = exerciseProgressPoints(base, "SQUAT");
+    expect(points).toHaveLength(1);
+    expect(points[0].est1RM).toBeCloseTo(100 * (1 + 5 / 30));
+  });
+
+  it("exerciseProgressPoints mengabaikan key kosong", () => {
+    expect(exerciseProgressPoints(emptyGym(), "  ")).toEqual([]);
   });
 });
 
