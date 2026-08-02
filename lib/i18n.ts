@@ -42,6 +42,8 @@ const dict: Record<Locale, Record<string, string>> = {
     "checklist.xp.meta": "Aktivitas",
     "checklist.test.label": "Mock test HSK {level}",
     "checklist.test.meta": "Simulasi ujian",
+    "checklist.gym.label": "Workout hari ini",
+    "checklist.gym.meta": "Gym",
 
     "learn.title": "Belajar HSK",
     "learn.subtitle": "Pilih level — {n} kosakata tersedia untuk saat ini.",
@@ -527,6 +529,7 @@ const dict: Record<Locale, Record<string, string>> = {
     "reminder.unsupported": "Browser ini tidak mendukung notifikasi.",
     "reminder.notifyTitle": "Levio",
     "reminder.notifyBody": "Jangan lupa belajar HSK hari ini! 🔥",
+    "reminder.gymNotifyBody": "Jangan lupa workout hari ini! 🔥",
 
     "badge.title": "Penghargaan",
     "badge.subtitle": "{earned}/{total} penghargaan diraih",
@@ -590,6 +593,8 @@ const dict: Record<Locale, Record<string, string>> = {
     "checklist.xp.meta": "Activity",
     "checklist.test.label": "Mock test HSK {level}",
     "checklist.test.meta": "Exam simulation",
+    "checklist.gym.label": "Workout today",
+    "checklist.gym.meta": "Gym",
 
     "learn.title": "Learn HSK",
     "learn.subtitle": "Pick a level — {n} words available so far.",
@@ -1075,6 +1080,7 @@ const dict: Record<Locale, Record<string, string>> = {
     "reminder.unsupported": "This browser doesn't support notifications.",
     "reminder.notifyTitle": "Levio",
     "reminder.notifyBody": "Don't forget to study HSK today! 🔥",
+    "reminder.gymNotifyBody": "Don't forget your workout today! 🔥",
 
     "badge.title": "Badges",
     "badge.subtitle": "{earned}/{total} badges earned",

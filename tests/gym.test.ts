@@ -28,6 +28,7 @@ import {
   toggleMuscle,
   updateSet,
   weeklyVolume,
+  workoutDoneOn,
   type GymExerciseLog,
   type GymSet,
   type GymState,
@@ -369,6 +370,18 @@ describe("gymStreak / sessionsThisWeek / groupSessionsByDate", () => {
     const groups = groupSessionsByDate(state);
     expect(groups[0].date).toBe("2026-08-02");
     expect(groups[0].sessions).toHaveLength(1);
+  });
+});
+
+describe("workoutDoneOn", () => {
+  it("false bila tidak ada sesi pada tanggal itu", () => {
+    const { state } = completeSession(startedSession());
+    expect(workoutDoneOn(state, d(1))).toBe(false);
+  });
+
+  it("true bila ada sesi selesai pada tanggal itu", () => {
+    const { state } = completeSession(startedSession());
+    expect(workoutDoneOn(state, d(0))).toBe(true);
   });
 });
 
