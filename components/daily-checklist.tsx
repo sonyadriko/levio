@@ -15,6 +15,7 @@ export function DailyChecklist() {
   const activity = progress?.activityByDate ?? {};
   const today = activity[todayKey()] ?? { xp: 0, reviews: 0, tests: 0, newWords: 0 };
   const { vocab, reviews: reviewTarget, xp: xpTarget } = settings.dailyTargets;
+  const level = progress?.unlockedUpTo ?? 1;
 
   const tasks: {
     labelKey: string;
@@ -22,11 +23,11 @@ export function DailyChecklist() {
     metaKey: string;
     done: boolean;
     href: string;
-    icon: "book" | "pen" | "chart" | "dumbbell";
+    icon: "book" | "pen" | "chart";
   }[] = [
     {
       labelKey: "checklist.learn.label",
-      vars: { n: vocab },
+      vars: { n: vocab, level },
       metaKey: "checklist.learn.meta",
       done: (today.newWords ?? 0) >= vocab,
       href: "/learn",
@@ -50,19 +51,11 @@ export function DailyChecklist() {
     },
     {
       labelKey: "checklist.test.label",
-      vars: {},
+      vars: { level },
       metaKey: "checklist.test.meta",
       done: today.tests >= 1,
       href: "/mock-test",
       icon: "chart" as const,
-    },
-    {
-      labelKey: "checklist.gym.label",
-      vars: {},
-      metaKey: "checklist.gym.meta",
-      done: false,
-      href: "/gym",
-      icon: "dumbbell" as const,
     },
   ];
   const doneCount = tasks.filter((task) => task.done).length;

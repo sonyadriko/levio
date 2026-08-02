@@ -19,8 +19,9 @@ Rencana produk lengkap: [`PLAN.md`](./PLAN.md).
 - 🌐 **Bilingual (ID/EN)** — ganti bahasa UI kapan saja via halaman Profil; pilihan tersimpan di browser
 - 🌗 **Tema terang/gelap/otomatis** — dari halaman Profil; tanpa flash saat reload
 - ⚡ **XP, level, streak** — tersimpan di browser (localStorage), muncul di dashboard
-- ☁️ **Akun & sync cloud** — login email/password, progress otomatis di-upload/download; tetap jalan offline tanpa koneksi
+- ☁️ **Akun & sync cloud** — login email/password, progress otomatis di-upload/download; tetap jalan offline tanpa koneksi; **lupa kata sandi** (reset via email)
 - ✅ **Checklist harian** — target kosakata, review SRS, XP harian, & mock test dalam satu halaman
+- 🛡️ **Keamanan** — Content-Security-Policy & header keamanan (X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy), limit rate pada API sintesis suara, dan whitelist bahasa
 - 🏷️ **Versioning** — versi aplikasi & "Yang Baru" tampil di Profil (`lib/version.ts` + `CHANGELOG.md`)
 - 🎞️ **Animasi halus** — kartu, transisi halaman (View Transitions), mikro-interaksi — tanpa dependensi tambahan
 - 📱 **Mobile-first responsive** — bottom nav di hp, sidebar di desktop, PWA-ready
@@ -42,8 +43,11 @@ Menu: **Home · Belajar · Gym · Statistik · Profil** (flashcard & mock test b
 | [`docs/data-model.md`](./docs/data-model.md) | Skema DB (target) & state localStorage |
 | [`docs/hsk-curriculum.md`](./docs/hsk-curriculum.md) | Standar & cara menambah kosakata HSK |
 | [`docs/modules.md`](./docs/modules.md) | Pola menambah bahasa/modul baru |
+| [`docs/BUGS.md`](./docs/BUGS.md) | Analisis potensi bug (audit kode) |
+| [`docs/SECURITY.md`](./docs/SECURITY.md) | Analisis & checklist keamanan |
 | [`CHANGELOG.md`](./CHANGELOG.md) | Riwayat rilis per versi |
 | [`CONTRIBUTING.md`](./CONTRIBUTING.md) | Aturan berkontribusi |
+| [`SOUL.md`](./SOUL.md) | Persona & cara kerja asisten (Esther) |
 
 ## Struktur
 
@@ -84,4 +88,4 @@ Tanpa `.env.local`, aplikasi tetap berjalan penuh dalam mode offline.
 
 - **V1:** HSK + gamifikasi + habit ✅ (dasar; kosakata lengkap menyusul)
 - **V2:** Bahasa Jepang (JLPT) + modul Gym
-- **V3:** English + polish + monetisasi
+- **V3:** English + polish + monetisasi (donasi via mayar.id)

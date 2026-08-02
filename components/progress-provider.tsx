@@ -17,6 +17,7 @@ import {
   applyXp,
   emptyProgress,
   loadProgress,
+  mergeProgress,
   PROGRESS_STORAGE_KEY,
   sanitizeProgress,
   saveProgress,
@@ -36,7 +37,7 @@ import {
 interface ProgressContextValue {
   progress: ProgressState;
   recordReview: (word: VocabWord, correct: boolean) => void;
-  recordTest: (correct: number, total: number) => void;
+  recordTest: (correct: number, total: number) => number;
   recordLevelPass: (level: number) => void;
   awardXp: (xp: number) => void;
   resetProgress: () => Promise<boolean>;
@@ -83,8 +84,10 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
     setProgress(applyReview(getSnapshot(), word, correct));
   }, []);
 
-  const recordTest = useCallback((correct: number, total: number) => {
-    setProgress(applyTest(getSnapshot(), correct, total));
+  const recordTest = useCallback((correct: number, total: number): number => {
+    const { state, awarded } = applyTest(getSnapshot(), correct, total);
+    setProgress(state);
+    return awarded;
   }, []);
 
   const recordLevelPass = useCallback((level: number) => {
@@ -116,6 +119,12 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
       // Bersihkan baris cloud yang tidak ada di file import, lalu push ulang.
       const deleted = await deleteAllData(client, userId);
       void pushProgress(client, userId, next);
+      // Tandai akun yang pernah import (S6) agar integritas gamifikasi terjaga
+      // bila nanti ada leaderboard/peringkat.
+      await client.from("profiles").upsert({
+        user_id: userId,
+        imported_at: new Date().toISOString(),
+      });
       return deleted;
     },
     [user?.id],
@@ -155,7 +164,10 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
           // Jangan timpa aktivitas lokal yang terjadi selama pull berjalan
           // (mis. review saat jaringan lambat) dengan snapshot cloud stale.
           if (!cancelled && cloud && getSnapshot() === localAtStart) {
-            setProgress(cloud);
+            // Merge dua arah: gabungkan progress lokal (mis. perangkat kedua
+            // yang jarang login) dengan data cloud, bukan cloud menang total.
+            const local = getSnapshot();
+            setProgress(hasLocalData(local) ? mergeProgress(local, cloud) : cloud);
           }
         } else if (hasLocalData(getSnapshot())) {
           await pushProgress(client, userId, getSnapshot());
@@ -178,10 +190,12 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
 
   // Sinkronkan perubahan ke cloud saat login (debounce). `pullDoneCount`
   // membuat efek ini berjalan ulang begitu pull selesai, sehingga aktivitas
-  // lokal yang terjadi selama pull tetap ikut ter-push.
+  // lokal yang terjadi selama pull tetap ikut ter-push. Push dilewati saat
+  // state kosong agar reset progress tidak membuat ulang profil kosong (B9).
   useEffect(() => {
     const userId = user?.id;
     if (!userId || !pullDone.current) return;
+    if (!hasLocalData(getSnapshot())) return;
     const client = getSupabaseBrowserClient();
     if (!client) return;
 

@@ -29,6 +29,14 @@ export function SentenceBuilder() {
   const [level, setLevel] = useState<HskLevel>(1);
   const words = useLevelWords(level);
 
+  const questionCount = useMemo(
+    () =>
+      words.length > 0
+        ? generateOrderQuestions(words, level, SESSION_SIZE).length
+        : 0,
+    [words, level],
+  );
+
   const [session, setSession] = useState<OrderQuestion[] | null>(null);
   const [index, setIndex] = useState(0);
   const [correct, setCorrect] = useState(0);
@@ -71,8 +79,6 @@ export function SentenceBuilder() {
 
   if (!session || done) {
     const available = words.length > 0;
-    const questionCount =
-      words.length > 0 ? generateOrderQuestions(words, level, SESSION_SIZE).length : 0;
     return (
       <section className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">

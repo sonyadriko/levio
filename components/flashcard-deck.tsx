@@ -28,6 +28,11 @@ export function FlashcardDeck() {
   const [level, setLevel] = useState<HskLevel>(1);
   const [flipped, setFlipped] = useState(false);
   const submitting = useRef(false);
+  const dragStartX = useRef<number | null>(null);
+  const dragging = useRef(false);
+  const suppressClick = useRef(false);
+  const [dragX, setDragX] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
   const [session, setSession] = useState<{
     deck: VocabWord[];
     index: number;
@@ -67,6 +72,43 @@ export function FlashcardDeck() {
     queueMicrotask(() => {
       submitting.current = false;
     });
+  };
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    dragStartX.current = e.clientX;
+    dragging.current = false;
+    suppressClick.current = false;
+    setDragX(0);
+    setIsDragging(true);
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (dragStartX.current === null) return;
+    const dx = e.clientX - dragStartX.current;
+    if (!dragging.current && Math.abs(dx) > 8) {
+      dragging.current = true;
+    }
+    if (dragging.current) {
+      setDragX(dx);
+    }
+  };
+
+  const onPointerUp = () => {
+    if (!dragging.current || dragStartX.current === null) {
+      dragStartX.current = null;
+      setIsDragging(false);
+      return;
+    }
+    const dx = dragX;
+    dragStartX.current = null;
+    dragging.current = false;
+    setIsDragging(false);
+    setDragX(0);
+    if (Math.abs(dx) > 80) {
+      suppressClick.current = true;
+      answer(dx > 0);
+    }
   };
 
   if (!session) {
@@ -174,10 +216,37 @@ export function FlashcardDeck() {
       <div key={word.id} className="animate-card-in">
         <button
           type="button"
-          onClick={() => setFlipped((f) => !f)}
+          onClick={() => {
+            if (suppressClick.current) {
+              suppressClick.current = false;
+              return;
+            }
+            setFlipped((f) => !f);
+          }}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerUp}
+          onPointerLeave={() => {
+            if (dragging.current) onPointerUp();
+          }}
           aria-label={t(flipped ? "deck.tapBack" : "deck.tapFlip")}
-          className="relative block h-72 w-full [perspective:1000px]"
+          className="relative block h-72 w-full cursor-grab touch-pan-y select-none [perspective:1000px] active:cursor-grabbing"
+          style={{
+            transform: `translateX(${dragX}px)`,
+            transition: isDragging ? "none" : "transform 250ms ease-out",
+          }}
         >
+          {dragX < -12 && (
+            <span className="pointer-events-none absolute inset-0 z-10 flex items-start justify-end rounded-2xl bg-red-500/10 p-4 text-sm font-bold text-red-600 dark:text-red-400">
+              {t("deck.notMemorized")}
+            </span>
+          )}
+          {dragX > 12 && (
+            <span className="pointer-events-none absolute inset-0 z-10 flex items-start justify-start rounded-2xl bg-emerald-500/10 p-4 text-sm font-bold text-emerald-600 dark:text-emerald-400">
+              {t("deck.memorized")}
+            </span>
+          )}
           <span
             className="absolute inset-0 transition-transform duration-500 [transform-style:preserve-3d]"
             style={{ transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)" }}
@@ -214,7 +283,11 @@ export function FlashcardDeck() {
       </div>
 
       {flipped && (
-        <div className="grid grid-cols-2 gap-3">
+        <>
+          <p className="text-center text-xs text-stone-400">
+            {t("deck.swipeHint")}
+          </p>
+          <div className="grid grid-cols-2 gap-3">
           <button
             onClick={() => answer(false)}
             className="flex h-14 items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white text-sm font-semibold text-stone-600 transition-colors hover:border-red-300 hover:text-red-600 active:scale-[0.97] dark:border-stone-800 dark:bg-stone-950 dark:text-stone-300"
@@ -229,7 +302,8 @@ export function FlashcardDeck() {
             <Icon name="check" className="h-5 w-5" />
             {t("deck.memorized")}
           </button>
-        </div>
+          </div>
+        </>
       )}
     </div>
   );

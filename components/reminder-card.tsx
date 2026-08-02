@@ -5,6 +5,7 @@ import { useLanguage } from "@/components/language-provider";
 import {
   canNotify,
   DEFAULT_REMINDER,
+  isValidTime,
   loadReminder,
   REMINDER_STORAGE_KEY,
   saveReminder,
@@ -81,7 +82,7 @@ export function ReminderCard() {
   };
 
   const setTime = (time: string) => {
-    if (!/^\d{2}:\d{2}$/.test(time)) return;
+    if (!isValidTime(time)) return;
     setReminder({ ...settings, time });
   };
 

@@ -12,6 +12,13 @@ export const DEFAULT_REMINDER: ReminderSettings = {
   lastSentKey: null,
 };
 
+// Validasi format dan rentang "HH:MM" (jam 00-23, menit 00-59).
+export function isValidTime(time: string): boolean {
+  if (!/^\d{2}:\d{2}$/.test(time)) return false;
+  const [h, m] = time.split(":").map(Number);
+  return h >= 0 && h <= 23 && m >= 0 && m <= 59;
+}
+
 export function loadReminder(): ReminderSettings {
   if (typeof window === "undefined") return DEFAULT_REMINDER;
   try {
@@ -20,7 +27,7 @@ export function loadReminder(): ReminderSettings {
     const parsed = JSON.parse(raw) as Partial<ReminderSettings>;
     return {
       enabled: parsed.enabled === true,
-      time: /^\d{2}:\d{2}$/.test(parsed.time ?? "")
+      time: isValidTime(parsed.time ?? "")
         ? (parsed.time as string)
         : DEFAULT_REMINDER.time,
       lastSentKey:

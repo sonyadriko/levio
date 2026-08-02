@@ -20,6 +20,31 @@ selalu disinkronkan saat rilis (lihat `docs/CONTRIBUTING` tidak ada; aturan ada 
 
 ---
 
+## [0.8.0] — 2026-08-02
+
+### Ditambahkan
+- **Lupa kata sandi** — mode "Lupa sandi" di kartu login (`AuthCard`) mengirim tautan reset via email; halaman `/auth/reset-password` untuk menetapkan sandi baru; tipe `recovery` pada callback auth diarahkan ke halaman tersebut.
+- **Keamanan:** Content-Security-Policy + header keamanan (`X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, `Permissions-Policy`, HSTS di produksi) via `next.config.ts`; skrip tema dipindah ke `public/theme-init.js` agar tetap bekerja tanpa flash di bawah CSP.
+- **Rate limit & whitelist bahasa** pada API TTS (`/api/tts`): maksimal 60 request/menit per IP + hanya `zh-CN`/`en`/`id`.
+
+### Perbaikan
+- **Sync cloud:** hapus baris `daily_activity`/`word_progress` basi per-chunk saat import/progress (B4/B9); state baru `testXpByDate` ikut di-merge saat login (B3); tekan push jika data lokal masih default (mencegah profil kosong dibuat ulang).
+- **XP tes harian:** cap XP dari mock/level-test di `testXpByDate` (maks 200/hari) — tampilan XP kini memakai XP yang benar-benar diberikan (B5).
+- **Pelajaran:** review kata salah langsung dijadwalkan ulang di tiap percobaan (B2); kartu flashcard tidak tersangkut setelah swipe (B1).
+- **Checklist harian** tidak lagi menampilkan item Gym; label tes mengikuti level terbuka (B6).
+- **HSK 6** tidak menampilkan tombol wisuda; hanya kartu "level tertinggi" (B14).
+- **Pengingat harian:** validasi jam (00–23/00–59) agar tidak membuat notifikasi tak terjadwal (B7).
+- **Robustness:** `sanitizeProgress` memotong nilai negatif (B8); pertanyaan latihan distabilkan dengan `useMemo` & builder di luar komponen (B10); versi service worker `levio-shell-v2` + pembersihan cache aset lama (B11).
+- `testXp` mengembalikan 0 bila total soal 0 (defensif, ditemukan lewat unit test).
+
+### Keamanan
+- `safeNext` pada `app/auth/callback` memblokir `next` non-internal (open-redirect) dan mengarahkan `recovery` ke halaman reset.
+
+### Teknis
+- Migrasi Supabase baru: `0005_add_imported_at.sql` (kolom `imported_at` di `profiles`) — jalankan berurutan setelah 0004.
+
+---
+
 ## [0.7.0] — 2026-08-02
 
 ### Ditambahkan

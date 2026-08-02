@@ -5,7 +5,7 @@ import { useProgress } from "@/components/progress-provider";
 import { useLanguage } from "@/components/language-provider";
 import { Icon } from "@/components/icons";
 import { ProgressBar } from "@/components/progress-bar";
-import { MIN_PASS_PCT, MAX_HSK_LEVEL, testXp } from "@/lib/progress";
+import { MIN_PASS_PCT, MAX_HSK_LEVEL } from "@/lib/progress";
 import { useLevelWords } from "@/lib/hsk/use-level-words";
 import {
   generateMockTest,
@@ -63,12 +63,12 @@ export function LevelTest({
     const correct = questions.filter((q) => answers[q.id] === q.answer).length;
     const total = questions.length;
     const pct = Math.round((correct / total) * 100);
-    recordTest(correct, total);
+    const xp = recordTest(correct, total);
     setResult({
       correct,
       total,
       pct,
-      xp: testXp(correct, total),
+      xp,
       answers,
       questions,
     });

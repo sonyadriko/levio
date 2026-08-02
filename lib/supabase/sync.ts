@@ -36,6 +36,44 @@ export function hasCloudData(profile: ProfileRow | null): boolean {
   );
 }
 
+const DELETE_CHUNK = 900;
+
+// Hapus baris cloud milik user yang tidak ada lagi di state (mis. setelah
+// import dataset lebih kecil atau reset kata). Dijalankan per-chunk agar tidak
+// melebihi batas argumen PostgREST untuk `in`.
+async function deleteStaleRows(
+  client: Client,
+  userId: string,
+  table: "daily_activity" | "word_progress",
+  idColumn: "date" | "word_id",
+  keep: string[],
+): Promise<boolean> {
+  const { data, error } = await client
+    .from(table)
+    .select(idColumn)
+    .eq("user_id", userId);
+  if (error) return false;
+
+  const keepSet = new Set(keep);
+  const stale: string[][] = [[]];
+  for (const row of data ?? []) {
+    const id = (row as { [k: string]: string | null })[idColumn] as string;
+    if (keepSet.has(id)) continue;
+    const last = stale[stale.length - 1];
+    if (last.length >= DELETE_CHUNK) stale.push([]);
+    stale[stale.length - 1].push(id);
+  }
+
+  const results = await Promise.all(
+    stale.map((ids) =>
+      ids.length === 0
+        ? Promise.resolve({ error: null })
+        : client.from(table).delete().eq("user_id", userId).in(idColumn, ids),
+    ),
+  );
+  return results.every((result) => !result.error);
+}
+
 export async function pushProgress(
   client: Client,
   userId: string,
@@ -92,8 +130,27 @@ export async function pushProgress(
     ops.push(client.from("word_progress").upsert(wordRows));
   }
 
+  // Bersihkan baris cloud yang sudah tidak ada di state agar tidak "bangkit
+  // kembali" saat pull berikutnya (B4/B9).
+  const [staleActivity, staleWords] = await Promise.all([
+    deleteStaleRows(
+      client,
+      userId,
+      "daily_activity",
+      "date",
+      Object.keys(state.activityByDate),
+    ),
+    deleteStaleRows(
+      client,
+      userId,
+      "word_progress",
+      "word_id",
+      Object.keys(state.words),
+    ),
+  ]);
+
   const results = await Promise.all(ops);
-  return results.every((result) => !result.error);
+  return results.every((result) => !result.error) && staleActivity && staleWords;
 }
 
 export async function deleteAllData(
