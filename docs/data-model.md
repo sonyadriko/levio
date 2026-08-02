@@ -97,6 +97,32 @@ PK gabungan: `(user_id, vocab_id)`.
 | `name` | `text` | `Push Day` |
 | `is_template` | `boolean` | Template bawaan vs milik user |
 
+### `gym_sessions` (V2 — sync gym, migration 0006)
+
+| Kolom | Tipe | Keterangan |
+|---|---|---|
+| `user_id` | `uuid` FK | |
+| `session_id` | `text` | id sesi lokal (UUID) |
+| `title` | `text` | Judul sesi |
+| `template_id` | `text` | Template rutin (opsional) |
+| `date` | `text` | `YYYY-MM-DD` |
+| `started_at` | `bigint` | epoch ms |
+| `completed_at` | `bigint` | null bila belum selesai |
+| `exercises` | `jsonb` | array `GymExerciseLog` ber-nesting (set, muscles, restSeconds) |
+| `updated_at` | `timestamptz` | |
+
+PK gabungan: `(user_id, session_id)`.
+
+### `gym_xp_by_date` (V2 — cap XP gym harian, migration 0006)
+
+| Kolom | Tipe | Keterangan |
+|---|---|---|
+| `user_id` | `uuid` FK | |
+| `date` | `text` | `YYYY-MM-DD` |
+| `xp` | `int` | XP gym yang sudah didapat hari itu (anti-farming, cap 30/hari) |
+
+PK gabungan: `(user_id, date)`.
+
 ## Implementasi Saat Ini (localStorage)
 
 Key: `levio.progress.v1`
@@ -185,7 +211,9 @@ Disimpan lokal (tidak di-sync ke cloud). `components/daily-reminder.tsx` memerik
 
 ### Modul Gym (`levio.gym.v2`)
 
-Disimpan lokal (belum di-sync ke cloud). Sumber kode: `lib/gym.ts`.
+Sumber kode: `lib/gym.ts`. Sync ke cloud: tabel `gym_sessions` + `gym_xp_by_date`
+(migration 0006), diorkestrasi `components/gym/gym-sync.tsx` — pull + merge
+`mergeGym` saat login, push debounce saat berubah (pola sama dengan progress).
 
 ```ts
 interface GymState {

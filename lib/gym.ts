@@ -131,7 +131,7 @@ function normalizeExercise(raw: Partial<GymExerciseLog>): GymExerciseLog {
   };
 }
 
-function normalizeSession(raw: Partial<GymSession>): GymSession {
+export function normalizeSession(raw: Partial<GymSession>): GymSession {
   const exercises = Array.isArray(raw.exercises)
     ? raw.exercises
         .filter((e) => !!e && typeof e === "object")
@@ -576,6 +576,42 @@ export function sessionsThisWeek(state: GymState): number {
 // reminder: sesi di `sessions` selalu yang sudah selesai).
 export function workoutDoneOn(state: GymState, date: string): boolean {
   return state.sessions.some((s) => s.date === date);
+}
+
+// Ambil sesi yang "paling lengkap": preferensi completed, lalu completedAt
+// terlama (revisi terakhir), lalu startedAt terlama.
+function pickSession(a: GymSession, b: GymSession): GymSession {
+  const aDone = a.completedAt !== null;
+  const bDone = b.completedAt !== null;
+  if (aDone !== bDone) return aDone ? a : b;
+  if (aDone) {
+    const aAt = a.completedAt ?? 0;
+    const bAt = b.completedAt ?? 0;
+    if (aAt !== bAt) return aAt > bAt ? a : b;
+  }
+  return a.startedAt >= b.startedAt ? a : b;
+}
+
+// Gabungkan dua snapshot gym (lokal vs cloud saat login). Strategi: sesi
+// digabung per id (`pickSession` untuk revisi paling lengkap), XP harian
+// diambil maksimum. `activeSession` tidak di-sync (transien).
+export function mergeGym(a: GymState, b: GymState): GymState {
+  const sessions = new Map<string, GymSession>();
+  for (const session of [...a.sessions, ...b.sessions]) {
+    const existing = sessions.get(session.id);
+    sessions.set(session.id, existing ? pickSession(existing, session) : session);
+  }
+
+  const xpByDate: Record<string, number> = { ...a.xpByDate };
+  for (const [date, xp] of Object.entries(b.xpByDate)) {
+    xpByDate[date] = Math.max(xpByDate[date] ?? 0, xp);
+  }
+
+  return {
+    activeSession: a.activeSession ?? b.activeSession,
+    sessions: Array.from(sessions.values()),
+    xpByDate,
+  };
 }
 
 export const ROUTINE_TEMPLATES: RoutineTemplate[] = [

@@ -2,12 +2,14 @@ import { Sidebar } from "@/components/sidebar";
 import { BottomNav } from "@/components/bottom-nav";
 import { SyncBanner } from "@/components/sync-banner";
 import { DailyReminder } from "@/components/daily-reminder";
+import { GymSync } from "@/components/gym/gym-sync";
 import { MobileThemeToggle } from "@/components/theme-toggle";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-svh bg-stone-50 dark:bg-stone-950">
       <DailyReminder />
+      <GymSync />
       <Sidebar />
       <MobileThemeToggle />
       <div className="flex min-h-svh flex-col lg:pl-64">
