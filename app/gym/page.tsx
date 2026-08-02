@@ -12,6 +12,7 @@ import { GymLog } from "@/components/gym/gym-log";
 import { GymSessionForm } from "@/components/gym/gym-session-form";
 import { GymVolume } from "@/components/gym/gym-volume";
 import { TemplatePicker } from "@/components/gym/template-picker";
+import { GymProgram } from "@/components/gym/gym-program";
 import { gymStreak, sessionsThisWeek } from "@/lib/gym";
 import { todayKey } from "@/lib/date";
 
@@ -20,6 +21,7 @@ export default function GymPage() {
   const {
     gym,
     beginSession,
+    beginProgramSession,
     setTitle,
     addExerciseToSession,
     addDbExercise,
@@ -50,6 +52,11 @@ export default function GymPage() {
 
   const handlePick = (templateId?: string) => {
     beginSession(templateId);
+    setEditorOpen(true);
+  };
+
+  const handleProgramPick = (programId: string, week: number, day: number) => {
+    beginProgramSession(programId, week, day);
     setEditorOpen(true);
   };
 
@@ -129,6 +136,7 @@ export default function GymPage() {
       )}
 
       <GymVolume gym={gym} />
+      <GymProgram gym={gym} onStart={handleProgramPick} />
       <GymLog gym={gym} onDelete={(session) => removeSession(session.id)} />
 
       {active ? (

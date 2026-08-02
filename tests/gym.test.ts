@@ -30,6 +30,10 @@ import {
   updateSet,
   weeklyVolume,
   workoutDoneOn,
+  programCompletedCount,
+  programDayDone,
+  programSessionDraft,
+  normalizeSession,
   type GymExerciseLog,
   type GymSet,
   type GymState,
@@ -435,5 +439,89 @@ describe("mergeGym", () => {
 describe("loadGym", () => {
   it("mengembalikan kosong bila localStorage kosong", () => {
     expect(loadGym()).toEqual(emptyGym());
+  });
+});
+
+describe("programSessionDraft", () => {
+  it("mem-prefill set sesuai target program (week/day + target sets/reps)", () => {
+    const draft = programSessionDraft("ppl-4w", 1, 0, (key) => key);
+    expect(draft.programId).toBe("ppl-4w");
+    expect(draft.programWeek).toBe(1);
+    expect(draft.programDay).toBe(0);
+    expect(draft.exercises.length).toBeGreaterThan(0);
+    expect(draft.exercises[0].exerciseId).toBe("bench-press");
+    expect(draft.exercises[0].sets).toHaveLength(4);
+    expect(draft.exercises[0].sets[0]).toMatchObject({
+      weightKg: 0,
+      reps: 8,
+      done: false,
+    });
+    expect(draft.exercises[0].restSeconds).toBe(
+      getExerciseDef("bench-press")?.restSeconds,
+    );
+  });
+
+  it("program tak dikenal menghasilkan draf kosong", () => {
+    const draft = programSessionDraft("nope", 1, 0, (key) => key);
+    expect(draft.exercises).toEqual([]);
+  });
+});
+
+describe("program progress", () => {
+  function programState(programId: string, week: number, day: number): GymState {
+    const state = startSession(emptyGym(), {
+      title: "Push",
+      programId,
+      programWeek: week,
+      programDay: day,
+      exercises: [exercise("Bench Press", [{ weightKg: 60, reps: 10, done: true }])],
+    });
+    return completeSession(state).state;
+  }
+
+  it("programDayDone true bila ada sesi selesai dengan penanda week/day", () => {
+    const state = programState("ppl-4w", 2, 0);
+    expect(programDayDone(state, "ppl-4w", 2, 0)).toBe(true);
+    expect(programDayDone(state, "ppl-4w", 2, 1)).toBe(false);
+  });
+
+  it("programCompletedCount menghitung total sesi program yang selesai", () => {
+    const a = programState("ppl-4w", 1, 0);
+    const b = programState("ppl-4w", 1, 1);
+    expect(programCompletedCount(a, "ppl-4w")).toBe(1);
+    expect(programCompletedCount(b, "ppl-4w")).toBe(1);
+  });
+});
+
+describe("normalizeSession", () => {
+  it("mempertahankan penanda program dan menormalkan nilai week/day", () => {
+    const session = normalizeSession({
+      id: "s1",
+      title: "Push",
+      programId: "ppl-4w",
+      programWeek: 3,
+      programDay: 0,
+      date: "2026-08-01",
+      startedAt: 1,
+      completedAt: 2,
+      exercises: [],
+    });
+    expect(session.programId).toBe("ppl-4w");
+    expect(session.programWeek).toBe(3);
+    expect(session.programDay).toBe(0);
+  });
+
+  it("programId tanpa week/day tidak menciptakan penanda program", () => {
+    const session = normalizeSession({
+      id: "s1",
+      title: "X",
+      date: "2026-08-01",
+      startedAt: 1,
+      completedAt: 2,
+      exercises: [],
+    });
+    expect(session.programId).toBeUndefined();
+    expect(session.programWeek).toBeUndefined();
+    expect(session.programDay).toBeUndefined();
   });
 });

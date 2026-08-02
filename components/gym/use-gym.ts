@@ -21,6 +21,7 @@ import {
   setExerciseRest,
   startSession,
   templateSessionDraft,
+  programSessionDraft,
   toggleMuscle,
   updateSet,
   type GymState,
@@ -74,6 +75,15 @@ export function useGym() {
       const draft = templateId
         ? templateSessionDraft(templateId, t)
         : { title: t("gym.freeSession"), exercises: [] };
+      setGym(startSession(getSnapshot(), draft));
+    },
+    [t],
+  );
+
+  const beginProgramSession = useCallback(
+    (programId: string, week: number, day: number) => {
+      const draft = programSessionDraft(programId, week, day, t);
+      if (draft.exercises.length === 0) return;
       setGym(startSession(getSnapshot(), draft));
     },
     [t],
@@ -164,6 +174,7 @@ export function useGym() {
   return {
     gym,
     beginSession,
+    beginProgramSession,
     setTitle,
     addExerciseToSession,
     addDbExercise,
