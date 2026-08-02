@@ -1,10 +1,29 @@
 # Panduan Deploy — Levio
 
-Runbook untuk rilis ke produksi. Alur: **Supabase (DB + Auth)** → **Vercel (host)**.
+Runbook untuk rilis ke produksi. Alur: **GitHub (branch + PR + CI)** → **Vercel (host, auto-deploy dari `main`)** → **Supabase (DB + Auth)**.
 
-- Versi saat ini: `v0.8.0` (lihat `lib/version.ts` + `package.json`).
+- Versi saat ini: `v0.10.0` (lihat `lib/version.ts` + `package.json`).
 - Stack produksi: Next.js 16 (App Router, Turbopack) di Vercel, Supabase sebagai
   backend, service worker `public/sw.js` untuk offline shell.
+- Alur development & branch (wajib): `RULE.md` → "Development & Deployment Flow".
+
+## 0. Alur Rilis (ringkas)
+
+```
+main (production, diproteksi)
+   ▲
+   │ PR + CI hijau (lint → test → build)
+   │
+release/vX.Y.Z ── bump versi + changelog + docs ──▶ PR → merge → tag vX.Y.Z
+   ▲
+feat/* fix/* docs/* chore/* hotfix/*
+```
+
+- `main` **tidak boleh** di-commit langsung — semua lewat PR.
+- CI di `.github/workflows/ci.yml` berjalan di tiap PR & push ke `main`.
+- Setelah merge ke `main`, Vercel **auto-deploy** (production branch = `main`);
+  tiap PR mendapat **preview deployment**.
+- Rilis = tag `vX.Y.Z` di `main` (tanda; deploy sudah terjadi saat merge).
 
 ## 1. Persiapan Supabase (sekali saja)
 
@@ -32,24 +51,35 @@ Runbook untuk rilis ke produksi. Alur: **Supabase (DB + Auth)** → **Vercel (ho
 
 ## 2. Deploy ke Vercel
 
+### 2a. Terhubung ke Git (disarankan — auto-deploy)
+
+1. [vercel.com](https://vercel.com) → **Add New Project** → **Import** dari
+   GitHub repo `levio`.
+2. Framework preset **Next.js** (terdeteksi otomatis). Build command default
+   (`next build`); jangan ubah kecuali perlu.
+3. **Production Branch** → `main`. Setelah ini:
+   - push/merge ke `main` → otomatis deploy produksi;
+   - tiap PR → preview deployment (URL muncul di komentar PR).
+4. Tambahkan env di **Project Settings → Environment Variables**:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   (tambahkan ke Production, Preview, dan Development.)
+
+> Env wajib ada **sebelum** build pertama: `next.config.ts` memakainya saat
+> build untuk menyusun CSP `connect-src`.
+
+### 2b. Manual via CLI (fallback / rollback)
+
 ```bash
 npm install
 npx vercel login        # login via browser (sekali saja)
 npx vercel link         # buat/pilih proyek Vercel
 npx vercel env add NEXT_PUBLIC_SUPABASE_URL production
 npx vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY production
-npx vercel --prod       # deploy produksi
-```
-
-Setelah itu deploy berikutnya cukup:
-
-```bash
-npm run build && npx vercel --prod
+npx vercel --prod       # deploy produksi (fallback saja)
 ```
 
 Catatan:
-- `next.config.ts` memakai `NEXT_PUBLIC_SUPABASE_URL` saat build untuk menyusun
-  CSP `connect-src` — pastikan env sudah ada **sebelum** `--prod`.
 - CSP memakai `'unsafe-inline'` pada `script-src` karena Next menanamkan skrip
   RSC inline; `'unsafe-eval'` hanya di development.
 - HSTS (`Strict-Transport-Security`) hanya dikirim di produksi (`NODE_ENV=production`).
@@ -77,14 +107,16 @@ Manual check di browser (incognito):
 
 ## 4. Checklist rilis (production)
 
+- [ ] Branch `release/vX.Y.Z` dari `main`; CI hijau di PR.
 - [ ] Migration 0001–0005 sudah dijalankan di Supabase.
-- [ ] Env Vercel terisi (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`).
+- [ ] Env Vercel terisi (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`) di Production + Preview + Development.
 - [ ] Supabase `Site URL` & `Redirect URLs` = domain produksi.
-- [ ] `git commit` pesan `release: vX.Y.Z` + versi di `package.json`, `lib/version.ts`,
-      `CHANGELOG.md`, highlight `RELEASE_NOTES` (id+en) sinkron.
+- [ ] Versi sinkron: `package.json`, `lib/version.ts` (`APP_VERSION`), highlight
+      `RELEASE_NOTES` (id+en), `CHANGELOG.md`.
 - [ ] Cache service worker di-bump (`public/sw.js` → `CACHE_NAME = "levio-shell-vN"`)
       bila aset statis berubah.
-- [ ] `npm run lint`, `npm test`, `npm run build` hijau.
+- [ ] PR `release/vX.Y.Z` → `main` merged; tag `vX.Y.Z` di-push.
+- [ ] Vercel auto-deploy `main` sukses (cek dashboard / `curl`).
 - [ ] Verifikasi header + halaman di §3.
 
 ## Rollback

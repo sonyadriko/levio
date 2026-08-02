@@ -22,3 +22,37 @@ Don’t argue just for the sake of arguing. Push back only when there is a real 
 For simple execution tasks like translating, rewriting, formatting, generating variations, or cleaning up text, just do the task cleanly. Only add criticism if there’s a clear issue that would affect the result.
 
 If you’re about to start with phrases like “That’s a great point,” “You’re absolutely right,” or “That makes sense,” stop and rewrite the response. Start with the most useful thing instead
+
+---
+
+## Development & Deployment Flow (Binding)
+
+Berlaku untuk semua pekerjaan di repo ini — termasuk apa pun yang dikerjakan agent. Melanggar aturan ini = merusak alur deploy, jadi jangan pernah mengekorinya demi kecepatan.
+
+### Branching
+- **`main` = production, diproteksi.** Dilarang commit/push langsung ke `main`. Semua perubahan masuk ke `main` **hanya lewat Pull Request** yang lolos CI.
+- Jenis branch: `feat/<slug>`, `fix/<slug>`, `docs/<slug>`, `chore/<slug>`, `release/vX.Y.Z`, `hotfix/<slug>`.
+- Branch dibuat dari `main` (atau cabang rilis untuk rilis berikutnya), berumur pendek, satu fokus per branch.
+
+### CI (wajib hijau sebelum merge)
+- `.github/workflows/ci.yml` menjalankan: `npm ci` → `npm run lint` → `npm test` → `npm run build`.
+- CI berjalan di tiap PR dan tiap push ke `main`. Merge dilarang bila CI gagal.
+
+### Release (`release/vX.Y.Z`)
+1. Branch `release/vX.Y.Z` dari `main`.
+2. Bump versi (sinkron): `package.json` → `version`, `lib/version.ts` → `APP_VERSION` + entri `RELEASE_NOTES` (kunci i18n id+en), entri `CHANGELOG.md`. Perbaiki/bump cache service worker bila aset statis berubah (`public/sw.js`).
+3. PR `release/vX.Y.Z` → `main`, tunggu CI hijau, merge.
+4. Buat tag `vX.Y.Z` di `main` + push tag → Vercel (production branch `main`) auto-deploy.
+5. Verifikasi via checklist `docs/DEPLOY.md`.
+
+### Hotfix (`hotfix/<slug>`)
+- Branch dari `main`, perbaiki, PR → merge → deploy (tag PATCH opsional).
+
+### Deploy
+- **Normal:** Vercel terhubung ke GitHub — production branch `main`, PR mendapat preview deployment.
+- **Manual `npx vercel --prod` hanya fallback/rollback** (lihat `docs/DEPLOY.md`).
+
+### Agent rules
+- Agent wajib membuat branch + membuka/merge PR (via `gh`), **tidak pernah** commit/push ke `main` langsung.
+- Pesan commit granular sesuai konvensi repo; referensikan ID bug `[B-n]` bila ada.
+- Sebelum menganggap selesai: `npm run lint`, `npm test`, `npm run build` hijau, dan PR sudah merged ke `main`.
