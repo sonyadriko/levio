@@ -20,6 +20,21 @@ selalu disinkronkan saat rilis (lihat `docs/CONTRIBUTING` tidak ada; aturan ada 
 
 ---
 
+## [0.9.0] — 2026-08-02
+
+### Ditambahkan
+- **Modul Gym (V2) berbasis sesi:** latihan dicatat dalam sesi (mulai dari template Push/Pull/Legs PPL, Upper/Lower, Full Body — latihan, set, & muscle group ter-prefill — atau sesi bebas). Set disimpan **per-row**: tiap set punya beban (kg), repetisi, dan status selesai (done). Sesi aktif tersimpan di `levio.gym.v2` sehingga aman saat refresh.
+- **Riwayat sesi expandable:** daftar per tanggal, detail per-latihan/per-set, hapus sesi dengan konfirmasi.
+- **Volume per muscle group** (chest, back, shoulders, arms, legs, core) dari Σ beban×repetisi tiap set.
+- **XP gym terintegrasi ke akun:** 10 XP per sesi selesai (maks 30/hari, anti-farming via `xpByDate`) masuk ke pool XP & aktivitas harian, TANPA menaikkan streak belajar — `applyGymXp` tidak menyentuh `lastActiveDate`; streak gym dihitung terpisah dari tanggal sesi selesai.
+- **shadcn/ui** diadopsi (base-ui): Button, Card, Dialog, Input, Label, Select, Sheet, Textarea + `cn()`; tema global selaras palette stone/teal.
+
+### Teknis
+- `lib/gym.ts` ditulis ulang ke model sesi (`GymSession`/`GymExerciseLog`/`GymSet`) menggantikan model entri agregat; key storage `levio.gym.v1` → `levio.gym.v2` (belum pernah dirilis, tanpa migrasi).
+- `lib/progress.ts` mendapat `applyGymXp` (XP murni tanpa update streak); `ProgressProvider` mengekspos `awardGymXp`.
+
+---
+
 ## [0.8.0] — 2026-08-02
 
 ### Ditambahkan
