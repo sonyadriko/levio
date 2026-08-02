@@ -171,3 +171,15 @@ create trigger gym_sessions_set_updated_at
   before update on public.gym_sessions
   for each row execute function public.set_updated_at();
 
+-- ==================== 0007_add_gym_program.sql ====================
+-- Levio: penanda program multi-minggu pada sesi gym.
+
+alter table public.gym_sessions
+  add column if not exists program_id   text,
+  add column if not exists program_week integer,
+  add column if not exists program_day  integer;
+
+create index if not exists gym_sessions_program_idx
+  on public.gym_sessions (user_id, program_id);
+
+

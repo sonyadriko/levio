@@ -105,6 +105,9 @@ PK gabungan: `(user_id, vocab_id)`.
 | `session_id` | `text` | id sesi lokal (UUID) |
 | `title` | `text` | Judul sesi |
 | `template_id` | `text` | Template rutin (opsional) |
+| `program_id` | `text` | Program multi-minggu (opsional, migration 0007) |
+| `program_week` | `int` | Pekan program, 1-indexed (opsional) |
+| `program_day` | `int` | Hari kerja dalam pekan, 0-indexed (opsional) |
 | `date` | `text` | `YYYY-MM-DD` |
 | `started_at` | `bigint` | epoch ms |
 | `completed_at` | `bigint` | null bila belum selesai |

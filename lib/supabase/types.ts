@@ -45,6 +45,9 @@ export interface GymSessionRow {
   session_id: string;
   title: string;
   template_id: string | null;
+  program_id: string | null;
+  program_week: number | null;
+  program_day: number | null;
   date: string;
   started_at: number;
   completed_at: number | null;

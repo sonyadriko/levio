@@ -1,5 +1,6 @@
 import { dateKeyOf, mondayOf, todayKey } from "./date";
 import { defaultRestSeconds, getExerciseDef } from "./gym-exercises";
+import { getProgram } from "./gym-programs";
 
 export const GYM_STORAGE_KEY = "levio.gym.v2";
 export const GYM_XP_PER_SESSION = 10;
@@ -42,6 +43,9 @@ export interface GymSession {
   id: string;
   title: string;
   templateId?: string;
+  programId?: string;
+  programWeek?: number;
+  programDay?: number;
   date: string;
   startedAt: number;
   completedAt: number | null;
@@ -74,6 +78,9 @@ export interface RoutineTemplate {
 
 export interface SessionDraft {
   templateId?: string;
+  programId?: string;
+  programWeek?: number;
+  programDay?: number;
   title: string;
   exercises: GymExerciseLog[];
 }
@@ -146,6 +153,16 @@ export function normalizeSession(raw: Partial<GymSession>): GymSession {
     title: typeof raw.title === "string" ? raw.title : "",
     templateId:
       typeof raw.templateId === "string" ? raw.templateId : undefined,
+    programId:
+      typeof raw.programId === "string" ? raw.programId : undefined,
+    programWeek:
+      typeof raw.programWeek === "number" && raw.programWeek > 0
+        ? Math.round(raw.programWeek)
+        : undefined,
+    programDay:
+      typeof raw.programDay === "number" && raw.programDay >= 0
+        ? Math.round(raw.programDay)
+        : undefined,
     date,
     startedAt: Math.max(0, toNumber(raw.startedAt)),
     completedAt:
@@ -240,12 +257,51 @@ export function templateSessionDraft(
   };
 }
 
+// Bangun draf sesi dari hari kerja program. Set terisi sesuai target
+// (weight 0, reps = targetReps, belum done). Week 1-indexed, day 0-based.
+export function programSessionDraft(
+  programId: string,
+  week: number,
+  day: number,
+  nameOf: (key: string) => string,
+): SessionDraft {
+  const program = getProgram(programId);
+  const workout = program?.workouts[day];
+  if (!program || !workout) return { title: "", exercises: [] };
+  return {
+    templateId: undefined,
+    programId: program.id,
+    programWeek: week,
+    programDay: day,
+    title: nameOf(workout.titleKey),
+    exercises: workout.exercises.map((ex) => {
+      const def = getExerciseDef(ex.exerciseId);
+      return {
+        id: makeId(),
+        name: def ? nameOf(def.nameKey) : ex.exerciseId,
+        muscles: def?.muscles ?? [],
+        sets: Array.from({ length: ex.targetSets }, () => ({
+          weightKg: 0,
+          reps: ex.targetReps,
+          done: false,
+        })),
+        notes: "",
+        exerciseId: ex.exerciseId,
+        restSeconds: defaultRestSeconds(def),
+      };
+    }),
+  };
+}
+
 export function startSession(state: GymState, draft: SessionDraft): GymState {
   return {
     ...state,
     activeSession: {
       id: makeId(),
       templateId: draft.templateId,
+      programId: draft.programId,
+      programWeek: draft.programWeek,
+      programDay: draft.programDay,
       title: draft.title,
       date: todayKey(),
       startedAt: Date.now(),
@@ -576,6 +632,31 @@ export function sessionsThisWeek(state: GymState): number {
 // reminder: sesi di `sessions` selalu yang sudah selesai).
 export function workoutDoneOn(state: GymState, date: string): boolean {
   return state.sessions.some((s) => s.date === date);
+}
+
+// Hari kerja program (programId + week + day) sudah pernah diselesaikan bila
+// ada sesi di riwayat yang memuat penanda program tersebut.
+export function programDayDone(
+  state: GymState,
+  programId: string,
+  week: number,
+  day: number,
+): boolean {
+  return state.sessions.some(
+    (s) =>
+      s.programId === programId &&
+      s.programWeek === week &&
+      s.programDay === day,
+  );
+}
+
+export function programCompletedCount(
+  state: GymState,
+  programId: string,
+): number {
+  return state.sessions.filter(
+    (s) => s.programId === programId && s.programWeek !== undefined,
+  ).length;
 }
 
 // Ambil sesi yang "paling lengkap": preferensi completed, lalu completedAt
