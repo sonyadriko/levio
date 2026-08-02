@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { ChevronDown, Trash2 } from "lucide-react";
 import { useLanguage } from "@/components/language-provider";
 import { Button } from "@/components/ui/button";
@@ -83,7 +84,16 @@ function SessionCard({
           {session.exercises.map((exercise) => (
             <div key={exercise.id} className="flex flex-col gap-1">
               <div className="flex flex-wrap items-center gap-2">
-                <p className="text-xs font-medium">{exercise.name}</p>
+                {exercise.exerciseId ? (
+                  <Link
+                    href={`/gym/exercises/${exercise.exerciseId}`}
+                    className="text-xs font-medium text-teal-700 underline-offset-2 hover:underline dark:text-teal-400"
+                  >
+                    {exercise.name}
+                  </Link>
+                ) : (
+                  <p className="text-xs font-medium">{exercise.name}</p>
+                )}
                 {exercise.muscles.map((muscle) => (
                   <span
                     key={muscle}

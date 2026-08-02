@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Play } from "lucide-react";
 import { useLanguage } from "@/components/language-provider";
 import { PageHeader } from "@/components/page-header";
@@ -21,6 +22,8 @@ export default function GymPage() {
     beginSession,
     setTitle,
     addExerciseToSession,
+    addDbExercise,
+    setRest,
     removeExerciseFromSession,
     renameExercise,
     toggleMuscleFor,
@@ -65,6 +68,14 @@ export default function GymPage() {
         title={t("gym.title")}
         subtitle={t("gym.description")}
       />
+
+      <Link
+        href="/gym/exercises"
+        className="flex items-center justify-between rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm font-medium transition-colors hover:border-teal-300 dark:border-stone-800 dark:bg-stone-950 dark:hover:border-teal-700"
+      >
+        <span>{t("gym.exercises.title")}</span>
+        <span className="text-stone-400">→</span>
+      </Link>
 
       {xpNote ? (
         <div className="rounded-xl border border-teal-200 bg-teal-50 px-4 py-3 text-sm font-medium text-teal-800 dark:border-teal-900 dark:bg-teal-900/30 dark:text-teal-200">
@@ -128,6 +139,8 @@ export default function GymPage() {
           api={{
             setTitle,
             addExerciseToSession,
+            addDbExercise,
+            setRest,
             removeExerciseFromSession,
             renameExercise,
             toggleMuscleFor,
