@@ -31,7 +31,8 @@ feat/* fix/* docs/* chore/* hotfix/*
 2. **SQL Editor** → jalankan semua migration. Ada dua cara:
    - Satu paste: salin isi `supabase/migrations/0000_setup_all.sql`, atau
    - Berurutan: `0001_init.sql` → `0002_add_srs.sql` → `0003_add_new_words.sql`
-     → `0004_add_unlocked_up_to.sql` → `0005_add_imported_at.sql`.
+     → `0004_add_unlocked_up_to.sql` → `0005_add_imported_at.sql`
+     → `0006_add_gym_sync.sql` → `0007_add_gym_program.sql`.
    Script menggunakan `if not exists` sehingga aman dijalankan ulang.
 3. **Authentication → Sign In / Up** → aktifkan provider **Email**.
    - (Opsional) matikan **Confirm email** supaya registrasi langsung aktif.
@@ -67,6 +68,20 @@ feat/* fix/* docs/* chore/* hotfix/*
 
 > Env wajib ada **sebelum** build pertama: `next.config.ts` memakainya saat
 > build untuk menyusun CSP `connect-src`.
+
+### 2c. Custom domain (mis. `levio.space`)
+
+1. **Project Settings → Domains** → tambahkan domain (mis. `levio.space`).
+2. Pilih salah satu konfigurasi DNS di registrar:
+   - **Opsi A (NS Vercel):** ganti nameserver domain ke `ns1.vercel-dns.com`
+     / `ns2.vercel-dns.com` — apex + `www` otomatis.
+   - **Opsi B (pertahankan NS registrar):** tambahkan
+     `A @ → 76.76.21.21` **dan** `CNAME www → cname.vercel-dns.com`.
+     Pastikan **tidak ada A record lain** di apex (hapus record parking bawaan
+     registrar) — record ekstra membuat Vercel menandai domain *misconfigured*.
+3. Tunggu propagasi DNS global (TTL lama bisa bertahan beberapa jam) sampai
+   Vercel mengeset `configVerifiedAt` lalu menerbitkan sertifikat SSL otomatis.
+   Verifikasi: `curl -sI https://levio.space | head -3`.
 
 ### 2b. Manual via CLI (fallback / rollback)
 
@@ -108,7 +123,7 @@ Manual check di browser (incognito):
 ## 4. Checklist rilis (production)
 
 - [ ] Branch `release/vX.Y.Z` dari `main`; CI hijau di PR.
-- [ ] Migration 0001–0005 sudah dijalankan di Supabase.
+- [ ] Migration 0001–0007 sudah dijalankan di Supabase.
 - [ ] Env Vercel terisi (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`) di Production + Preview + Development.
 - [ ] Supabase `Site URL` & `Redirect URLs` = domain produksi.
 - [ ] Versi sinkron: `package.json`, `lib/version.ts` (`APP_VERSION`), highlight

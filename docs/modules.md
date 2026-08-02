@@ -44,11 +44,12 @@ app/<route>/           → halaman
 
 Modul gym **sudah berjalan** (rilis 0.9.0–0.10.0). Pola yang dipakai:
 
-1. **Data**: `lib/gym.ts` (model sesi + logika murni) + `lib/gym-exercises.ts` (master data latihan). Skema DB target di `docs/data-model.md`.
+1. **Data**: `lib/gym.ts` (model sesi + logika murni) + `lib/gym-exercises.ts` (master data latihan) + `lib/gym-programs.ts` (program multi-minggu: target set/reps per hari kerja). Skema DB target di `docs/data-model.md`.
 2. **State**: `components/gym/use-gym.ts` — hook `useSyncExternalStore` di atas localStorage `levio.gym.v2` (sesi aktif tersimpan aman saat refresh).
-3. **Halaman**: `app/gym/` (sesi + template + riwayat + volume mingguan), `app/gym/exercises/` (database latihan), `app/gym/exercises/[id]/` (detail + grafik progress).
-4. **Komponen**: `gym-session-form.tsx` (editor sesi: set per-row, rest timer, pemilih latihan dari DB), `gym-log.tsx` (riwayat expandable), `exercise-chart.tsx` (LineChart SVG tanpa dependensi).
-5. **Integrasi XP**: `applyGymXp` di `lib/progress.ts` — 10 XP/sesi (maks 30/hari) masuk ke pool XP **tanpa** menyentuh streak belajar; streak gym dihitung terpisah di `gymStreak`.
+3. **Sync cloud**: `components/gym/gym-sync.tsx` + `lib/supabase/sync.ts` (`pushGym`/`pullGym`/`mergeGym`) — sesi selesai + XP harian + penanda program tersinkron ke Supabase (`gym_sessions`, `gym_xp_by_date`).
+4. **Halaman**: `app/gym/` (sesi + template + **program multi-minggu** + riwayat + volume mingguan), `app/gym/exercises/` (database latihan), `app/gym/exercises/[id]/` (detail + grafik progress).
+5. **Komponen**: `gym-session-form.tsx` (editor sesi: set per-row, rest timer, pemilih latihan dari DB), `gym-program.tsx` (grid Pekan × Hari kerja dengan target set/reps + status selesai), `gym-log.tsx` (riwayat expandable), `exercise-chart.tsx` (LineChart SVG tanpa dependensi).
+6. **Integrasi XP**: `applyGymXp` di `lib/progress.ts` — 10 XP/sesi (maks 30/hari) masuk ke pool XP **tanpa** menyentuh streak belajar; streak gym dihitung terpisah di `gymStreak`.
 
 Pola menambah modul baru (Jepang, modul kesehatan lain) tetap sama: `lib/<domain>/`
 (logika murni) → `app/<route>/` (halaman) → `components/<domain>-*` (UI client),
