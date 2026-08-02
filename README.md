@@ -45,6 +45,7 @@ Menu: **Home · Belajar · Gym · Statistik · Profil** (flashcard & mock test b
 | [`docs/modules.md`](./docs/modules.md) | Pola menambah bahasa/modul baru |
 | [`docs/BUGS.md`](./docs/BUGS.md) | Analisis potensi bug (audit kode) |
 | [`docs/SECURITY.md`](./docs/SECURITY.md) | Analisis & checklist keamanan |
+| [`docs/DEPLOY.md`](./docs/DEPLOY.md) | Runbook deploy (Supabase + Vercel) |
 | [`CHANGELOG.md`](./CHANGELOG.md) | Riwayat rilis per versi |
 | [`CONTRIBUTING.md`](./CONTRIBUTING.md) | Aturan berkontribusi |
 | [`SOUL.md`](./SOUL.md) | Persona & cara kerja asisten (Esther) |
