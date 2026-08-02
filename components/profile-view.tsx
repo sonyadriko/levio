@@ -67,7 +67,7 @@ function TargetStepper({
 }
 
 export function ProfileView() {
-  const { user, ready, configured, signIn, signUp, signInWithGoogle, signOut } = useAuth();
+  const { user, ready, configured, signIn, signUp, signInWithGoogle, resetPassword, signOut } = useAuth();
   const { progress, resetProgress, importProgress } = useProgress();
   const { locale, setLocale, t } = useLanguage();
   const { settings, setName, setDailyTargets } = useSettings();
@@ -182,7 +182,16 @@ export function ProfileView() {
 
   if (!user) {
     return (
-      <AuthCard t={t} signIn={signIn} signUp={signUp} signInWithGoogle={signInWithGoogle} />
+      <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
+        <AuthCard
+          t={t}
+          signIn={signIn}
+          signUp={signUp}
+          signInWithGoogle={signInWithGoogle}
+          resetPassword={resetPassword}
+        />
+        <ProfilePreviewPlaceholder t={t} />
+      </div>
     );
   }
 
@@ -236,13 +245,15 @@ function AuthCard({
   signIn,
   signUp,
   signInWithGoogle,
+  resetPassword,
 }: {
   t: (key: string, vars?: Record<string, string | number>) => string;
   signIn: (email: string, password: string) => Promise<AuthResult>;
   signUp: (email: string, password: string) => Promise<AuthResult>;
   signInWithGoogle: () => Promise<AuthResult>;
+  resetPassword: (email: string) => Promise<AuthResult>;
 }) {
-  const [mode, setMode] = useState<"login" | "register">("login");
+  const [mode, setMode] = useState<"login" | "register" | "forgot">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [notice, setNotice] = useState<string | null>(null);
@@ -268,6 +279,17 @@ function AuthCard({
     setError(null);
     setNotice(null);
     setSubmitting(true);
+    if (mode === "forgot") {
+      const result = await resetPassword(email);
+      setSubmitting(false);
+      if (!result.ok) {
+        setError(result.error ?? "auth.errorNetwork");
+        return;
+      }
+      setNotice("auth.resetSent");
+      setPassword("");
+      return;
+    }
     const result =
       mode === "login"
         ? await signIn(email, password)
@@ -298,76 +320,82 @@ function AuthCard({
         L
       </span>
       <h2 className="mt-4 text-center text-lg font-bold tracking-tight">
-        {t("auth.title")}
+        {t(mode === "forgot" ? "auth.resetTitle" : "auth.title")}
       </h2>
       <p className="mx-auto mt-1 max-w-sm text-center text-sm text-stone-500 dark:text-stone-400">
-        {t("auth.subtitle")}
+        {t(mode === "forgot" ? "auth.resetSubtitle" : "auth.subtitle")}
       </p>
 
-      <div className="mx-auto mt-6 flex max-w-xs rounded-xl bg-stone-100 p-1 dark:bg-stone-800/70">
+      {mode !== "forgot" && (
+        <div className="mx-auto mt-6 flex max-w-xs rounded-xl bg-stone-100 p-1 dark:bg-stone-800/70">
+          <button
+            type="button"
+            onClick={() => mode !== "login" && switchMode()}
+            className={`h-9 flex-1 rounded-lg text-sm font-semibold transition-colors ${
+              mode === "login"
+                ? "bg-white text-stone-900 shadow-sm dark:bg-stone-900 dark:text-stone-100"
+                : "text-stone-500 dark:text-stone-400"
+            }`}
+          >
+            {t("auth.loginTab")}
+          </button>
+          <button
+            type="button"
+            onClick={() => mode !== "register" && switchMode()}
+            className={`h-9 flex-1 rounded-lg text-sm font-semibold transition-colors ${
+              mode === "register"
+                ? "bg-white text-stone-900 shadow-sm dark:bg-stone-900 dark:text-stone-100"
+                : "text-stone-500 dark:text-stone-400"
+            }`}
+          >
+            {t("auth.registerTab")}
+          </button>
+        </div>
+      )}
+
+      {mode !== "forgot" && (
         <button
           type="button"
-          onClick={() => mode !== "login" && switchMode()}
-          className={`h-9 flex-1 rounded-lg text-sm font-semibold transition-colors ${
-            mode === "login"
-              ? "bg-white text-stone-900 shadow-sm dark:bg-stone-900 dark:text-stone-100"
-              : "text-stone-500 dark:text-stone-400"
-          }`}
+          disabled={googleSubmitting}
+          onClick={async () => {
+            setError(null);
+            setNotice(null);
+            setGoogleSubmitting(true);
+            const result = await signInWithGoogle();
+            setGoogleSubmitting(false);
+            if (!result.ok) setError(result.error ?? "auth.errorNetwork");
+          }}
+          className="mx-auto mt-5 flex h-12 w-full max-w-xs items-center justify-center gap-2.5 rounded-xl border border-stone-200 bg-white text-sm font-semibold text-stone-700 shadow-sm transition-colors hover:border-teal-300 hover:text-teal-700 active:scale-[0.97] disabled:opacity-60 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:hover:border-teal-700 dark:hover:text-teal-300"
         >
-          {t("auth.loginTab")}
+          <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              fill="#4285F4"
+              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1Z"
+            />
+            <path
+              fill="#34A853"
+              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23Z"
+            />
+            <path
+              fill="#FBBC05"
+              d="M5.84 14.1A6.6 6.6 0 0 1 5.5 12c0-.73.13-1.43.34-2.1V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84Z"
+            />
+            <path
+              fill="#EA4335"
+              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15A10.97 10.97 0 0 0 12 1a11 11 0 0 0-9.82 6.06l3.66 2.84C6.71 7.3 9.14 5.38 12 5.38Z"
+            />
+          </svg>
+          {googleSubmitting ? "…" : t("auth.signInGoogle")}
         </button>
-        <button
-          type="button"
-          onClick={() => mode !== "register" && switchMode()}
-          className={`h-9 flex-1 rounded-lg text-sm font-semibold transition-colors ${
-            mode === "register"
-              ? "bg-white text-stone-900 shadow-sm dark:bg-stone-900 dark:text-stone-100"
-              : "text-stone-500 dark:text-stone-400"
-          }`}
-        >
-          {t("auth.registerTab")}
-        </button>
-      </div>
+      )}
 
-      <button
-        type="button"
-        disabled={googleSubmitting}
-        onClick={async () => {
-          setError(null);
-          setNotice(null);
-          setGoogleSubmitting(true);
-          const result = await signInWithGoogle();
-          setGoogleSubmitting(false);
-          if (!result.ok) setError(result.error ?? "auth.errorNetwork");
-        }}
-        className="mx-auto mt-5 flex h-12 w-full max-w-xs items-center justify-center gap-2.5 rounded-xl border border-stone-200 bg-white text-sm font-semibold text-stone-700 shadow-sm transition-colors hover:border-teal-300 hover:text-teal-700 active:scale-[0.97] disabled:opacity-60 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:hover:border-teal-700 dark:hover:text-teal-300"
-      >
-        <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            fill="#4285F4"
-            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1Z"
-          />
-          <path
-            fill="#34A853"
-            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23Z"
-          />
-          <path
-            fill="#FBBC05"
-            d="M5.84 14.1A6.6 6.6 0 0 1 5.5 12c0-.73.13-1.43.34-2.1V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84Z"
-          />
-          <path
-            fill="#EA4335"
-            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15A10.97 10.97 0 0 0 12 1a11 11 0 0 0-9.82 6.06l3.66 2.84C6.71 7.3 9.14 5.38 12 5.38Z"
-          />
-        </svg>
-        {googleSubmitting ? "…" : t("auth.signInGoogle")}
-      </button>
-
-      <div className="mx-auto mt-5 flex max-w-xs items-center gap-3">
-        <span className="h-px flex-1 bg-stone-200 dark:bg-stone-800" />
-        <span className="text-xs text-stone-400">{t("auth.or")}</span>
-        <span className="h-px flex-1 bg-stone-200 dark:bg-stone-800" />
-      </div>
+      {mode !== "forgot" && (
+        <div className="mx-auto mt-5 flex max-w-xs items-center gap-3">
+          <span className="h-px flex-1 bg-stone-200 dark:bg-stone-800" />
+          <span className="text-xs text-stone-400">{t("auth.or")}</span>
+          <span className="h-px flex-1 bg-stone-200 dark:bg-stone-800" />
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="mx-auto mt-5 flex max-w-xs flex-col gap-3">
         <label className="flex flex-col gap-1">
@@ -383,20 +411,22 @@ function AuthCard({
             className="h-11 rounded-xl border border-stone-200 bg-white px-3 text-sm outline-none transition-colors focus:border-teal-400 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100"
           />
         </label>
-        <label className="flex flex-col gap-1">
-          <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
-            {t("auth.password")}
-          </span>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-            autoComplete={mode === "login" ? "current-password" : "new-password"}
-            className="h-11 rounded-xl border border-stone-200 bg-white px-3 text-sm outline-none transition-colors focus:border-teal-400 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100"
-          />
-        </label>
+        {mode !== "forgot" && (
+          <label className="flex flex-col gap-1">
+            <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
+              {t("auth.password")}
+            </span>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+              autoComplete={mode === "login" ? "current-password" : "new-password"}
+              className="h-11 rounded-xl border border-stone-200 bg-white px-3 text-sm outline-none transition-colors focus:border-teal-400 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100"
+            />
+          </label>
+        )}
         {mode === "register" && (
           <p className="text-xs text-stone-400">{t("auth.passwordHint")}</p>
         )}
@@ -419,21 +449,146 @@ function AuthCard({
         >
           {submitting
             ? "…"
-            : t(mode === "login" ? "auth.submitLogin" : "auth.submitRegister")}
+            : t(
+                mode === "forgot"
+                  ? "auth.sendReset"
+                  : mode === "login"
+                    ? "auth.submitLogin"
+                    : "auth.submitRegister",
+              )}
         </button>
       </form>
 
+      {mode === "login" && (
+        <p className="mt-3 text-center text-xs">
+          <button
+            type="button"
+            onClick={() => {
+              setMode("forgot");
+              setError(null);
+              setNotice(null);
+            }}
+            className="font-medium text-teal-700 hover:underline dark:text-teal-600"
+          >
+            {t("auth.forgotPassword")}
+          </button>
+        </p>
+      )}
+
       <p className="mt-4 text-center text-xs text-stone-400">
-        {t(mode === "login" ? "auth.noAccount" : "auth.haveAccount")}{" "}
-        <button
-          type="button"
-          onClick={switchMode}
-          className="font-semibold text-teal-700 hover:underline dark:text-teal-600"
-        >
-          {t(mode === "login" ? "auth.registerTab" : "auth.loginTab")}
-        </button>
+        {mode === "forgot" ? (
+          <>
+            <button
+              type="button"
+              onClick={() => {
+                setMode("login");
+                setError(null);
+                setNotice(null);
+              }}
+              className="font-semibold text-teal-700 hover:underline dark:text-teal-600"
+            >
+              {t("auth.backToLogin")}
+            </button>
+          </>
+        ) : (
+          <>
+            {t(mode === "login" ? "auth.noAccount" : "auth.haveAccount")}{" "}
+            <button
+              type="button"
+              onClick={switchMode}
+              className="font-semibold text-teal-700 hover:underline dark:text-teal-600"
+            >
+              {t(mode === "login" ? "auth.registerTab" : "auth.loginTab")}
+            </button>
+          </>
+        )}
       </p>
       <p className="mt-4 text-center text-xs text-stone-400">{t("auth.migrate")}</p>
+    </div>
+  );
+}
+
+function ProfilePreviewPlaceholder({
+  t,
+}: {
+  t: (key: string, vars?: Record<string, string | number>) => string;
+}) {
+  const stats = [
+    { labelKey: "stats.streak", icon: "flame" as const },
+    { labelKey: "stats.bestStreak", icon: "flame" as const },
+    { labelKey: "stats.mastered", icon: "book" as const },
+    { labelKey: "stats.completedTests", icon: "chart" as const },
+  ];
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-950">
+        <div className="flex items-center gap-3">
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-stone-100 dark:bg-stone-800">
+            <Icon name="lock" className="h-5 w-5 text-stone-400" />
+          </span>
+          <div>
+            <h3 className="text-sm font-semibold">{t("profile.previewTitle")}</h3>
+            <p className="text-xs text-stone-400">{t("profile.previewDesc")}</p>
+          </div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {stats.map((stat) => (
+            <div
+              key={stat.labelKey}
+              className="rounded-xl border border-dashed border-stone-200 bg-stone-50/60 p-3 dark:border-stone-800 dark:bg-stone-900/40"
+            >
+              <Icon name={stat.icon} className="h-4 w-4 text-stone-300 dark:text-stone-600" />
+              <p className="mt-2 text-lg font-bold text-stone-300 dark:text-stone-600">—</p>
+              <p className="text-[11px] text-stone-400">{t(stat.labelKey)}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-950">
+        <div className="mb-3 flex items-center justify-between">
+          <h3 className="text-sm font-semibold">{t("badge.title")}</h3>
+          <span className="text-xs text-stone-400">0/10</span>
+        </div>
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex flex-col items-center gap-1.5 rounded-xl border border-dashed border-stone-200 bg-stone-50/60 p-3 dark:border-stone-800 dark:bg-stone-900/40"
+            >
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-stone-100 dark:bg-stone-800">
+                <Icon name="lock" className="h-4 w-4 text-stone-300 dark:text-stone-600" />
+              </span>
+              <span className="h-1.5 w-3/4 rounded-full bg-stone-200 dark:bg-stone-800" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-950">
+        <div className="mb-3 flex items-center justify-between">
+          <h3 className="text-sm font-semibold">{t("profile.data")}</h3>
+          <Icon name="lock" className="h-4 w-4 text-stone-300 dark:text-stone-600" />
+        </div>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          {[t("profile.export"), t("profile.import"), t("profile.reset"), t("profile.prefs")].map(
+            (label) => (
+              <div
+                key={label}
+                className="flex h-11 items-center justify-center gap-2 rounded-xl border border-dashed border-stone-200 bg-stone-50/60 text-sm font-semibold text-stone-300 dark:border-stone-800 dark:bg-stone-900/40 dark:text-stone-600"
+              >
+                <Icon name="lock" className="h-4 w-4" />
+                {label}
+              </div>
+            ),
+          )}
+        </div>
+        <p className="mt-3 text-center text-xs text-stone-400">
+          {t("profile.previewCta")}
+        </p>
+      </div>
     </div>
   );
 }

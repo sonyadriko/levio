@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useProgress } from "@/components/progress-provider";
 import { useLanguage } from "@/components/language-provider";
 import { ProgressBar } from "@/components/progress-bar";
@@ -71,6 +71,11 @@ export function ChoicePracticeSession({
 
   const words = useLevelWords(level);
 
+  const questionCount = useMemo(
+    () => (words.length > 0 ? build(words, level).length : 0),
+    [words, level, build],
+  );
+
   const activeQuestion = session?.[index];
   const doneCorrect = done ? correct : 0;
   const doneXp = done ? xpEarned : 0;
@@ -96,7 +101,6 @@ export function ChoicePracticeSession({
 
   if (!session || done) {
     const available = words.length > 0;
-    const questionCount = words.length > 0 ? build(words, level).length : 0;
     return (
       <section className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">

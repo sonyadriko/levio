@@ -54,7 +54,7 @@ export function LevelContent({ level }: { level: HskLevel }) {
       <SentencePractice level={level} />
       <WordList words={words} />
 
-      {frontier && (
+      {frontier && level < MAX_HSK_LEVEL && (
         <div className="flex flex-col gap-3">
           <div className="flex items-start gap-3 rounded-2xl border border-dashed border-teal-300 bg-teal-50/60 p-4 dark:border-teal-800 dark:bg-teal-950/40">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-teal-100 dark:bg-teal-900">
@@ -74,6 +74,14 @@ export function LevelContent({ level }: { level: HskLevel }) {
             variant="graduate"
             onPass={() => recordLevelPass(level)}
           />
+        </div>
+      )}
+
+      {frontier && level === MAX_HSK_LEVEL && (
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-950/40">
+          <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
+            {t("level.maxReached", { level })}
+          </p>
         </div>
       )}
 

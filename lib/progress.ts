@@ -8,6 +8,8 @@ export const MIN_EASE = 1.3;
 export const MAX_INTERVAL_DAYS = 365;
 export const MAX_HSK_LEVEL = 6;
 export const MIN_PASS_PCT = 60;
+// Batas XP dari tes per hari (anti-farming mock test / tes kelulusan).
+export const MAX_TEST_XP_PER_DAY = 200;
 
 export interface WordProgress {
   reviews: number;
@@ -42,6 +44,8 @@ export interface ProgressState {
   lastTest: LastTest | null;
   // Level HSK tertinggi yang terbuka (1..6). Lulus tes level N → naik ke N+1.
   unlockedUpTo: number;
+  // XP tes yang sudah didapat per tanggal (local-only, untuk cap anti-farming).
+  testXpByDate: Record<string, number>;
 }
 
 export function emptyProgress(): ProgressState {
@@ -55,6 +59,7 @@ export function emptyProgress(): ProgressState {
     activityByDate: {},
     lastTest: null,
     unlockedUpTo: 1,
+    testXpByDate: {},
   };
 }
 
@@ -132,10 +137,10 @@ export function sanitizeProgress(data: unknown): ProgressState | null {
       if (day && typeof day === "object") {
         const d = day as Partial<ActivityDay>;
         activityByDate[key] = {
-          xp: toNumber(d.xp),
-          reviews: toNumber(d.reviews),
-          tests: toNumber(d.tests),
-          newWords: toNumber(d.newWords),
+          xp: Math.max(0, toNumber(d.xp)),
+          reviews: Math.max(0, toNumber(d.reviews)),
+          tests: Math.max(0, toNumber(d.tests)),
+          newWords: Math.max(0, toNumber(d.newWords)),
         };
       }
     }
@@ -148,8 +153,22 @@ export function sanitizeProgress(data: unknown): ProgressState | null {
     typeof (rawTest as LastTest).correct === "number" &&
     typeof (rawTest as LastTest).total === "number" &&
     typeof (rawTest as LastTest).date === "string"
-      ? (rawTest as LastTest)
+      ? {
+          correct: Math.max(0, (rawTest as LastTest).correct),
+          total: Math.max(0, (rawTest as LastTest).total),
+          date: (rawTest as LastTest).date,
+        }
       : null;
+
+  const testXpByDate: Record<string, number> = {};
+  const rawTestXp = record.testXpByDate;
+  if (rawTestXp && typeof rawTestXp === "object" && !Array.isArray(rawTestXp)) {
+    for (const [key, value] of Object.entries(rawTestXp)) {
+      if (/^\d{4}-\d{2}-\d{2}$/.test(key)) {
+        testXpByDate[key] = Math.max(0, toNumber(value));
+      }
+    }
+  }
 
   return {
     xp: Math.max(0, record.xp),
@@ -157,11 +176,12 @@ export function sanitizeProgress(data: unknown): ProgressState | null {
     lastActiveDate:
       typeof record.lastActiveDate === "string" ? record.lastActiveDate : null,
     words,
-    completedReviews: toNumber(record.completedReviews),
-    completedTests: toNumber(record.completedTests),
+    completedReviews: Math.max(0, toNumber(record.completedReviews)),
+    completedTests: Math.max(0, toNumber(record.completedTests)),
     activityByDate,
     lastTest,
     unlockedUpTo: clampLevel(toNumber(record.unlockedUpTo)),
+    testXpByDate,
   };
 }
 
@@ -248,7 +268,8 @@ export function applyReview(
 }
 
 export function testXp(correct: number, total: number): number {
-  const accuracy = total === 0 ? 0 : correct / total;
+  if (total <= 0) return 0;
+  const accuracy = correct / total;
   return Math.round(correct * 5 * (0.5 + accuracy * 0.5));
 }
 
@@ -256,21 +277,31 @@ export function applyTest(
   state: ProgressState,
   correct: number,
   total: number,
-): ProgressState {
+): { state: ProgressState; awarded: number } {
   const today = todayKey();
-  const xp = testXp(correct, total);
+  const rawXp = testXp(correct, total);
+  const spent = state.testXpByDate[today] ?? 0;
+  // Jangan melebihi batas XP harian untuk tes.
+  const awarded = Math.max(0, Math.min(rawXp, MAX_TEST_XP_PER_DAY - spent));
 
   return {
-    ...state,
-    xp: state.xp + xp,
-    streak: updateStreak(state, today),
-    lastActiveDate: today,
-    completedTests: state.completedTests + 1,
-    activityByDate: addActivity(state.activityByDate, today, {
-      xp,
-      tests: 1,
-    }),
-    lastTest: { correct, total, date: today },
+    state: {
+      ...state,
+      xp: state.xp + awarded,
+      streak: updateStreak(state, today),
+      lastActiveDate: today,
+      completedTests: state.completedTests + 1,
+      testXpByDate: {
+        ...state.testXpByDate,
+        [today]: spent + awarded,
+      },
+      activityByDate: addActivity(state.activityByDate, today, {
+        xp: awarded,
+        tests: 1,
+      }),
+      lastTest: { correct, total, date: today },
+    },
+    awarded,
   };
 }
 
@@ -297,6 +328,86 @@ export function applyXp(state: ProgressState, xp: number): ProgressState {
   };
 }
 
+// XP dari gym: masuk ke pool XP & aktivitas harian, TANPA menaikkan streak
+// belajar (lastActiveDate tidak disentuh) — streak gym dihitung terpisah.
+export function applyGymXp(state: ProgressState, xp: number): ProgressState {
+  const today = todayKey();
+  return {
+    ...state,
+    xp: state.xp + xp,
+    activityByDate: addActivity(state.activityByDate, today, { xp }),
+  };
+}
+
+// Pilih record word yang paling "maju" secara SRS: jumlah review paling
+// banyak; tie-break jumlah benar, lalu mastered, lalu tanggal review terakhir.
+function pickWordProgress(a: WordProgress, b: WordProgress): WordProgress {
+  if (b.reviews > a.reviews) return b;
+  if (b.reviews < a.reviews) return a;
+  if (b.correct > a.correct) return b;
+  if (b.correct < a.correct) return a;
+  if (b.mastered && !a.mastered) return b;
+  if (a.mastered && !b.mastered) return a;
+  return (b.nextReview ?? "") > (a.nextReview ?? "") ? b : a;
+}
+
+// Gabungkan dua snapshot progres (mis. lokal vs cloud saat login). Strategi:
+// nilai kumulatif (xp, streak, review/test selesai) diambil maksimum; kata
+// digabung dengan `pickWordProgress`; aktivitas harian digabung dengan nilai
+// maksimum per tanggal; `lastTest` diambil yang paling baru.
+export function mergeProgress(a: ProgressState, b: ProgressState): ProgressState {
+  const words: Record<string, WordProgress> = { ...a.words };
+  for (const [id, wb] of Object.entries(b.words)) {
+    const wa = words[id];
+    words[id] = wa ? pickWordProgress(wa, wb) : wb;
+  }
+
+  const activityByDate: Record<string, ActivityDay> = { ...a.activityByDate };
+  for (const [date, db] of Object.entries(b.activityByDate)) {
+    const da = activityByDate[date];
+    activityByDate[date] = da
+      ? {
+          xp: Math.max(da.xp, db.xp),
+          reviews: Math.max(da.reviews, db.reviews),
+          tests: Math.max(da.tests, db.tests),
+          newWords: Math.max(da.newWords ?? 0, db.newWords ?? 0),
+        }
+      : db;
+  }
+
+  const lastTest = !a.lastTest
+    ? b.lastTest
+    : !b.lastTest
+      ? a.lastTest
+      : b.lastTest.date >= a.lastTest.date
+        ? b.lastTest
+        : a.lastTest;
+
+  const testXpByDate: Record<string, number> = { ...a.testXpByDate };
+  for (const [date, xp] of Object.entries(b.testXpByDate)) {
+    testXpByDate[date] = Math.max(testXpByDate[date] ?? 0, xp);
+  }
+
+  return {
+    xp: Math.max(a.xp, b.xp),
+    streak: Math.max(a.streak, b.streak),
+    lastActiveDate: pickLaterDate(a.lastActiveDate, b.lastActiveDate),
+    words,
+    completedReviews: Math.max(a.completedReviews, b.completedReviews),
+    completedTests: Math.max(a.completedTests, b.completedTests),
+    activityByDate,
+    lastTest,
+    unlockedUpTo: Math.max(a.unlockedUpTo, b.unlockedUpTo),
+    testXpByDate,
+  };
+}
+
+function pickLaterDate(a: string | null, b: string | null): string | null {
+  if (!a) return b;
+  if (!b) return a;
+  return a >= b ? a : b;
+}
+
 export function loadProgress(): ProgressState {
   if (typeof window === "undefined") return emptyProgress();
   try {
@@ -307,10 +418,17 @@ export function loadProgress(): ProgressState {
     for (const [id, w] of Object.entries(parsed.words ?? {})) {
       words[id] = normalizeWordProgress(w ?? {});
     }
+    const testXpByDate: Record<string, number> = {};
+    for (const [date, xp] of Object.entries(parsed.testXpByDate ?? {})) {
+      if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        testXpByDate[date] = Math.max(0, toNumber(xp));
+      }
+    }
     return {
       ...emptyProgress(),
       ...parsed,
       words,
+      testXpByDate,
       unlockedUpTo: clampLevel(toNumber(parsed.unlockedUpTo)),
     };
   } catch {

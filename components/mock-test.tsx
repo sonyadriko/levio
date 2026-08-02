@@ -8,7 +8,6 @@ import { ProgressBar } from "@/components/progress-bar";
 import { Pill } from "@/components/pill";
 import { Confetti } from "@/components/confetti";
 import { useCountUp } from "@/lib/use-count-up";
-import { testXp } from "@/lib/progress";
 import { countWordsByLevel } from "@/lib/hsk";
 import { useLevelWords } from "@/lib/hsk/use-level-words";
 import { allLevels, getLevelMeta } from "@/lib/hsk/levels";
@@ -155,8 +154,7 @@ export function MockTest() {
     if (!questions || submitted.current) return;
     submitted.current = true;
     const correct = questions.filter((q) => answers[q.id] === q.answer).length;
-    const xp = testXp(correct, questions.length);
-    recordTest(correct, questions.length);
+    const xp = recordTest(correct, questions.length);
     setResult({ correct, total: questions.length, xp, answers, questions });
   }, [questions, answers, recordTest]);
 

@@ -127,9 +127,11 @@ export function Lesson({ level }: { level: HskLevel }) {
   const pick = (option: string) => {
     if (!session || !word || picked) return;
     const correct = option === word.meaning;
+    // Rekam ke SRS setiap percobaan (termasuk retest kata yang salah di
+    // akhir antrean), agar jadwal review mengikuti hasil terakhir.
+    recordReview(word, correct);
     if (!recorded.current.has(word.id)) {
       recorded.current.add(word.id);
-      recordReview(word, correct);
       setResults((prev) => ({ ...prev, [word.id]: correct }));
     }
     setPicked({ option, correct });

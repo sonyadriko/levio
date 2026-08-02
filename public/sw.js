@@ -1,5 +1,11 @@
-const CACHE_NAME = "levio-shell-v1";
+const CACHE_NAME = "levio-shell-v2";
 const PRECACHE_URLS = ["/", "/manifest.webmanifest", "/icon-192.png", "/icon-512.png"];
+const PRECACHE_PATHNAMES = PRECACHE_URLS.map(
+  (url) => new URL(url, self.location.origin).pathname,
+);
+// Aset statis lama (hashed JS/CSS dari rilis sebelumnya) diprune jika sudah
+// berumur lebih dari ini — mencegah cache membesar tanpa batas.
+const ASSET_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -12,12 +18,35 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches
-      .keys()
-      .then((keys) =>
-        Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))),
-      )
-      .then(() => self.clients.claim()),
+    (async () => {
+      // Hapus cache versi lain.
+      const keys = await caches.keys();
+      await Promise.all(
+        keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)),
+      );
+      // Prune aset lama di dalam cache aktif (kecuali precache inti).
+      const cache = await caches.open(CACHE_NAME);
+      const requests = await cache.keys();
+      const now = Date.now();
+      await Promise.all(
+        requests
+          .filter((req) => {
+            const pathname = new URL(req.url).pathname;
+            return !PRECACHE_PATHNAMES.includes(pathname);
+          })
+          .map(async (req) => {
+            const response = await cache.match(req);
+            if (!response) return;
+            const date = response.headers.get("date");
+            if (!date) return;
+            const age = now - new Date(date).getTime();
+            if (Number.isFinite(age) && age > ASSET_MAX_AGE_MS) {
+              await cache.delete(req);
+            }
+          }),
+      );
+      await self.clients.claim();
+    })(),
   );
 });
 

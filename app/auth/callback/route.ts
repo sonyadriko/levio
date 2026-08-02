@@ -10,9 +10,20 @@ const OTP_TYPES = [
   "email",
 ] as const;
 
+// Hanya izinkan redirect internal (path relatif di origin yang sama) untuk
+// mencegah open redirect bila parameter `next` dimanipulasi.
+function safeNext(raw: string | null): string {
+  if (!raw) return "/profile";
+  if (!raw.startsWith("/")) return "/profile";
+  if (raw.startsWith("//") || raw.includes("://") || raw.includes("\\")) {
+    return "/profile";
+  }
+  return raw;
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
-  const next = searchParams.get("next") ?? "/profile";
+  const next = safeNext(searchParams.get("next"));
   const code = searchParams.get("code");
   const tokenHash = searchParams.get("token_hash");
   const type = searchParams.get("type");
@@ -35,7 +46,9 @@ export async function GET(request: NextRequest) {
         type: type as (typeof OTP_TYPES)[number],
       });
       if (!error) {
-        return NextResponse.redirect(`${origin}${next}`);
+        // Tautan recovery membuka halaman khusus untuk memasang kata sandi baru.
+        const target = type === "recovery" ? "/auth/reset-password" : next;
+        return NextResponse.redirect(`${origin}${target}`);
       }
     }
   }

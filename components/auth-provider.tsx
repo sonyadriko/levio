@@ -28,6 +28,7 @@ interface AuthContextValue {
   signIn: (email: string, password: string) => Promise<AuthResult>;
   signUp: (email: string, password: string) => Promise<AuthResult>;
   signInWithGoogle: () => Promise<AuthResult>;
+  resetPassword: (email: string) => Promise<AuthResult>;
   signOut: () => Promise<void>;
 }
 
@@ -148,6 +149,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { ok: true, error: null };
   }, []);
 
+  const resetPassword = useCallback(async (email: string) => {
+    const client = getSupabaseBrowserClient();
+    if (!client) return { ok: false, error: "auth.errorNetwork" };
+    const { error } = await client.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/callback`,
+    });
+    if (error) return { ok: false, error: mapAuthError(error) };
+    return { ok: true, error: null };
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -157,6 +168,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signIn,
         signUp,
         signInWithGoogle,
+        resetPassword,
         signOut,
       }}
     >

@@ -10,6 +10,12 @@ import {
 import { generateListeningQuestions } from "@/lib/hsk/exercises";
 import type { VocabWord } from "@/lib/hsk/types";
 
+// Referensi stabil di module scope agar useMemo `build` di dalam
+// ChoicePracticeSession benar-benar efektif (tidak dibuat ulang per render).
+function buildListeningQuestions(words: VocabWord[]): ChoiceQ[] {
+  return generateListeningQuestions(words, 8) as ChoiceQ[];
+}
+
 // Mainkan suara kata: audio native lewat proxy TTS (/api/tts), fallback ke
 // Web Speech API (speechSynthesis) bila audio native gagal (mis. offline).
 function useSpeech() {
@@ -75,7 +81,7 @@ export function ListeningPractice() {
 
   return (
     <ChoicePracticeSession
-      build={(w: VocabWord[]) => generateListeningQuestions(w, 8) as ChoiceQ[]}
+      build={buildListeningQuestions}
       renderPrompt={(q) => (
         <div className="rounded-xl border border-stone-200 bg-stone-50 p-6 text-center dark:border-stone-800 dark:bg-stone-900">
           <p className="text-sm font-medium text-stone-500 dark:text-stone-400">

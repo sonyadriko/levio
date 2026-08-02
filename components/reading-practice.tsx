@@ -3,24 +3,27 @@
 import { useLanguage } from "@/components/language-provider";
 import {
   ChoicePracticeSession,
+  type ChoiceQ,
 } from "@/components/practice-session";
 import { generateReadingQuestions } from "@/lib/hsk/exercises";
 import type { HskLevel, VocabWord } from "@/lib/hsk/types";
+
+function buildReadingQuestions(words: VocabWord[], level: HskLevel): ChoiceQ[] {
+  return generateReadingQuestions(words, level, 8).map((q) => ({
+    id: q.id,
+    prompt: q.answer,
+    options: q.options,
+    answer: q.answer,
+    passage: q.passage,
+  }));
+}
 
 export function ReadingPractice() {
   const { t } = useLanguage();
 
   return (
     <ChoicePracticeSession
-      build={(w: VocabWord[], l: HskLevel) =>
-        generateReadingQuestions(w, l, 8).map((q) => ({
-          id: q.id,
-          prompt: q.answer,
-          options: q.options,
-          answer: q.answer,
-          passage: q.passage,
-        }))
-      }
+      build={buildReadingQuestions}
       renderPrompt={(q) => {
         const passage = q.passage ?? [];
         return (

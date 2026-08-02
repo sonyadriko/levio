@@ -125,6 +125,8 @@ Levio
 - Modul kesehatan lain: step counter, water tracker, sleep
 - Komunitas & belajar bareng (group challenge)
 - Marketplace premium content / subscription
+- **Integrasi donasi mayar.id (V3/Future):** halaman "Dukung Levio" + redirect ke
+  checkout mayar.id → webhook untuk catat donasi → opsi subscription via mayar.id.
 
 ---
 
@@ -186,9 +188,20 @@ Deploy   : Vercel (frontend) + Supabase (backend/DB)
 
 ## 9. Monetisasi (Opsional / Future)
 
+- **Donasi via [mayar.id](https://mayar.id) (langkah pertama):** integrasi payment gateway
+  lokal Indonesia. Mulai dari halaman/ tombol **"Dukung Levio"** (sekali klik, tanpa
+  akun belanja) → menyusul opsi berlangganan. Detail implementasi & versi target ada di
+  roadmap bawah (`Future / Nice-to-have`).
 - Freemium: level dasar gratis, premium untuk HSK 3–6 + semua bahasa.
 - Subscription bulanan/tahunan (mode, mock test unlimited, analytics detail).
 - Premium template workout + program gym terstruktur.
+
+> **Alur integrasi mayar.id (draft):**
+> 1. Buat link/API checkout donasi di dashboard mayar.id (title, nominal nominal default).
+> 2. Tambahkan halaman/komponen "Dukung" di aplikasi (mis. `/support`) yang menampilkan
+>    nominal & tombol donasi → redirect ke link mayar.id.
+> 3. Opsional: webhook mayar.id untuk mencatat donasi (tabel baru `donations`) — bisa
+>    dilewati di iterasi pertama (cukup redirect ke halaman terima kasih).
 
 ---
 

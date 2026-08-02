@@ -58,6 +58,7 @@ Dokumen ini mendeskripsikan struktur data aplikasi, baik yang sudah diimplementa
 | `completed_reviews` | `int` | Total kartu direview |
 | `completed_tests` | `int` | Total tes selesai |
 | `unlocked_up_to` | `int` | Level HSK terbuka (default 1; naik saat lulus tes kelulusan) |
+| `imported_at` | `timestamptz` | Tanda akun yang pernah import progress (migration 0005) |
 | `updated_at` | `timestamptz` | |
 
 ### `srs_cards` (Spaced Repetition per kata)

@@ -115,10 +115,11 @@ supabase/
     │                            + RLS via auth.uid() + trigger updated_at
     ├── 0002_add_srs.sql       → kolom SRS (ease, repetitions) di word_progress
     ├── 0003_add_new_words.sql → kolom new_words di daily_activity
-    └── 0004_add_unlocked_up_to.sql → kolom unlocked_up_to di profiles (gating level HSK)
+    ├── 0004_add_unlocked_up_to.sql → kolom unlocked_up_to di profiles (gating level HSK)
+    └── 0005_add_imported_at.sql → kolom imported_at di profiles (tanda akun yang pernah import)
 ```
 
-> Jalankan migration **berurutan** (0001 → 0004) di Supabase SQL Editor.
+> Jalankan migration **berurutan** (0001 → 0005) di Supabase SQL Editor.
 
 ## Alur Data
 
@@ -179,10 +180,15 @@ Stack: `@supabase/ssr` + `@supabase/supabase-js`. Auth via **email + password**
 - `lib/supabase/server.ts` → server client (pakai `cookies()` dari `next/headers`).
 - `lib/supabase/middleware.ts` + `proxy.ts` → refresh session di middleware.
 - `lib/supabase/sync.ts` → `pullProfile/pullProgress/pullSettings/pushProgress/pushSettings`
-  (upsert ke 4 tabel + merge ke `ProgressState`/`UserSettings`).
+  (upsert ke 4 tabel + merge ke `ProgressState`/`UserSettings`; `deleteStaleRows`
+  menghapus baris cloud yang tidak ada di state, per-chunk 900).
+- `lib/progress.ts` → `mergeProgress` menggabungkan dua arah (words: pilih hasil
+  terbanyak/koreksi; activity: max per tanggal; `testXpByDate`: max; `lastTest`:
+  tanggal terbaru) + `emptyProgress`.
 - `components/auth-provider.tsx` → `useAuth()`: user/ready/configured/signIn/signUp/signOut.
   `signUp` mengembalikan `needsConfirmation` (bila "Confirm email" aktif).
-- `app/auth/callback/route.ts` → tukar `code` (OAuth) atau `token_hash` (konfirmasi email).
+- `app/auth/callback/route.ts` → tukar `code` (OAuth) atau `token_hash` (konfirmasi email);
+  `safeNext` memvalidasi redirect + `recovery` → `/auth/reset-password`.
 
 Alur sinkronisasi:
 
@@ -191,25 +197,26 @@ login (signInWithPassword)
    │
    ▼
 progress-provider & settings-provider
-   │  pullProfile (ada data cloud?) ── ada ──▶ pullProgress/pullSettings → setProgress
-   │                                            (cloud menang)
+   │  pullProfile (ada data cloud?) ── ada ──▶ jika snapshot lokal tidak berubah:
+   │                                            pullProgress → mergeProgress(local, cloud)
+   │                                            (data perangkat & cloud digabung, tidak saling timpa)
    └── tidak ada ──▶ pushProgress/pushSettings (migrasi data lokal → cloud)
                         │
-ubah progress/settings (dengan debounce 600/400ms) ──▶ push ke cloud
+ubah progress/settings (dengan debounce 600/400ms) ──▶ push ke cloud (upsert + hapus basi)
 ```
 
 Kunci logika: `hasLocalData(state)` (apakah lokal punya data untuk di-migrasi)
 dan `hasCloudData(profile)` (apakah cloud sudah punya riwayat). Semua tabel
 dilindungi RLS (`auth.uid() = user_id`), sehingga user hanya mengakses datanya
-sendiri. Migration ada di `supabase/migrations/` (0001 → 0004, jalankan
-berurutan). `unlocked_up_to` (gating level HSK) ikut disinkronkan lewat
-`profiles`.
+sendiri. Migration ada di `supabase/migrations/` (0001 → 0005, jalankan
+berurutan). `unlocked_up_to` (gating level HSK) dan `imported_at` (tanda akun
+yang pernah import) ikut disinkronkan lewat `profiles`.
 
 ### Mengaktifkan backend
 
 1. Buat proyek di [supabase.com](https://supabase.com).
 2. Isi `.env.local` (`NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY`).
-3. Jalankan `supabase/migrations/0001_init.sql` → `0002` → `0003` → `0004` di SQL Editor (berurutan).
+3. Jalankan `supabase/migrations/0001_init.sql` → `0002` → `0003` → `0004` → `0005` di SQL Editor (berurutan).
 4. Authentication → Sign In / Up → aktifkan **Email** (matikan "Confirm email" agar
    registrasi langsung aktif).
 5. Authentication → URL Configuration → Site URL: `http://localhost:3000`.
@@ -261,7 +268,8 @@ selalu konsisten dengan data nyata dan tidak bisa "curang":
 - `app/api/tts/route.ts` → proxy GET `/api/tts?text=...&tl=zh-CN`. Mengambil audio MP3
   dari Google Translate TTS (tanpa API key), lalu mengembalikannya dengan
   `Content-Type: audio/mpeg` + `Cache-Control` lama. Cache in-memory (`Map`) 7 hari
-  untuk menghindari request berulang ke upstream; batas 200 karakter per teks.
+  untuk menghindari request berulang ke upstream; batas 200 karakter per teks;
+  **rate limit** 60 req/menit/IP + **whitelist bahasa** (`zh-CN`/`en`/`id`).
 - `components/listening-practice.tsx` → `useSpeech()` memutar `<audio>` dari proxy
   TTS (suara native, konsisten antar browser). Bila audio gagal (offline/error),
   otomatis fallback ke **Web Speech API** (`speechSynthesis`, lang `zh-CN`, rate 0.8).
@@ -302,6 +310,17 @@ Semua animasi murni CSS + sedikit React hook, **tanpa dependensi eksternal**:
 - `/learn/[level]` (rute lama) → redirect 307 ke `/learn/hsk/[level]`.
 - Level tidak valid → `notFound()` → 404.
 - Semua halaman lain statis (di-prerender saat build).
+- `/auth/reset-password` → halaman set kata sandi dari link email recovery.
+
+## Keamanan
+
+- **CSP & header keamanan** dipasang via `next.config.ts` `headers()` (lihat
+  `docs/SECURITY.md`). Skrip tema inline dipindah ke `public/theme-init.js`
+  (skrip blocking di `<head>` layout) agar tidak ada FOUC sekaligus tetap bisa
+  dipakai dengan CSP `script-src 'self' 'unsafe-inline'`.
+- **Callback auth** memvalidasi `next` (`safeNext`) dan mengarahkan `recovery`
+  ke `/auth/reset-password`; `imported_at` di-set saat import progress.
+- Rincian temuan & status keamanan: [`docs/SECURITY.md`](./SECURITY.md).
 
 ## Responsive & Mobile-first
 
@@ -315,10 +334,14 @@ Semua animasi murni CSS + sedikit React hook, **tanpa dependensi eksternal**:
 ```bash
 npm run lint     # ESLint
 npm run build    # tipe-check + production build + SSG
-npm run dev      # development server
+npm test         # Vitest — unit test logika murni di lib/ (tests/)
+npm run test:watch
 ```
 
-Tidak ada framework test terpasang saat ini. Rencana: tambah Vitest untuk unit test logika murni di `lib/` (progress, helper kosakata) sebelum V2.
+Unit test (Vitest) mencakup logika murni di `lib/`: `progress.ts` (merge,
+sanitize, XP tes & cap harian, SRS), `reminder.ts`, `settings.ts`, `badges.ts`,
+dan `date.ts`. Test file di `tests/*.test.ts`; konfigurasi di
+`vitest.config.mts` (alias `@/*` → root proyek).
 
 ## Jalan Menuju V2 (Modularitas)
 
