@@ -572,6 +572,12 @@ export function sessionsThisWeek(state: GymState): number {
   return state.sessions.filter((s) => s.date >= startKey).length;
 }
 
+// Ada sesi gym yang selesai pada tanggal tertentu (dipakai Daily Checklist &
+// reminder: sesi di `sessions` selalu yang sudah selesai).
+export function workoutDoneOn(state: GymState, date: string): boolean {
+  return state.sessions.some((s) => s.date === date);
+}
+
 export const ROUTINE_TEMPLATES: RoutineTemplate[] = [
   {
     id: "push",

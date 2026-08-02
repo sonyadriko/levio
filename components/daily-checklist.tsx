@@ -4,13 +4,16 @@ import Link from "next/link";
 import { useProgress } from "@/components/progress-provider";
 import { useLanguage } from "@/components/language-provider";
 import { useSettings } from "@/components/settings-provider";
+import { useGym } from "@/components/gym/use-gym";
 import { Icon } from "@/components/icons";
 import { todayKey } from "@/lib/date";
+import { workoutDoneOn } from "@/lib/gym";
 
 export function DailyChecklist() {
   const { progress } = useProgress();
   const { t } = useLanguage();
   const { settings } = useSettings();
+  const { gym } = useGym();
 
   const activity = progress?.activityByDate ?? {};
   const today = activity[todayKey()] ?? { xp: 0, reviews: 0, tests: 0, newWords: 0 };
@@ -23,7 +26,7 @@ export function DailyChecklist() {
     metaKey: string;
     done: boolean;
     href: string;
-    icon: "book" | "pen" | "chart";
+    icon: "book" | "pen" | "chart" | "dumbbell";
   }[] = [
     {
       labelKey: "checklist.learn.label",
@@ -56,6 +59,14 @@ export function DailyChecklist() {
       done: today.tests >= 1,
       href: "/mock-test",
       icon: "chart" as const,
+    },
+    {
+      labelKey: "checklist.gym.label",
+      vars: {},
+      metaKey: "checklist.gym.meta",
+      done: workoutDoneOn(gym, todayKey()),
+      href: "/gym",
+      icon: "dumbbell" as const,
     },
   ];
   const doneCount = tasks.filter((task) => task.done).length;
