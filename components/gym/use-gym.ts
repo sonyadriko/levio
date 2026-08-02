@@ -56,6 +56,14 @@ function setGym(next: GymState): void {
   listeners.forEach((listener) => listener());
 }
 
+export function getGymSnapshot(): GymState {
+  return getSnapshot();
+}
+
+export function setGymSnapshot(next: GymState): void {
+  setGym(next);
+}
+
 export function useGym() {
   const gym = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const { t } = useLanguage();
@@ -149,6 +157,10 @@ export function useGym() {
     setGym(deleteSession(getSnapshot(), sessionId));
   }, []);
 
+  const resetGym = useCallback(() => {
+    setGym(emptyGym());
+  }, []);
+
   return {
     gym,
     beginSession,
@@ -166,5 +178,6 @@ export function useGym() {
     endSession,
     abortSession,
     removeSession,
+    resetGym,
   };
 }

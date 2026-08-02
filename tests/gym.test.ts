@@ -14,6 +14,7 @@ import {
   groupSessionsByDate,
   loadGym,
   makeId,
+  mergeGym,
   removeExercise,
   removeSet,
   ROUTINE_TEMPLATES,
@@ -382,6 +383,52 @@ describe("workoutDoneOn", () => {
   it("true bila ada sesi selesai pada tanggal itu", () => {
     const { state } = completeSession(startedSession());
     expect(workoutDoneOn(state, d(0))).toBe(true);
+  });
+});
+
+describe("mergeGym", () => {
+  it("menggabungkan sesi dari kedua sisi tanpa duplikasi id", () => {
+    const a: GymState = {
+      activeSession: null,
+      xpByDate: { "2026-08-01": 10 },
+      sessions: [{ id: "s1", title: "A", date: "2026-08-01", startedAt: 1, completedAt: 2, exercises: [exercise("A")] }],
+    };
+    const b: GymState = {
+      activeSession: null,
+      xpByDate: { "2026-08-02": 20 },
+      sessions: [{ id: "s2", title: "B", date: "2026-08-02", startedAt: 3, completedAt: 4, exercises: [exercise("B")] }],
+    };
+    const merged = mergeGym(a, b);
+    expect(merged.sessions.map((s) => s.id).sort()).toEqual(["s1", "s2"]);
+    expect(merged.xpByDate).toEqual({ "2026-08-01": 10, "2026-08-02": 20 });
+  });
+
+  it("untuk id sama, memilih revisi dengan completedAt terlama", () => {
+    const base = (completedAt: number | null): GymState => ({
+      activeSession: null,
+      xpByDate: {},
+      sessions: [
+        { id: "s1", title: "A", date: "2026-08-01", startedAt: 1, completedAt, exercises: [exercise("A")] },
+      ],
+    });
+    const merged = mergeGym(base(10), base(20));
+    expect(merged.sessions[0].completedAt).toBe(20);
+  });
+
+  it("sesi tanpa completedAt kalah dengan yang sudah selesai", () => {
+    const a: GymState = {
+      activeSession: null,
+      xpByDate: {},
+      sessions: [{ id: "s1", title: "A", date: "2026-08-01", startedAt: 5, completedAt: null, exercises: [exercise("A")] }],
+    };
+    const b: GymState = {
+      activeSession: null,
+      xpByDate: {},
+      sessions: [{ id: "s1", title: "A", date: "2026-08-01", startedAt: 5, completedAt: 9, exercises: [exercise("A")] }],
+    };
+    const merged = mergeGym(a, b);
+    expect(merged.sessions).toHaveLength(1);
+    expect(merged.sessions[0].completedAt).toBe(9);
   });
 });
 

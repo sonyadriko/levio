@@ -26,8 +26,11 @@ import {
 } from "@/lib/progress";
 import { useAuth } from "@/components/auth-provider";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { emptyGym } from "@/lib/gym";
+import { setGymSnapshot } from "@/components/gym/use-gym";
 import {
   deleteAllData,
+  deleteGymData,
   hasCloudData,
   hasLocalData,
   pullProfile,
@@ -106,11 +109,16 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
 
   const resetProgress = useCallback(async (): Promise<boolean> => {
     setProgress(emptyProgress());
+    setGymSnapshot(emptyGym());
     const userId = user?.id;
     if (!userId) return true;
     const client = getSupabaseBrowserClient();
     if (!client) return true;
-    return deleteAllData(client, userId);
+    const [progressDeleted, gymDeleted] = await Promise.all([
+      deleteAllData(client, userId),
+      deleteGymData(client, userId),
+    ]);
+    return progressDeleted && gymDeleted;
   }, [user?.id]);
 
   const importProgress = useCallback(

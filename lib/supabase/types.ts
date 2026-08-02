@@ -39,3 +39,21 @@ export interface LastTestRow {
   date: string | null;
   updated_at: string;
 }
+
+export interface GymSessionRow {
+  user_id: string;
+  session_id: string;
+  title: string;
+  template_id: string | null;
+  date: string;
+  started_at: number;
+  completed_at: number | null;
+  exercises: unknown;
+  updated_at: string;
+}
+
+export interface GymXpByDateRow {
+  user_id: string;
+  date: string;
+  xp: number;
+}

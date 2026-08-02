@@ -6,8 +6,16 @@ import {
   type ProgressState,
 } from "@/lib/progress";
 import { DEFAULT_SETTINGS, type UserSettings } from "@/lib/settings";
+import {
+  emptyGym,
+  normalizeSession,
+  type GymSession,
+  type GymState,
+} from "@/lib/gym";
 import type {
   ActivityRow,
+  GymSessionRow,
+  GymXpByDateRow,
   LastTestRow,
   ProfileRow,
   WordRow,
@@ -44,8 +52,12 @@ const DELETE_CHUNK = 900;
 async function deleteStaleRows(
   client: Client,
   userId: string,
-  table: "daily_activity" | "word_progress",
-  idColumn: "date" | "word_id",
+  table:
+    | "daily_activity"
+    | "word_progress"
+    | "gym_sessions"
+    | "gym_xp_by_date",
+  idColumn: "date" | "word_id" | "session_id",
   keep: string[],
 ): Promise<boolean> {
   const { data, error } = await client
@@ -324,4 +336,119 @@ export async function pullSettings(
     },
     theme: DEFAULT_SETTINGS.theme,
   };
+}
+
+// ==================== GYM ====================
+
+export function hasLocalGymData(state: GymState): boolean {
+  return state.sessions.length > 0 || Object.keys(state.xpByDate).length > 0;
+}
+
+export function hasCloudGymData(state: GymState): boolean {
+  return state.sessions.length > 0 || Object.keys(state.xpByDate).length > 0;
+}
+
+function gymSessionToRow(userId: string, session: GymSession): GymSessionRow {
+  return {
+    user_id: userId,
+    session_id: session.id,
+    title: session.title,
+    template_id: session.templateId ?? null,
+    date: session.date,
+    started_at: session.startedAt,
+    completed_at: session.completedAt,
+    exercises: session.exercises,
+    updated_at: new Date().toISOString(),
+  };
+}
+
+function gymRowToSession(row: GymSessionRow): GymSession {
+  return normalizeSession({
+    id: row.session_id,
+    title: row.title,
+    templateId: row.template_id ?? undefined,
+    date: row.date,
+    startedAt: row.started_at,
+    completedAt: row.completed_at,
+    exercises: Array.isArray(row.exercises) ? (row.exercises as GymSession["exercises"]) : [],
+  });
+}
+
+// Push gym lokal ke cloud: upsert semua sesi + XP harian, lalu hapus baris
+// cloud yang tidak ada lagi di state (sesi yang dihapus / tanggal XP reset).
+export async function pushGym(
+  client: Client,
+  userId: string,
+  state: GymState,
+): Promise<boolean> {
+  const sessionRows = state.sessions.map((session) =>
+    gymSessionToRow(userId, session),
+  );
+  const xpRows: GymXpByDateRow[] = Object.entries(state.xpByDate).map(
+    ([date, xp]) => ({ user_id: userId, date, xp }),
+  );
+
+  const ops: PromiseLike<{ error: Error | null }>[] = [];
+  if (sessionRows.length > 0) {
+    ops.push(client.from("gym_sessions").upsert(sessionRows));
+  }
+  if (xpRows.length > 0) {
+    ops.push(client.from("gym_xp_by_date").upsert(xpRows));
+  }
+
+  const [staleSessions, staleXp] = await Promise.all([
+    deleteStaleRows(
+      client,
+      userId,
+      "gym_sessions",
+      "session_id",
+      state.sessions.map((s) => s.id),
+    ),
+    deleteStaleRows(
+      client,
+      userId,
+      "gym_xp_by_date",
+      "date",
+      Object.keys(state.xpByDate),
+    ),
+  ]);
+
+  const results = await Promise.all(ops);
+  return results.every((result) => !result.error) && staleSessions && staleXp;
+}
+
+export async function pullGym(
+  client: Client,
+  userId: string,
+): Promise<GymState | null> {
+  const [sessionsRes, xpRes] = await Promise.all([
+    client.from("gym_sessions").select("*").eq("user_id", userId),
+    client.from("gym_xp_by_date").select("*").eq("user_id", userId),
+  ]);
+
+  if (sessionsRes.error || xpRes.error) {
+    throw new Error("pull_gym_failed");
+  }
+
+  const sessionRows = (sessionsRes.data ?? []) as GymSessionRow[];
+  const xpRows = (xpRes.data ?? []) as GymXpByDateRow[];
+  if (sessionRows.length === 0 && xpRows.length === 0) return null;
+
+  const state = emptyGym();
+  state.sessions = sessionRows.map(gymRowToSession);
+  for (const row of xpRows) {
+    state.xpByDate[row.date] = Math.max(0, row.xp);
+  }
+  return state;
+}
+
+export async function deleteGymData(
+  client: Client,
+  userId: string,
+): Promise<boolean> {
+  const results = await Promise.all([
+    client.from("gym_sessions").delete().eq("user_id", userId),
+    client.from("gym_xp_by_date").delete().eq("user_id", userId),
+  ]);
+  return results.every((result) => !result.error);
 }
