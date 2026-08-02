@@ -5,7 +5,7 @@ import { useProgress } from "@/components/progress-provider";
 import { useLanguage } from "@/components/language-provider";
 import { useGym } from "@/components/gym/use-gym";
 import { todayKey } from "@/lib/date";
-import { workoutDoneOn } from "@/lib/gym";
+import { todayStatus } from "@/lib/habits";
 import {
   canNotify,
   isPastTime,
@@ -18,7 +18,7 @@ import {
 //  - user mengaktifkan pengingat & mengizinkan notifikasi,
 //  - sudah lewat jam pengingat,
 //  - belum pernah dikirim hari ini,
-//  - user belum belajar apa pun hari ini, atau belum workout hari ini.
+//  - masih ada aktivitas yang belum dikerjakan hari ini (belajar / gym).
 export function DailyReminder() {
   const { progress } = useProgress();
   const { t } = useLanguage();
@@ -34,15 +34,15 @@ export function DailyReminder() {
       if (!isPastTime(settings.time)) return;
       if (settings.lastSentKey === todayKey()) return;
 
-      const activeToday = Boolean(progress.activityByDate[todayKey()]);
-      const workedOutToday = workoutDoneOn(gym, todayKey());
-      if (activeToday && workedOutToday) return;
+      const { studied, workedOut } = todayStatus(progress, gym);
+      if (studied && workedOut) return;
 
-      const reminder = new Notification(t("reminder.notifyTitle"), {
-        body: activeToday
+      const body = workedOut
+        ? t("reminder.studyNotifyBody")
+        : studied
           ? t("reminder.gymNotifyBody")
-          : t("reminder.notifyBody"),
-      });
+          : t("reminder.notifyBody");
+      const reminder = new Notification(t("reminder.notifyTitle"), { body });
       reminder.onclick = () => {
         window.focus();
         reminder.close();
@@ -53,7 +53,7 @@ export function DailyReminder() {
     check();
     const interval = window.setInterval(check, 60_000);
     return () => window.clearInterval(interval);
-  }, [progress.activityByDate, gym, t]);
+  }, [progress, gym, t]);
 
   return null;
 }

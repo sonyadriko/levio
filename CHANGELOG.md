@@ -20,6 +20,20 @@ selalu disinkronkan saat rilis (lihat `docs/CONTRIBUTING` tidak ada; aturan ada 
 
 ---
 
+## [0.11.0] — 2026-08-03
+
+### Ditambahkan
+- **Item gym di Daily Checklist & reminder workout:** task baru `checklist.gym` di beranda (ikon dumbbell, link ke `/gym`, selesai bila ada sesi hari ini via `workoutDoneOn`); reminder web kini membedakan — sudah belajar tapi belum workout → body khusus gym.
+- **Sync gym ke cloud (Supabase):** sesi selesai + XP harian + progres program tersinkron antar perangkat via `gym_sessions` & `gym_xp_by_date` (migration 0006), diorkestrasi `gym-sync.tsx` (pull + `mergeGym` saat login, push debounce 600 ms); reset akun turut menghapus data gym cloud.
+- **Program workout multi-minggu:** `lib/gym-programs.ts` + UI `gym-program.tsx` di `/gym` — program contoh PPL 4 pekan (Push/Pull/Legs 3×/minggu) dengan target set/reps per latihan & estimasi durasi; sesi dari program membawa penanda `programId/programWeek/programDay` (migration 0007) sehingga progres ter-tracking per pekan × hari dan ikut tersinkron.
+- **Streak gabungan & reminder pintar:** `lib/habits.ts` — hari aktif = belajar ATAU gym; `overallStreak` ditampilkan di beranda; reminder memilih body sesuai aktivitas yang belum dikerjakan (`studyNotifyBody` saat gym sudah, belajar belum).
+- **Custom domain:** panduan Opsi A/B DNS di `docs/DEPLOY.md` (`levio.space` → A `76.76.21.21` + CNAME `cname.vercel-dns.com`; hapus record A ganda agar Vercel tidak misconfigured).
+
+### Catatan
+- Migration Supabase **0006 & 0007** wajib dijalankan (SQL Editor) agar sync cloud aktif.
+
+---
+
 ## [0.10.0] — 2026-08-02
 
 ### Ditambahkan
