@@ -7,6 +7,7 @@ dan rekomendasi perbaikan.
 
 > Status: **B1–B14 ✅ diperbaiki di v0.8.0**. Baris di bawah mencatat temuan asli
 > dan lokasi perbaikannya. Nomor `[B-n]` dipakai sebagai ID referensi di PR/issue.
+> **B15 ✅ diperbaiki di v0.10.0** (ditemukan saat E2E modul gym).
 
 ## Ringkasan
 
@@ -26,6 +27,7 @@ dan rekomendasi perbaikan.
 | B12 | Rendah | Auth | Tidak ada flow "Lupa kata sandi" walau callback sudah mendukung recovery | ✅ |
 | B13 | Rendah | Kebersihan | Dua kunci i18n dalam satu baris (`lib/i18n.ts`) | ✅ |
 | B14 | Rendah | UI | Tes wisuda HSK 6 muncul tapi tidak bisa membuka level apa pun | ✅ |
+| B15 | Rendah | Gym | Grafik progress: `topWeight` hanya menghitung set `done`, inkonsisten dengan `est1RM` yang menghitung semua set | ✅ |
 
 Detail tiap temuan di bawah. Referensi lokasi memakai `file:baris`.
 
@@ -49,6 +51,26 @@ Semua temuan B1–B14 diperbaiki. Lokasi perbaikan:
 | B12 | Mode "Lupa sandi" di `AuthCard` + halaman `/auth/reset-password` + `resetPassword` di provider — `components/profile-view.tsx`, `app/auth/reset-password/page.tsx` |
 | B13 | Kunci `profile.role` dipisah ke baris masing-masing — `lib/i18n.ts` |
 | B14 | Blok wisuda disembunyikan saat `level === MAX_HSK_LEVEL`; tampil kartu `level.maxReached` — `components/level-content.tsx` |
+
+---
+
+## B15 — `topWeight` inkonsisten dengan `est1RM` di progress per latihan
+
+- **Severity:** Rendah · **Area:** Gym / Logika
+- **Lokasi:** `lib/gym.ts` — `exerciseProgressPoints` (sebelum perbaikan)
+- **Deskripsi:** Saat E2E halaman detail latihan (rilis 0.10.0), grafik metrik
+  "Beban" (topWeight) menampilkan 0 untuk sesi yang set-nya belum ditandai
+  `done` (mis. Squat 100×5 done:false), padahal metrik "1RM" sudah benar
+  menghitung semua set. Akar masalah: `topWeight` hanya menjumlah set `done`,
+  sedangkan `estOneRepMax` menghitung seluruh set — hasil dua metrik tidak
+  konsisten untuk data lama.
+- **Dampak:** Grafik beban kosong/menyesatkan untuk latihan yang log-nya tidak
+  mencentang done (umum pada data sebelum fitur done).
+- **Rekomendasi:** hitung `topWeight` untuk semua set valid
+  (`set.reps > 0 && set.weightKg > topWeight`), bukan hanya yang `done`.
+- **Perbaikan:** `lib/gym.ts` `exerciseProgressPoints` — kondisi update
+  `topWeight` diubah ke `set.reps > 0 && set.weightKg > topWeight`; ditutup
+  unit test di `tests/gym.test.ts` (E2E Squat: PR 116.7 kg Epley, Beban 100 kg).
 
 ---
 
