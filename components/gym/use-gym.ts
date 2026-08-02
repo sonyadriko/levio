@@ -2,6 +2,7 @@
 
 import { useCallback, useSyncExternalStore } from "react";
 import { useLanguage } from "@/components/language-provider";
+import { useProgress } from "@/components/progress-provider";
 import {
   addExercise,
   addSet,
@@ -55,6 +56,7 @@ function setGym(next: GymState): void {
 export function useGym() {
   const gym = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const { t } = useLanguage();
+  const { awardGymXp } = useProgress();
 
   const beginSession = useCallback(
     (templateId?: string) => {
@@ -110,9 +112,10 @@ export function useGym() {
 
   const endSession = useCallback((): number => {
     const { state, awarded } = completeSession(getSnapshot());
+    if (awarded > 0) awardGymXp(awarded);
     setGym(state);
     return awarded;
-  }, []);
+  }, [awardGymXp]);
 
   const abortSession = useCallback(() => {
     setGym(cancelSession(getSnapshot()));

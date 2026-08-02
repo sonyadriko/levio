@@ -11,6 +11,7 @@ import {
 } from "react";
 import type { VocabWord } from "@/lib/hsk/types";
 import {
+  applyGymXp,
   applyLevelPass,
   applyReview,
   applyTest,
@@ -40,6 +41,7 @@ interface ProgressContextValue {
   recordTest: (correct: number, total: number) => number;
   recordLevelPass: (level: number) => void;
   awardXp: (xp: number) => void;
+  awardGymXp: (xp: number) => void;
   resetProgress: () => Promise<boolean>;
   importProgress: (data: unknown) => Promise<boolean>;
 }
@@ -96,6 +98,10 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
 
   const awardXp = useCallback((xp: number) => {
     setProgress(applyXp(getSnapshot(), xp));
+  }, []);
+
+  const awardGymXp = useCallback((xp: number) => {
+    setProgress(applyGymXp(getSnapshot(), xp));
   }, []);
 
   const resetProgress = useCallback(async (): Promise<boolean> => {
@@ -214,6 +220,7 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
         recordTest,
         recordLevelPass,
         awardXp,
+        awardGymXp,
         resetProgress,
         importProgress,
       }}

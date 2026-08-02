@@ -328,6 +328,17 @@ export function applyXp(state: ProgressState, xp: number): ProgressState {
   };
 }
 
+// XP dari gym: masuk ke pool XP & aktivitas harian, TANPA menaikkan streak
+// belajar (lastActiveDate tidak disentuh) — streak gym dihitung terpisah.
+export function applyGymXp(state: ProgressState, xp: number): ProgressState {
+  const today = todayKey();
+  return {
+    ...state,
+    xp: state.xp + xp,
+    activityByDate: addActivity(state.activityByDate, today, { xp }),
+  };
+}
+
 // Pilih record word yang paling "maju" secara SRS: jumlah review paling
 // banyak; tie-break jumlah benar, lalu mastered, lalu tanggal review terakhir.
 function pickWordProgress(a: WordProgress, b: WordProgress): WordProgress {

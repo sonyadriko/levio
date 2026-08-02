@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   MAX_TEST_XP_PER_DAY,
+  applyGymXp,
   applyLevelPass,
   applyReview,
   applyTest,
@@ -64,6 +65,23 @@ describe("applyTest", () => {
     const second = applyTest(first.state, 40, 40); // raw 200, sisa 125
     expect(second.awarded).toBe(125);
     expect(second.state.testXpByDate[todayKey()]).toBe(200);
+  });
+});
+
+describe("applyGymXp", () => {
+  it("menambah XP & aktivitas harian tanpa menyentuh streak belajar", () => {
+    const seeded = makeState({ streak: 5, lastActiveDate: todayKey() });
+    const state = applyGymXp(seeded, 10);
+    expect(state.xp).toBe(10);
+    expect(state.activityByDate[todayKey()].xp).toBe(10);
+    expect(state.streak).toBe(5);
+    expect(state.lastActiveDate).toBe(todayKey());
+  });
+
+  it("tidak menaikkan streak meski belum aktif hari ini", () => {
+    const seeded = makeState({ streak: 3, lastActiveDate: null });
+    const state = applyGymXp(seeded, 10);
+    expect(state.streak).toBe(3);
   });
 });
 
