@@ -5,6 +5,7 @@ import { useLanguage } from "@/components/language-provider";
 import { useProgress } from "@/components/progress-provider";
 import {
   addExercise,
+  addExerciseFromDb,
   addSet,
   cancelSession,
   completeSession,
@@ -17,6 +18,7 @@ import {
   setActiveSessionTitle,
   setExerciseMuscles,
   setExerciseName,
+  setExerciseRest,
   startSession,
   templateSessionDraft,
   toggleMuscle,
@@ -24,6 +26,7 @@ import {
   type GymState,
   type MuscleGroup,
 } from "@/lib/gym";
+import { defaultRestSeconds, getExerciseDef } from "@/lib/gym-exercises";
 
 const listeners = new Set<() => void>();
 const serverSnapshot = emptyGym();
@@ -74,6 +77,27 @@ export function useGym() {
 
   const addExerciseToSession = useCallback(() => {
     setGym(addExercise(getSnapshot()));
+  }, []);
+
+  const addDbExercise = useCallback(
+    (defId: string) => {
+      const def = getExerciseDef(defId);
+      if (!def) return;
+      setGym(
+        addExerciseFromDb(
+          getSnapshot(),
+          def.id,
+          t(def.nameKey),
+          def.muscles,
+          defaultRestSeconds(def),
+        ),
+      );
+    },
+    [t],
+  );
+
+  const setRest = useCallback((exerciseId: string, restSeconds: number) => {
+    setGym(setExerciseRest(getSnapshot(), exerciseId, restSeconds));
   }, []);
 
   const removeExerciseFromSession = useCallback((exerciseId: string) => {
@@ -130,6 +154,8 @@ export function useGym() {
     beginSession,
     setTitle,
     addExerciseToSession,
+    addDbExercise,
+    setRest,
     removeExerciseFromSession,
     renameExercise,
     setMuscles,

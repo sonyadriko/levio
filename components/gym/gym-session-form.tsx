@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, Plus, Trash2 } from "lucide-react";
 import { useLanguage } from "@/components/language-provider";
 import { Button } from "@/components/ui/button";
@@ -13,12 +13,20 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Sheet,
   SheetContent,
   SheetFooter,
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { EXERCISE_DB, defaultRestSeconds, getExerciseDef } from "@/lib/gym-exercises";
 import {
   MUSCLE_GROUPS,
   type GymSession,
@@ -30,6 +38,8 @@ import { cn } from "@/lib/utils";
 export interface GymSessionApi {
   setTitle: (title: string) => void;
   addExerciseToSession: () => void;
+  addDbExercise: (defId: string) => void;
+  setRest: (exerciseId: string, restSeconds: number) => void;
   removeExerciseFromSession: (exerciseId: string) => void;
   renameExercise: (exerciseId: string, name: string) => void;
   toggleMuscleFor: (exerciseId: string, muscle: MuscleGroup) => void;
@@ -42,6 +52,62 @@ export interface GymSessionApi {
   removeSetOf: (exerciseId: string, setIndex: number) => void;
   endSession: () => number;
   abortSession: () => void;
+}
+
+const REST_OPTIONS = [45, 60, 90, 120, 150, 180];
+
+function formatTime(ms: number): string {
+  const total = Math.max(0, Math.ceil(ms / 1000));
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
+let audioContext: AudioContext | null = null;
+
+function ensureAudio(): void {
+  if (typeof window === "undefined") return;
+  if (!audioContext) {
+    try {
+      audioContext = new AudioContext();
+    } catch {
+      audioContext = null;
+    }
+  }
+  if (audioContext && audioContext.state === "suspended") {
+    void audioContext.resume();
+  }
+}
+
+function playRestBeep(): void {
+  ensureAudio();
+  try {
+    if (!audioContext) return;
+    const ctx = audioContext;
+    const beep = (freq: number, at: number) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = "sine";
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.0001, ctx.currentTime + at);
+      gain.gain.exponentialRampToValueAtTime(0.4, ctx.currentTime + at + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + at + 0.35);
+      osc.start(ctx.currentTime + at);
+      osc.stop(ctx.currentTime + at + 0.4);
+    };
+    beep(880, 0);
+    beep(880, 0.3);
+    beep(1175, 0.6);
+  } catch {
+    // audio tidak tersedia — abaikan.
+  }
+  try {
+    navigator.vibrate?.(600);
+  } catch {
+    // vibration tidak tersedia — abaikan.
+  }
 }
 
 function SetRow({
@@ -106,9 +172,19 @@ function SetRow({
 function ExerciseCard({
   exercise,
   api,
+  restSeconds,
+  restRemaining,
+  onStartRest,
+  onSkipRest,
+  onSetRest,
 }: {
   exercise: GymSession["exercises"][number];
   api: GymSessionApi;
+  restSeconds: number;
+  restRemaining: number | null;
+  onStartRest: (exerciseId: string, seconds: number) => void;
+  onSkipRest: () => void;
+  onSetRest: (seconds: number) => void;
 }) {
   const { t } = useLanguage();
   return (
@@ -132,26 +208,57 @@ function ExerciseCard({
         </Button>
       </div>
 
-      <div className="mt-2 flex flex-wrap gap-1.5">
-        {MUSCLE_GROUPS.map((muscle) => {
-          const selected = exercise.muscles.includes(muscle);
-          return (
-            <button
-              key={muscle}
-              type="button"
-              onClick={() => api.toggleMuscleFor(exercise.id, muscle)}
-              className={cn(
-                "rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors",
-                selected
-                  ? "bg-teal-600 text-white"
-                  : "bg-stone-100 text-stone-600 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700",
-              )}
-            >
-              {t(`gym.muscle.${muscle}`)}
-            </button>
-          );
-        })}
+      <div className="mt-2 flex items-center justify-between gap-2">
+        <div className="flex flex-wrap gap-1.5">
+          {MUSCLE_GROUPS.map((muscle) => {
+            const selected = exercise.muscles.includes(muscle);
+            return (
+              <button
+                key={muscle}
+                type="button"
+                onClick={() => api.toggleMuscleFor(exercise.id, muscle)}
+                className={cn(
+                  "rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors",
+                  selected
+                    ? "bg-teal-600 text-white"
+                    : "bg-stone-100 text-stone-600 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700",
+                )}
+              >
+                {t(`gym.muscle.${muscle}`)}
+              </button>
+            );
+          })}
+        </div>
+        <Select
+          value={String(restSeconds)}
+          onValueChange={(value) => onSetRest(Number(value))}
+        >
+          <SelectTrigger size="sm" aria-label={t("gym.rest.edit")}>
+            <SelectValue>{t("gym.rest.seconds", { s: restSeconds })}</SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            {REST_OPTIONS.map((seconds) => (
+              <SelectItem key={seconds} value={String(seconds)}>
+                {t("gym.rest.seconds", { s: seconds })}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
+
+      {restRemaining !== null ? (
+        <div className="mt-2 flex items-center gap-2 rounded-lg bg-teal-600 px-3 py-2 text-sm font-semibold text-white">
+          <span className="tabular-nums">{formatTime(restRemaining)}</span>
+          <span className="text-xs font-normal opacity-90">{t("gym.rest")}</span>
+          <button
+            type="button"
+            onClick={onSkipRest}
+            className="ml-auto rounded-md px-2 py-0.5 text-xs font-medium underline-offset-2 hover:bg-white/20 hover:underline"
+          >
+            {t("gym.rest.skip")}
+          </button>
+        </div>
+      ) : null}
 
       <div className="mt-3 flex flex-col gap-1.5">
         <div className="grid grid-cols-[2rem_1fr_1fr_2.25rem_2rem] gap-2 text-[10px] font-semibold uppercase tracking-wide text-stone-400">
@@ -166,7 +273,10 @@ function ExerciseCard({
             key={index}
             index={index}
             set={set}
-            onChange={(patch) => api.updateSetOf(exercise.id, index, patch)}
+            onChange={(patch) => {
+              api.updateSetOf(exercise.id, index, patch);
+              if (patch.done === true) onStartRest(exercise.id, restSeconds);
+            }}
             onRemove={() => api.removeSetOf(exercise.id, index)}
           />
         ))}
@@ -187,6 +297,113 @@ function ExerciseCard({
   );
 }
 
+function AddExerciseSheet({
+  open,
+  onOpenChange,
+  onPick,
+  onCustom,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onPick: (defId: string) => void;
+  onCustom: () => void;
+}) {
+  const { t } = useLanguage();
+  const [query, setQuery] = useState("");
+  const [muscle, setMuscle] = useState<MuscleGroup | null>(null);
+
+  const q = query.trim().toLowerCase();
+  const filtered = EXERCISE_DB.filter(
+    (def) =>
+      (muscle === null || def.muscles.includes(muscle)) &&
+      (q === "" || t(def.nameKey).toLowerCase().includes(q)),
+  );
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{t("gym.exercise.library")}</DialogTitle>
+        </DialogHeader>
+
+        <Input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={t("gym.exercise.searchPlaceholder")}
+          autoFocus
+          aria-label={t("gym.exercise.searchPlaceholder")}
+        />
+
+        <div className="flex flex-wrap gap-1.5">
+          <button
+            type="button"
+            onClick={() => setMuscle(null)}
+            className={cn(
+              "rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors",
+              muscle === null
+                ? "bg-teal-600 text-white"
+                : "bg-stone-100 text-stone-600 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700",
+            )}
+          >
+            {t("gym.exercise.allMuscles")}
+          </button>
+          {MUSCLE_GROUPS.map((group) => (
+            <button
+              key={group}
+              type="button"
+              onClick={() => setMuscle(muscle === group ? null : group)}
+              className={cn(
+                "rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors",
+                muscle === group
+                  ? "bg-teal-600 text-white"
+                  : "bg-stone-100 text-stone-600 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700",
+              )}
+            >
+              {t(`gym.muscle.${group}`)}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex max-h-64 flex-col gap-1 overflow-y-auto pr-1">
+          {filtered.length === 0 ? (
+            <p className="py-4 text-center text-sm text-stone-400">
+              {t("gym.exercises.empty")}
+            </p>
+          ) : (
+            filtered.map((def) => (
+              <button
+                key={def.id}
+                type="button"
+                onClick={() => onPick(def.id)}
+                className="flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-teal-50 dark:hover:bg-teal-900/30"
+              >
+                <span className="truncate font-medium">{t(def.nameKey)}</span>
+                <span className="flex shrink-0 gap-1">
+                  {def.muscles.map((group) => (
+                    <span
+                      key={group}
+                      className="rounded-full bg-stone-100 px-2 py-0.5 text-[10px] uppercase tracking-wide text-stone-500 dark:bg-stone-800 dark:text-stone-400"
+                    >
+                      {t(`gym.muscle.${group}`)}
+                    </span>
+                  ))}
+                </span>
+              </button>
+            ))
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" className="w-full" onClick={onCustom}>
+            <Plus />
+            {t("gym.exercise.custom")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export function GymSessionForm({
   open,
   onOpenChange,
@@ -202,16 +419,64 @@ export function GymSessionForm({
 }) {
   const { t } = useLanguage();
   const [confirmCancel, setConfirmCancel] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [timers, setTimers] = useState<Record<string, { until: number }>>({});
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    if (Object.keys(timers).length === 0) return;
+    const interval = window.setInterval(() => setNow(Date.now()), 250);
+    return () => window.clearInterval(interval);
+  }, [timers]);
+
+  useEffect(() => {
+    const prune = () => {
+      const ids = new Set(session.exercises.map((ex) => ex.id));
+      let changed = false;
+      let anyExpired = false;
+      const next: Record<string, { until: number }> = {};
+      for (const [exerciseId, timer] of Object.entries(timers)) {
+        if (!ids.has(exerciseId) || timer.until <= now) {
+          changed = true;
+          if (timer.until <= now) anyExpired = true;
+          continue;
+        }
+        next[exerciseId] = timer;
+      }
+      if (changed) {
+        setTimers(next);
+        if (anyExpired) playRestBeep();
+      }
+    };
+    prune();
+  }, [now, timers, session.exercises]);
+
+  const startRest = (exerciseId: string, seconds: number) => {
+    ensureAudio();
+    const until = Date.now() + Math.max(1, seconds) * 1000;
+    setTimers((prev) => ({ ...prev, [exerciseId]: { until } }));
+    setNow(Date.now());
+  };
+
+  const skipRest = (exerciseId: string) => {
+    setTimers((prev) => {
+      const next = { ...prev };
+      delete next[exerciseId];
+      return next;
+    });
+  };
 
   const handleEnd = () => {
     const awarded = api.endSession();
     onEnded(awarded);
+    setTimers({});
     onOpenChange(false);
   };
 
   const handleCancel = () => {
     api.abortSession();
     setConfirmCancel(false);
+    setTimers({});
     onOpenChange(false);
   };
 
@@ -241,15 +506,31 @@ export function GymSessionForm({
               </p>
             </div>
           ) : (
-            session.exercises.map((exercise) => (
-              <ExerciseCard key={exercise.id} exercise={exercise} api={api} />
-            ))
+            session.exercises.map((exercise) => {
+              const restSeconds =
+                exercise.restSeconds ??
+                defaultRestSeconds(getExerciseDef(exercise.exerciseId));
+              const timer = timers[exercise.id];
+              const remaining = timer ? timer.until - now : null;
+              return (
+                <ExerciseCard
+                  key={exercise.id}
+                  exercise={exercise}
+                  api={api}
+                  restSeconds={restSeconds}
+                  restRemaining={remaining !== null && remaining > 0 ? remaining : null}
+                  onStartRest={startRest}
+                  onSkipRest={() => skipRest(exercise.id)}
+                  onSetRest={(seconds) => api.setRest(exercise.id, seconds)}
+                />
+              );
+            })
           )}
 
           <Button
             variant="outline"
             className="w-full"
-            onClick={() => api.addExerciseToSession()}
+            onClick={() => setPickerOpen(true)}
           >
             <Plus />
             {t("gym.session.addExercise")}
@@ -289,6 +570,19 @@ export function GymSessionForm({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AddExerciseSheet
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        onPick={(defId) => {
+          api.addDbExercise(defId);
+          setPickerOpen(false);
+        }}
+        onCustom={() => {
+          api.addExerciseToSession();
+          setPickerOpen(false);
+        }}
+      />
     </Sheet>
   );
 }
