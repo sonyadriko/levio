@@ -20,6 +20,24 @@ selalu disinkronkan saat rilis (lihat `docs/CONTRIBUTING` tidak ada; aturan ada 
 
 ---
 
+## [0.12.1] — 2026-08-03
+
+### Diperbaiki
+- **Sync cloud level per modul:** level terbuka modul English (dan modul lain selain HSK) kini tersimpan & dipulihkan lintas perangkat. Kolom `unlocked_by_module` (jsonb) ditambahkan ke `profiles` (migration **0008**) — `unlocked_up_to` tetap sumber otoritatif untuk HSK.
+
+### Ditambahkan
+- **Badge per modul:** badge kuasai & lulus digenerate otomatis untuk setiap bahasa (HSK, English) dari registry modul.
+- **Statistik per modul:** halaman Statistik mengelompokkan progress per level berdasarkan modul; legenda label master/kuasai berlaku per modul.
+- **Checklist harian netral modul:** target kosakata harian ("{n} kosakata baru") & mock test tidak lagi mengacu spesifik HSK.
+
+### Teknis
+- `lib/badges.ts` → badge digenerate dari `allLanguageModules()` (`master-<module>-<level>`, `graduate-<module>-1`).
+- `components/stats-dashboard.tsx` → `ModuleLevelProgress({ module })` per modul.
+- `components/daily-checklist.tsx` → label netral modul.
+- `lib/supabase/sync.ts` + `types.ts` → push/pull `unlocked_by_module`.
+
+---
+
 ## [0.12.0] — 2026-08-03
 
 ### Ditambahkan
