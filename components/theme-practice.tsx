@@ -81,6 +81,17 @@ function speak(reading: string): void {
   }, 100);
 }
 
+function cancelSpeech(): void {
+  if (typeof window === "undefined") return;
+  if (pendingSpeak !== null) {
+    window.clearTimeout(pendingSpeak);
+    pendingSpeak = null;
+  }
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  }
+}
+
 function ResultView({
   correct,
   total,
@@ -269,7 +280,10 @@ function QuizMode({
     setPicked(option);
   };
 
-  const advance = () => setIndex((i) => i + 1);
+  const advance = () => {
+    setPicked(null);
+    setIndex((i) => i + 1);
+  };
 
   if (done) {
     return (
@@ -605,6 +619,12 @@ function ListenMode({
   }, []);
 
   useEffect(() => {
+    return () => {
+      cancelSpeech();
+    };
+  }, []);
+
+  useEffect(() => {
     if (!word || typeof window === "undefined") return;
     if (!("speechSynthesis" in window)) return;
     const timer = setTimeout(() => speak(word.reading ?? word.term), 250);
@@ -682,7 +702,10 @@ function ListenMode({
       </ul>
       {picked && (
         <button
-          onClick={() => setIndex((i) => i + 1)}
+          onClick={() => {
+            setPicked(null);
+            setIndex((i) => i + 1);
+          }}
           className="h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 active:scale-[0.97]"
         >
           {t("mock.next")}
