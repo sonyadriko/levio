@@ -9,7 +9,7 @@ dengan scope ringkas. Rincian pola menambah modul: [`modules.md`](./modules.md).
 |---|---|---|
 | v0.10.0 | Gym V2: database latihan, grafik progress, rest timer | ✅ rilis |
 | v0.11.0 | Gym cloud sync, program multi-minggu, streak gabungan belajar+gym, domain `levio.space` | ✅ rilis |
-| v0.12.0 (next) | Modul belajar multi-bahasa: English (CEFR) A1–A2 | 🚧 di main (belum rilis) |
+| v0.12.0 | Modul belajar multi-bahasa: English (CEFR) A1–A2 | ✅ rilis |
 | v4.x | Modul Financial Planner | 🕓 draft |
 
 ## Selesai
