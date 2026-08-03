@@ -1,12 +1,11 @@
 // Jumlah kata per level (ringan, bisa di-import sinkron tanpa memuat data).
-// Level B1–C2 belum berisi data — placeholder 0 sampai kosakata ditambahkan.
 export const ENGLISH_COUNTS: Record<number, number> = {
   1: 50,
   2: 50,
-  3: 0,
-  4: 0,
-  5: 0,
-  6: 0,
+  3: 50,
+  4: 50,
+  5: 50,
+  6: 50,
 };
 
-export const ENGLISH_TOTAL = 100;
+export const ENGLISH_TOTAL = 300;

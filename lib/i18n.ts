@@ -54,7 +54,7 @@ const dict: Record<Locale, Record<string, string>> = {
     "learn.moduleHskDesc": "Kosakata resmi HSK 1–6 — pemula hingga mahir.",
     "learn.moduleEnglish": "English (CEFR)",
     "learn.moduleEnglishDesc":
-      "Kosakata CEFR A1–C2 — pemula hingga mahir. Data A1–A2 tersedia.",
+      "Kosakata CEFR A1–C2 — pemula hingga mahir. Data lengkap (300 kosakata).",
 
     "level.back": "Kembali ke daftar level",
     "learn.backToModules": "Kembali ke modul",
@@ -178,10 +178,10 @@ const dict: Record<Locale, Record<string, string>> = {
 
     "levelDesc.en.1": "Pemula: kata & frasa paling dasar untuk percakapan sederhana (50 kata).",
     "levelDesc.en.2": "Dasar: percakapan sehari-hari tentang topik familiar (50 kata).",
-    "levelDesc.en.3": "Menengah: kosakata topik umum & opini (segera tersedia).",
-    "levelDesc.en.4": "Menengah-atas: kosakata topik luas & bahasa formal (segera tersedia).",
-    "levelDesc.en.5": "Mahir: kosakata kompleks untuk konteks profesional & akademik (segera tersedia).",
-    "levelDesc.en.6": "Sangat mahir: ekspresi bernuansa tingkat penutur asli (segera tersedia).",
+    "levelDesc.en.3": "Menengah: kosakata topik umum & opini (50 kata).",
+    "levelDesc.en.4": "Menengah-atas: kosakata topik luas & bahasa formal (50 kata).",
+    "levelDesc.en.5": "Mahir: kosakata kompleks untuk konteks profesional & akademik (50 kata).",
+    "levelDesc.en.6": "Sangat mahir: ekspresi bernuansa tingkat penutur asli (50 kata).",
 
     "practice.title": "Latihan Flashcards",
     "practice.subtitle": "Review kartu dengan metode Spaced Repetition.",
@@ -634,7 +634,7 @@ const dict: Record<Locale, Record<string, string>> = {
     "learn.moduleHskDesc": "Official HSK 1–6 vocabulary — beginner to advanced.",
     "learn.moduleEnglish": "English (CEFR)",
     "learn.moduleEnglishDesc":
-      "CEFR A1–C2 vocabulary — beginner to advanced. A1–A2 data available.",
+      "CEFR A1–C2 vocabulary — beginner to advanced. Full data (300 words).",
 
     "level.back": "Back to level list",
     "learn.backToModules": "Back to modules",
@@ -757,10 +757,10 @@ const dict: Record<Locale, Record<string, string>> = {
 
     "levelDesc.en.1": "Beginner: most basic words & phrases for simple conversation (50 words).",
     "levelDesc.en.2": "Elementary: everyday conversation on familiar topics (50 words).",
-    "levelDesc.en.3": "Intermediate: everyday topics & opinions (coming soon).",
-    "levelDesc.en.4": "Upper-intermediate: broad topics & formal language (coming soon).",
-    "levelDesc.en.5": "Advanced: complex vocabulary for professional & academic contexts (coming soon).",
-    "levelDesc.en.6": "Proficiency: nuanced expression at native-speaker level (coming soon).",
+    "levelDesc.en.3": "Intermediate: everyday topics & opinions (50 words).",
+    "levelDesc.en.4": "Upper-intermediate: broad topics & formal language (50 words).",
+    "levelDesc.en.5": "Advanced: complex vocabulary for professional & academic contexts (50 words).",
+    "levelDesc.en.6": "Proficiency: nuanced expression at native-speaker level (50 words).",
 
     "practice.title": "Practice Flashcards",
     "practice.subtitle": "Review cards with Spaced Repetition.",

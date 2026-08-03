@@ -15,10 +15,10 @@ describe("language modules", () => {
     expect(english.maxLevel).toBe(6);
     expect(english.levelName(1)).toBe("A1");
     expect(english.levelName(6)).toBe("C2");
-    expect(english.countWordsByLevel(1)).toBe(50);
-    expect(english.countWordsByLevel(2)).toBe(50);
-    expect(english.countWordsByLevel(3)).toBe(0);
-    expect(english.totalWordCount()).toBe(100);
+    for (let level = 1; level <= 6; level++) {
+      expect(english.countWordsByLevel(level)).toBe(50);
+    }
+    expect(english.totalWordCount()).toBe(300);
   });
 
   it("english tidak mendukung mengetik/lesson, tapi punya mock test", () => {
@@ -45,6 +45,23 @@ describe("language modules", () => {
     expect(words[0].id.startsWith("en-a1-")).toBe(true);
     expect(words[0].term).toBe("I");
     expect(words[0].meaning).toBe("saya");
+  });
+
+  it("english memuat data B1–C2 (50 kata per level, prefix sesuai)", async () => {
+    const english = getLanguageModule("english")!;
+    const expected = [
+      { level: 3, prefix: "en-b1-", label: "B1" },
+      { level: 4, prefix: "en-b2-", label: "B2" },
+      { level: 5, prefix: "en-c1-", label: "C1" },
+      { level: 6, prefix: "en-c2-", label: "C2" },
+    ];
+    for (const { level, prefix, label } of expected) {
+      const words = await english.loadWords(level);
+      expect(words).toHaveLength(50);
+      expect(words[0].id.startsWith(prefix)).toBe(true);
+      expect(words.every((w) => w.level === level)).toBe(true);
+      expect(english.levelName(level)).toBe(label);
+    }
   });
 });
 

@@ -7,10 +7,10 @@ import type { LanguageModule, VocabItem } from "./types";
 const loaders: Record<number, () => Promise<VocabItem[]>> = {
   1: () => import("../english/data/a1").then((m) => m.a1Words),
   2: () => import("../english/data/a2").then((m) => m.a2Words),
-  3: () => Promise.resolve([]),
-  4: () => Promise.resolve([]),
-  5: () => Promise.resolve([]),
-  6: () => Promise.resolve([]),
+  3: () => import("../english/data/b1").then((m) => m.b1Words),
+  4: () => import("../english/data/b2").then((m) => m.b2Words),
+  5: () => import("../english/data/c1").then((m) => m.c1Words),
+  6: () => import("../english/data/c2").then((m) => m.c2Words),
 };
 
 const store = createLevelWordStore(loaders);
