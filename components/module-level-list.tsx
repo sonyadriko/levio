@@ -8,7 +8,9 @@ import { PageHeader } from "@/components/page-header";
 import { T } from "@/components/translate";
 import { useProgress } from "@/components/progress-provider";
 import { getLanguageModule } from "@/lib/languages";
+import { allJapaneseThemes } from "@/lib/japanese/themes";
 import { unlockedFor } from "@/lib/progress";
+import type { IconName } from "@/lib/nav";
 
 export function ModuleLevelList({ moduleId }: { moduleId: string }) {
   const { progress } = useProgress();
@@ -30,6 +32,37 @@ export function ModuleLevelList({ moduleId }: { moduleId: string }) {
           }
         />
       </div>
+
+      {languageModule.id === "japanese" && allJapaneseThemes().length > 0 && (
+        <section className="flex flex-col gap-3">
+          <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+            <T id="theme.packs" />
+          </p>
+          {allJapaneseThemes().map((theme) => (
+            <Link
+              key={theme.id}
+              href={`/learn/japanese/themes/${theme.id}`}
+              className="flex items-center gap-4 rounded-xl border border-violet-200 bg-violet-50/60 p-4 transition-colors hover:border-violet-300 dark:border-violet-900 dark:bg-violet-950/40 dark:hover:border-violet-700"
+            >
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-violet-700 text-white">
+                <Icon name={theme.icon as IconName} className="h-5 w-5" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold">
+                  <T id={theme.titleKey} />
+                </p>
+                <p className="text-xs text-stone-500 dark:text-stone-400">
+                  <T id={theme.descKey} />
+                </p>
+              </div>
+              <span className="shrink-0 text-xs font-medium text-stone-400">
+                <T id="learn.wordCount" vars={{ n: theme.words.length }} />
+              </span>
+              <span className="shrink-0 text-stone-300 dark:text-stone-700">→</span>
+            </Link>
+          ))}
+        </section>
+      )}
 
       <section className="flex flex-col gap-3">
         {languageModule.script && (
