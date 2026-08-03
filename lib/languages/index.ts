@@ -1,10 +1,12 @@
 import type { LanguageModule } from "./types";
 import { hskModule } from "./hsk";
 import { englishModule } from "./english";
+import { japaneseModule } from "./japanese";
 
 export const LANGUAGE_MODULES: Record<string, LanguageModule> = {
   hsk: hskModule,
   english: englishModule,
+  japanese: japaneseModule,
 };
 
 export const DEFAULT_MODULE_ID = "hsk";

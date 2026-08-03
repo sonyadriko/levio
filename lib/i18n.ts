@@ -55,6 +55,9 @@ const dict: Record<Locale, Record<string, string>> = {
     "learn.moduleEnglish": "English (CEFR)",
     "learn.moduleEnglishDesc":
       "Kosakata CEFR A1–C2 — pemula hingga mahir. Data lengkap (300 kosakata).",
+    "learn.moduleJapanese": "Bahasa Jepang",
+    "learn.moduleJapaneseDesc":
+      "Kosakata JLPT N5–N1. Data awal N5 tersedia (100 kosakata).",
 
     "level.back": "Kembali ke daftar level",
     "learn.backToModules": "Kembali ke modul",
@@ -182,6 +185,11 @@ const dict: Record<Locale, Record<string, string>> = {
     "levelDesc.en.4": "Menengah-atas: kosakata topik luas & bahasa formal (50 kata).",
     "levelDesc.en.5": "Mahir: kosakata kompleks untuk konteks profesional & akademik (50 kata).",
     "levelDesc.en.6": "Sangat mahir: ekspresi bernuansa tingkat penutur asli (50 kata).",
+    "levelDesc.ja.1": "N5 — kosakata dasar percakapan sehari-hari (100 kata).",
+    "levelDesc.ja.2": "N4 — kosakata topik familiar & aktivitas harian (segera tersedia).",
+    "levelDesc.ja.3": "N3 — kosakata topik luas & nuansa bahasa (segera tersedia).",
+    "levelDesc.ja.4": "N2 — kosakata formal untuk media & kerja (segera tersedia).",
+    "levelDesc.ja.5": "N1 — kosakata kompleks tingkat penutur asli (segera tersedia).",
 
     "practice.title": "Latihan Flashcards",
     "practice.subtitle": "Review kartu dengan metode Spaced Repetition.",
@@ -637,6 +645,9 @@ const dict: Record<Locale, Record<string, string>> = {
     "learn.moduleEnglish": "English (CEFR)",
     "learn.moduleEnglishDesc":
       "CEFR A1–C2 vocabulary — beginner to advanced. Full data (300 words).",
+    "learn.moduleJapanese": "Japanese",
+    "learn.moduleJapaneseDesc":
+      "JLPT N5–N1 vocabulary. Starter N5 data (100 words).",
 
     "level.back": "Back to level list",
     "learn.backToModules": "Back to modules",
@@ -763,6 +774,11 @@ const dict: Record<Locale, Record<string, string>> = {
     "levelDesc.en.4": "Upper-intermediate: broad topics & formal language (50 words).",
     "levelDesc.en.5": "Advanced: complex vocabulary for professional & academic contexts (50 words).",
     "levelDesc.en.6": "Proficiency: nuanced expression at native-speaker level (50 words).",
+    "levelDesc.ja.1": "N5 — basic vocabulary for everyday conversation (100 words).",
+    "levelDesc.ja.2": "N4 — familiar topics & daily activities (coming soon).",
+    "levelDesc.ja.3": "N3 — broad topics & language nuance (coming soon).",
+    "levelDesc.ja.4": "N2 — formal vocabulary for media & work (coming soon).",
+    "levelDesc.ja.5": "N1 — complex vocabulary at native level (coming soon).",
 
     "practice.title": "Practice Flashcards",
     "practice.subtitle": "Review cards with Spaced Repetition.",

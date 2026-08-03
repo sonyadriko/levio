@@ -4,10 +4,11 @@ import { generateMockTest } from "../lib/languages/mock-test";
 import type { VocabItem } from "../lib/languages/types";
 
 describe("language modules", () => {
-  it("mendaftarkan hsk dan english", () => {
+  it("mendaftarkan hsk, english dan japanese", () => {
     const ids = allLanguageModules().map((m) => m.id);
     expect(ids).toContain("hsk");
     expect(ids).toContain("english");
+    expect(ids).toContain("japanese");
   });
 
   it("english punya 6 level CEFR A1–C2", () => {
@@ -36,6 +37,28 @@ describe("language modules", () => {
     expect(first.id).toMatch(/^hsk1-/);
     expect(first.term.length).toBeGreaterThan(0);
     expect(typeof first.reading).toBe("string");
+  });
+
+  it("japanese punya 5 level JLPT N5–N1 dengan data N5", async () => {
+    const japanese = getLanguageModule("japanese")!;
+    expect(japanese.maxLevel).toBe(5);
+    expect(japanese.levelName(1)).toBe("N5");
+    expect(japanese.levelName(5)).toBe("N1");
+    expect(japanese.countWordsByLevel(1)).toBe(100);
+    expect(japanese.countWordsByLevel(2)).toBe(0);
+    expect(japanese.totalWordCount()).toBe(100);
+
+    const words = await japanese.loadWords(1);
+    expect(words).toHaveLength(100);
+    expect(words[0].id.startsWith("ja-n5-")).toBe(true);
+    expect(words.every((w) => w.level === 1)).toBe(true);
+    expect(words.every((w) => typeof w.reading === "string" && w.reading.length > 0)).toBe(true);
+    expect(japanese.questionTypes).toEqual([
+      "term-meaning",
+      "meaning-term",
+      "reading-term",
+      "term-reading",
+    ]);
   });
 
   it("english memuat data A1 dengan prefix id en-a1-", async () => {

@@ -97,8 +97,8 @@ Levio
 - [x] Responsive mobile-first (bottom nav, touch-friendly, uji di layar hp) + PWA installable
 
 ### V2 — Modularitas + Jepang + Kesehatan (bulan ke-5–8)
-- [ ] Refactor modul bahasa → generic "Language Module" (konfigurasi skrip, audio, deck per bahasa)
-- [ ] Bahasa Jepang: kurikulum JLPT N5 (kana → kosakata → kanji)
+- [x] Refactor modul bahasa → generic "Language Module" (konfigurasi skrip, audio, deck per bahasa) — HSK + English + Japanese
+- [x] Bahasa Jepang: kurikulum JLPT N5 (kana → kosakata → kanji) — N5 starter live; N4–N1 menyusul
 - [ ] **Modul Gym (MVP → paritas kompetitor):**
   - [x] Log workout sesi (latihan, set per-row: beban/reps/done)
   - [x] Template rutinitas (Push/Pull/Legs PPL, Upper/Lower, Full Body)
