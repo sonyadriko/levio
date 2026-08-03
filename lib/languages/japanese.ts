@@ -7,10 +7,10 @@ import type { LanguageModule, VocabItem } from "./types";
 // reading = hiragana). Level N4–N1 menyusul.
 const loaders: Record<number, () => Promise<VocabItem[]>> = {
   1: () => import("../japanese/data/n5").then((m) => m.n5Words),
-  2: () => Promise.resolve([]),
-  3: () => Promise.resolve([]),
-  4: () => Promise.resolve([]),
-  5: () => Promise.resolve([]),
+  2: () => import("../japanese/data/n4").then((m) => m.n4Words),
+  3: () => import("../japanese/data/n3").then((m) => m.n3Words),
+  4: () => import("../japanese/data/n2").then((m) => m.n2Words),
+  5: () => import("../japanese/data/n1").then((m) => m.n1Words),
 };
 
 const store = createLevelWordStore(loaders);
