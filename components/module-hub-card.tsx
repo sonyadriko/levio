@@ -5,7 +5,7 @@ import { methodsFor } from "@/lib/languages/methods";
 import type { LanguageModule } from "@/lib/languages/types";
 
 // Kartu modul di hub /learn: header navigasi ke daftar level + daftar metode
-// belajar yang didukung modul (apa & kenapa), bisa dibuka/tutup.
+// belajar yang didukung modul (apa), bisa dibuka/tutup.
 export function ModuleHubCard({ module }: { module: LanguageModule }) {
   const methods = methodsFor(module);
 
@@ -60,12 +60,6 @@ export function ModuleHubCard({ module }: { module: LanguageModule }) {
               </div>
               <p className="mt-2 text-xs text-stone-600 dark:text-stone-300">
                 <T id={method.descKey} />
-              </p>
-              <p className="mt-1 text-xs text-stone-400 dark:text-stone-500">
-                <span className="font-medium">
-                  <T id="learn.methodWhy" />{" "}
-                </span>
-                <T id={method.whyKey} />
               </p>
               <Link
                 href={method.href(module)}
