@@ -1,4 +1,4 @@
-export type LanguageId = "hsk" | "english";
+export type LanguageId = "hsk" | "english" | "japanese";
 
 // Bentuk kanonik kosakata lintas modul bahasa. HSK memetakan hanzi→term,
 // pinyin→reading; English langsung memakai term (kata) dan membaca reading

@@ -2,7 +2,7 @@
 
 Levio dirancang modular: tiap domain (bahasa, kesehatan) berdiri sendiri di atas **shared foundation** (progress, XP, streak, layout). Dokumen ini menjelaskan pola untuk menambahkan bahasa baru (Jepang, Inggris) dan modul kesehatan (gym) sesuai roadmap.
 
-Arsitektur modul belajar **sudah generik**: HSK (Mandarin) dan **English (CEFR)** berjalan di atas antarmuka `LanguageModule` (lihat bagian "Arsitektur LanguageModule").
+Arsitektur modul belajar **sudah generik**: HSK (Mandarin), **English (CEFR)**, dan **Japanese (JLPT)** berjalan di atas antarmuka `LanguageModule` (lihat bagian "Arsitektur LanguageModule").
 
 ## Pola Satu Modul
 
@@ -26,7 +26,10 @@ app/<route>/           → halaman
 | Pengingat harian | `lib/reminder.ts` + `components/daily-reminder.tsx` (dipasang di AppShell) |
 | Ikon | tambah nama ke `IconName` (`lib/nav.ts`) + path SVG di `components/icons.tsx` |
 
-## Contoh: Tambah Bahasa Baru (Jepang)
+## Contoh: Bahasa Baru (Jepang — sudah live)
+
+Modul **Japanese (JLPT)** sudah terdaftar (N5 starter, 100 kata; N4–N1 menyusul).
+Langkah-langkah berikut adalah pola yang dipakai (berlaku untuk bahasa baru lain):
 
 1. **Buat data**: folder `lib/japanese/` untuk data kosakata per level (mengikuti pola `lib/english/data/`) — atau langsung sebagai `VocabItem[]` (kanji/kana → `term`, furigana/romaji → `reading`).
 
@@ -55,15 +58,15 @@ dengan i18n id+en untuk semua teks baru dan `npm run lint`/`build`/`test` lolos.
 
 ## Arsitektur LanguageModule (sudah berjalan)
 
-Antarmuka modul bahasa generik di `lib/languages/types.ts` (sudah diimplementasikan, HSK + English):
+Antarmuka modul bahasa generik di `lib/languages/types.ts` (sudah diimplementasikan, HSK + English + Japanese):
 
 ```ts
 interface LanguageModule {
-  id: "hsk" | "english";
+  id: "hsk" | "english" | "japanese";
   nameKey: string;
   descriptionKey: string;
-  icon: string;
-  maxLevel: number;                       // HSK/English = 6 (CEFR A1–C2)
+  icon: string;                           // "汉" | "A" | "あ"
+  maxLevel: number;                       // HSK/English = 6 (CEFR A1–C2), Japanese = 5 (JLPT N5–N1)
   supportsTyping: boolean;                // mengetik pelafalan (pinyin)
   supportsLesson: boolean;
   supportsSentences: boolean;
@@ -80,7 +83,7 @@ interface LanguageModule {
 }
 ```
 
-- **Data**: `lib/languages/loader.ts` (`createLevelWordStore` — cache + pending + subscribe), adapter HSK di `lib/languages/hsk.ts` (memetakan `VocabWord` → `VocabItem`), modul English di `lib/languages/english.ts` + data `lib/english/`.
+- **Data**: `lib/languages/loader.ts` (`createLevelWordStore` — cache + pending + subscribe), adapter HSK di `lib/languages/hsk.ts` (memetakan `VocabWord` → `VocabItem`), modul English di `lib/languages/english.ts` + data `lib/english/`, modul Japanese di `lib/languages/japanese.ts` + data `lib/japanese/`.
 - **Routes**: `app/learn/[lang]/[level]` satu rute dinamis untuk semua bahasa (SSG via `generateStaticParams`); redirect legacy `/learn/{n}` → `/learn/hsk/{n}`.
 - **Progress per modul**: `unlockedByModule` di `lib/progress.ts` + helper `unlockedFor(progress, moduleId)`; HSK tetap memakai `unlockedUpTo` (backward-compatible).
 - **Boundary RSC**: server page cukup meneruskan `moduleId` (string); komponen client me-resolve modul via `getLanguageModule(moduleId)` — objek modul berisi fungsi sehingga tidak boleh dilewatkan lintas boundary.
