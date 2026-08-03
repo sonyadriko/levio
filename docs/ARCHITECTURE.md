@@ -125,10 +125,13 @@ supabase/
     ├── 0002_add_srs.sql       → kolom SRS (ease, repetitions) di word_progress
     ├── 0003_add_new_words.sql → kolom new_words di daily_activity
     ├── 0004_add_unlocked_up_to.sql → kolom unlocked_up_to di profiles (gating level HSK)
-    └── 0005_add_imported_at.sql → kolom imported_at di profiles (tanda akun yang pernah import)
+    ├── 0005_add_imported_at.sql → kolom imported_at di profiles (tanda akun yang pernah import)
+    ├── 0006_add_gym_sync.sql
+    ├── 0007_add_gym_program.sql
+    └── 0008_add_unlocked_by_module.sql → kolom unlocked_by_module jsonb di profiles (gating per modul)
 ```
 
-> Jalankan migration **berurutan** (0001 → 0005) di Supabase SQL Editor.
+> Jalankan migration **berurutan** (0001 → 0008) di Supabase SQL Editor.
 
 ## Alur Data
 
@@ -217,9 +220,10 @@ ubah progress/settings (dengan debounce 600/400ms) ──▶ push ke cloud (upse
 Kunci logika: `hasLocalData(state)` (apakah lokal punya data untuk di-migrasi)
 dan `hasCloudData(profile)` (apakah cloud sudah punya riwayat). Semua tabel
 dilindungi RLS (`auth.uid() = user_id`), sehingga user hanya mengakses datanya
-sendiri. Migration ada di `supabase/migrations/` (0001 → 0005, jalankan
-berurutan). `unlocked_up_to` (gating level HSK) dan `imported_at` (tanda akun
-yang pernah import) ikut disinkronkan lewat `profiles`.
+sendiri. Migration ada di `supabase/migrations/` (0001 → 0008, jalankan
+berurutan). `unlocked_up_to` (gating level HSK), `unlocked_by_module` (gating
+per modul bahasa) dan `imported_at` (tanda akun yang pernah import) ikut
+disinkronkan lewat `profiles`.
 
 ### Mengaktifkan backend
 

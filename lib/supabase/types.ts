@@ -8,6 +8,7 @@ export interface ProfileRow {
   completed_reviews: number;
   completed_tests: number;
   unlocked_up_to: number;
+  unlocked_by_module: Record<string, number> | null;
   imported_at: string | null;
   updated_at: string;
 }

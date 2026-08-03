@@ -183,3 +183,12 @@ create index if not exists gym_sessions_program_idx
   on public.gym_sessions (user_id, program_id);
 
 
+
+-- ==================== 0008_add_unlocked_by_module.sql ====================
+-- Levio: tambah kolom unlocked_by_module di profiles.
+-- Level terbuka per modul bahasa (jsonb, contoh {"hsk":3,"english":2}); hsk
+-- tetap sejalan dengan unlocked_up_to (legacy). Kolom nullable agar baris lama
+-- yang belum punya nilai tetap kompatibel.
+
+alter table public.profiles
+  add column if not exists unlocked_by_module jsonb;

@@ -124,6 +124,7 @@ export async function pushProgress(
       completed_reviews: state.completedReviews,
       completed_tests: state.completedTests,
       unlocked_up_to: state.unlockedUpTo,
+      unlocked_by_module: state.unlockedByModule,
       updated_at: new Date().toISOString(),
     }),
     client.from("last_test").upsert({
@@ -223,6 +224,15 @@ export async function pullProgress(
   if (typeof profile.unlocked_up_to === "number") {
     state.unlockedUpTo = Math.min(MAX_HSK_LEVEL, Math.max(1, profile.unlocked_up_to));
   }
+  // Level terbuka per modul bahasa. `unlocked_up_to` tetap sumber otoritatif
+  // untuk HSK; modul lain (mis. english) diambil dari jsonb. Kolom nullable
+  // sehingga akun lama tanpa nilai tetap kompatibel.
+  const unlockedByModule: Record<string, number> = {
+    hsk: state.unlockedUpTo,
+    ...(profile.unlocked_by_module ?? {}),
+  };
+  unlockedByModule.hsk = state.unlockedUpTo;
+  state.unlockedByModule = unlockedByModule;
 
   for (const row of (activityRes.data ?? []) as ActivityRow[]) {
     state.activityByDate[row.date] = {

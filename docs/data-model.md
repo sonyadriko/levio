@@ -58,6 +58,7 @@ Dokumen ini mendeskripsikan struktur data aplikasi, baik yang sudah diimplementa
 | `completed_reviews` | `int` | Total kartu direview |
 | `completed_tests` | `int` | Total tes selesai |
 | `unlocked_up_to` | `int` | Level HSK terbuka (default 1; naik saat lulus tes kelulusan) |
+| `unlocked_by_module` | `jsonb` | Level terbuka per modul bahasa, contoh `{"hsk":3,"english":2}` (migration 0008; `null` untuk akun lama) |
 | `imported_at` | `timestamptz` | Tanda akun yang pernah import progress (migration 0005) |
 | `updated_at` | `timestamptz` | |
 
@@ -190,10 +191,11 @@ Sumber kode: `lib/progress.ts`.
 
 `applyTest(state, correct, total)` → XP = `correct × 5 × (0.5 + akurasi × 0.5)`, update streak & `completedTests + 1`. Akurasi tinggi → bonus XP lebih besar.
 
-### Gating level HSK (`unlockedUpTo`)
+### Gating level modul (`unlockedUpTo` / `unlockedByModule`)
 
-- Level HSK tertinggi yang terbuka, rentang `1..6` (`MAX_HSK_LEVEL`), default `1`.
-- `applyLevelPass(state, level)` → naik ke `level + 1` saat lulus tes kelulusan (skor ≥ `MIN_PASS_PCT` = 60%). Disinkronkan ke cloud via `profiles.unlocked_up_to`.
+- `unlockedUpTo` = level HSK tertinggi yang terbuka, rentang `1..6` (`MAX_HSK_LEVEL`), default `1`.
+- `unlockedByModule` = `Record<moduleId, level>` untuk gating per modul (mis. `{hsk:1, english:2}`); `unlockedFor(progress, moduleId)` = `max(unlockedUpTo, unlockedByModule[moduleId])`.
+- `applyModuleLevelPass(state, moduleId, level)` → naik ke `level + 1` saat lulus tes kelulusan (skor ≥ `MIN_PASS_PCT` = 60%); untuk HSK `unlockedUpTo` ikut dinaikkan agar tetap sinkron dengan `applyLevelPass` legacy. Disinkronkan ke cloud via `profiles.unlocked_up_to` (HSK) + `profiles.unlocked_by_module` (semua modul).
 - `applyXp(state, xp)` → XP murni tanpa menyentuh kata/tes (dipakai latihan kalimat); streak & aktivitas harian tetap dihitung.
 
 ### Badge (derivasi, tanpa storage)

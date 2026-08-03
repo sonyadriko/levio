@@ -32,7 +32,8 @@ feat/* fix/* docs/* chore/* hotfix/*
    - Satu paste: salin isi `supabase/migrations/0000_setup_all.sql`, atau
    - Berurutan: `0001_init.sql` → `0002_add_srs.sql` → `0003_add_new_words.sql`
      → `0004_add_unlocked_up_to.sql` → `0005_add_imported_at.sql`
-     → `0006_add_gym_sync.sql` → `0007_add_gym_program.sql`.
+     → `0006_add_gym_sync.sql` → `0007_add_gym_program.sql`
+     → `0008_add_unlocked_by_module.sql`.
    Script menggunakan `if not exists` sehingga aman dijalankan ulang.
 3. **Authentication → Sign In / Up** → aktifkan provider **Email**.
    - (Opsional) matikan **Confirm email** supaya registrasi langsung aktif.
@@ -123,7 +124,7 @@ Manual check di browser (incognito):
 ## 4. Checklist rilis (production)
 
 - [ ] Branch `release/vX.Y.Z` dari `main`; CI hijau di PR.
-- [ ] Migration 0001–0007 sudah dijalankan di Supabase.
+- [ ] Migration 0001–0008 sudah dijalankan di Supabase.
 - [ ] Env Vercel terisi (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`) di Production + Preview + Development.
 - [ ] Supabase `Site URL` & `Redirect URLs` = domain produksi.
 - [ ] Versi sinkron: `package.json`, `lib/version.ts` (`APP_VERSION`), highlight
