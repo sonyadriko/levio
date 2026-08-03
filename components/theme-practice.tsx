@@ -61,16 +61,24 @@ function buildOptions(word: VocabItem, pool: VocabItem[]): string[] {
   return shuffle([word.meaning, ...distractors]);
 }
 
+let pendingSpeak: number | null = null;
+
 function speak(reading: string): void {
-  try {
-    const utter = new SpeechSynthesisUtterance(reading);
-    utter.lang = "ja-JP";
-    utter.rate = 0.85;
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utter);
-  } catch {
-    // speechSynthesis tidak tersedia — abaikan (UI menampilkan reading).
-  }
+  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+  if (pendingSpeak !== null) window.clearTimeout(pendingSpeak);
+  const synth = window.speechSynthesis;
+  synth.cancel();
+  const utter = new SpeechSynthesisUtterance(reading);
+  utter.lang = "ja-JP";
+  utter.rate = 0.85;
+  // Bug Chrome: speak() yang dipanggil langsung setelah cancel() sering
+  // diabaikan sehingga audio hanya bisa diputar sekali. Pisahkan ke task
+  // berikutnya dengan jeda agar cancel() selesai diproses dulu.
+  pendingSpeak = window.setTimeout(() => {
+    pendingSpeak = null;
+    synth.cancel();
+    synth.speak(utter);
+  }, 100);
 }
 
 function ResultView({

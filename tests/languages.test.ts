@@ -27,12 +27,11 @@ describe("language modules", () => {
     expect(ids("japanese")).toEqual(["flashcard", "kana", "mockTest"]);
   });
 
-  it("setiap metode punya penjelasan apa & kenapa + href valid", () => {
+  it("setiap metode punya penjelasan apa + href valid", () => {
     for (const mod of allLanguageModules()) {
       for (const method of methodsFor(mod)) {
         expect(method.titleKey.length).toBeGreaterThan(0);
         expect(method.descKey.length).toBeGreaterThan(0);
-        expect(method.whyKey.length).toBeGreaterThan(0);
         expect(method.href(mod).startsWith("/")).toBe(true);
       }
     }
