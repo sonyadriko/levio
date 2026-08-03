@@ -46,6 +46,14 @@ export interface LanguageModule {
   supportsTyping: boolean;
   supportsLesson: boolean;
   supportsSentences: boolean;
+  // Permukaan latihan sistem huruf (mis. kana Jepang) — opsional, tampil sebagai
+  // kartu terpisah di atas daftar level modul. Progresnya terpisah dari SRS vocab.
+  script?: {
+    path: string;
+    titleKey: string;
+    descKey: string;
+    icon: string;
+  };
   questionTypes: QuestionType[];
   levelName: (index: number) => string;
   levelDescriptionKey: (index: number) => string;

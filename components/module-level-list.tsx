@@ -32,6 +32,25 @@ export function ModuleLevelList({ moduleId }: { moduleId: string }) {
       </div>
 
       <section className="flex flex-col gap-3">
+        {languageModule.script && (
+          <Link
+            href={languageModule.script.path}
+            className="flex items-center gap-4 rounded-xl border border-teal-200 bg-teal-50/60 p-4 transition-colors hover:border-teal-300 dark:border-teal-800 dark:bg-teal-950/40 dark:hover:border-teal-700"
+          >
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-teal-700 text-lg font-bold text-white">
+              {languageModule.script.icon}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold">
+                <T id={languageModule.script.titleKey} />
+              </p>
+              <p className="text-xs text-stone-500 dark:text-stone-400">
+                <T id={languageModule.script.descKey} />
+              </p>
+            </div>
+            <span className="shrink-0 text-stone-300 dark:text-stone-700">→</span>
+          </Link>
+        )}
         {languageModule.levels().map((meta) => {
           const locked = meta.index > unlockedFor(progress, languageModule.id);
           return (
