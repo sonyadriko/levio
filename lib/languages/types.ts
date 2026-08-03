@@ -12,6 +12,9 @@ export interface VocabItem {
   example?: string;
   exampleReading?: string;
   exampleMeaning?: string;
+  // Paket tematik (situasi) tempat kata ini dipakai, mis. ["travel", "food"].
+  // Daftar kata per tema didefinisikan per modul (mis. lib/japanese/themes.ts).
+  themes?: string[];
 }
 
 // Tipe soal mock test generik:
