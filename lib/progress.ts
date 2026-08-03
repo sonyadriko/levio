@@ -1,4 +1,3 @@
-import type { VocabWord } from "./hsk/types";
 import { dateKeyOf, todayKey } from "./date";
 
 export const PROGRESS_STORAGE_KEY = "levio.progress.v1";
@@ -6,7 +5,10 @@ export const XP_PER_LEVEL = 500;
 export const DEFAULT_EASE = 2.5;
 export const MIN_EASE = 1.3;
 export const MAX_INTERVAL_DAYS = 365;
-export const MAX_HSK_LEVEL = 6;
+// Jumlah level maksimum per modul bahasa (simetris: HSK 1–6, CEFR A1–C2).
+export const MAX_LEVEL = 6;
+// Alias legacy untuk HSK (dipakai badges, sync cloud, dsb).
+export const MAX_HSK_LEVEL = MAX_LEVEL;
 export const MIN_PASS_PCT = 60;
 // Batas XP dari tes per hari (anti-farming mock test / tes kelulusan).
 export const MAX_TEST_XP_PER_DAY = 200;
@@ -43,7 +45,11 @@ export interface ProgressState {
   activityByDate: Record<string, ActivityDay>;
   lastTest: LastTest | null;
   // Level HSK tertinggi yang terbuka (1..6). Lulus tes level N → naik ke N+1.
+  // Tetap sebagai nilai HSK agar kompatibel dengan data lama & cloud sync.
   unlockedUpTo: number;
+  // Level terbuka per modul bahasa (id modul → level 1..6). `hsk` selalu
+  // tercermin di `unlockedUpTo`; modul lain (mis. english) disimpan di sini.
+  unlockedByModule: Record<string, number>;
   // XP tes yang sudah didapat per tanggal (local-only, untuk cap anti-farming).
   testXpByDate: Record<string, number>;
 }
@@ -59,6 +65,7 @@ export function emptyProgress(): ProgressState {
     activityByDate: {},
     lastTest: null,
     unlockedUpTo: 1,
+    unlockedByModule: { hsk: 1 },
     testXpByDate: {},
   };
 }
@@ -170,6 +177,21 @@ export function sanitizeProgress(data: unknown): ProgressState | null {
     }
   }
 
+  const hskLevel = clampLevel(toNumber(record.unlockedUpTo));
+  const unlockedByModule: Record<string, number> = { hsk: hskLevel };
+  const rawUnlocked = record.unlockedByModule;
+  if (
+    rawUnlocked &&
+    typeof rawUnlocked === "object" &&
+    !Array.isArray(rawUnlocked)
+  ) {
+    for (const [key, value] of Object.entries(rawUnlocked)) {
+      const n = toNumber(value);
+      if (n >= 1) unlockedByModule[key] = Math.min(MAX_LEVEL, Math.round(n));
+    }
+  }
+  if (!unlockedByModule.hsk) unlockedByModule.hsk = hskLevel;
+
   return {
     xp: Math.max(0, record.xp),
     streak: Math.max(0, toNumber(record.streak)),
@@ -180,7 +202,8 @@ export function sanitizeProgress(data: unknown): ProgressState | null {
     completedTests: Math.max(0, toNumber(record.completedTests)),
     activityByDate,
     lastTest,
-    unlockedUpTo: clampLevel(toNumber(record.unlockedUpTo)),
+    unlockedUpTo: hskLevel,
+    unlockedByModule,
     testXpByDate,
   };
 }
@@ -220,7 +243,7 @@ function addActivity(
 
 export function applyReview(
   state: ProgressState,
-  word: VocabWord,
+  word: { id: string },
   correct: boolean,
 ): ProgressState {
   const today = todayKey();
@@ -305,14 +328,45 @@ export function applyTest(
   };
 }
 
-// Lulus tes kelulusan level N membuka level N+1.
+// Level terbuka untuk suatu modul bahasa. HSK menggunakan `unlockedUpTo`
+// (legacy) yang selalu sejalan dengan `unlockedByModule.hsk`; bila sempat
+// divergen (mis. state lama), ambil nilai terbesar.
+export function unlockedFor(progress: ProgressState, moduleId: string): number {
+  const explicit = progress.unlockedByModule?.[moduleId];
+  if (moduleId === "hsk") {
+    const legacy = progress.unlockedUpTo;
+    const byModule = typeof explicit === "number" && explicit >= 1 ? explicit : 1;
+    return Math.max(legacy, byModule);
+  }
+  return typeof explicit === "number" && explicit >= 1 ? explicit : 1;
+}
+
+// Lulus tes kelulusan level N pada modul tertentu membuka level N+1 modul tsb.
+// Modul lain (selain HSK) progres unlock-nya disimpan per modul.
+export function applyModuleLevelPass(
+  state: ProgressState,
+  moduleId: string,
+  level: number,
+): ProgressState {
+  const current = unlockedFor(state, moduleId);
+  const next = Math.min(MAX_LEVEL, Math.max(current, level + 1));
+  if (next === current) return state;
+  const unlockedByModule = {
+    ...(state.unlockedByModule ?? {}),
+    [moduleId]: next,
+  };
+  if (moduleId === "hsk") {
+    return { ...state, unlockedByModule, unlockedUpTo: next };
+  }
+  return { ...state, unlockedByModule };
+}
+
+// Alias legacy: lulus tes kelulusan level HSK N membuka HSK N+1.
 export function applyLevelPass(
   state: ProgressState,
   level: number,
 ): ProgressState {
-  const next = Math.min(MAX_HSK_LEVEL, Math.max(state.unlockedUpTo, level + 1));
-  if (next === state.unlockedUpTo) return state;
-  return { ...state, unlockedUpTo: next };
+  return applyModuleLevelPass(state, "hsk", level);
 }
 
 // XP murni tanpa menyentuh kata/tes — dipakai latihan non-kosakata
@@ -388,6 +442,17 @@ export function mergeProgress(a: ProgressState, b: ProgressState): ProgressState
     testXpByDate[date] = Math.max(testXpByDate[date] ?? 0, xp);
   }
 
+  const unlockedByModule = { ...(a.unlockedByModule ?? {}) };
+  for (const [moduleId, level] of Object.entries(b.unlockedByModule ?? {})) {
+    unlockedByModule[moduleId] = Math.max(unlockedByModule[moduleId] ?? 1, level);
+  }
+  const mergedHsk = Math.max(
+    unlockedByModule.hsk ?? 1,
+    a.unlockedUpTo,
+    b.unlockedUpTo,
+  );
+  unlockedByModule.hsk = mergedHsk;
+
   return {
     xp: Math.max(a.xp, b.xp),
     streak: Math.max(a.streak, b.streak),
@@ -397,7 +462,8 @@ export function mergeProgress(a: ProgressState, b: ProgressState): ProgressState
     completedTests: Math.max(a.completedTests, b.completedTests),
     activityByDate,
     lastTest,
-    unlockedUpTo: Math.max(a.unlockedUpTo, b.unlockedUpTo),
+    unlockedUpTo: mergedHsk,
+    unlockedByModule,
     testXpByDate,
   };
 }
@@ -424,12 +490,21 @@ export function loadProgress(): ProgressState {
         testXpByDate[date] = Math.max(0, toNumber(xp));
       }
     }
+    const hskLevel = clampLevel(toNumber(parsed.unlockedUpTo));
+    const unlockedByModule: Record<string, number> = { hsk: hskLevel };
+    for (const [moduleId, level] of Object.entries(
+      parsed.unlockedByModule ?? {},
+    )) {
+      const n = toNumber(level);
+      if (n >= 1) unlockedByModule[moduleId] = Math.min(MAX_LEVEL, Math.round(n));
+    }
     return {
       ...emptyProgress(),
       ...parsed,
       words,
       testXpByDate,
-      unlockedUpTo: clampLevel(toNumber(parsed.unlockedUpTo)),
+      unlockedUpTo: hskLevel,
+      unlockedByModule,
     };
   } catch {
     return emptyProgress();

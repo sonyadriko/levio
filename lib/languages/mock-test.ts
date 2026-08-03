@@ -1,10 +1,4 @@
-import type { VocabWord } from "./types";
-
-export type QuestionType =
-  | "hanzi-meaning"
-  | "meaning-hanzi"
-  | "pinyin-hanzi"
-  | "hanzi-pinyin";
+import type { QuestionType, VocabItem } from "./types";
 
 export interface MockQuestion {
   id: string;
@@ -12,15 +6,8 @@ export interface MockQuestion {
   prompt: string;
   options: string[];
   answer: string;
-  word: VocabWord;
+  word: VocabItem;
 }
-
-export const QUESTION_TYPES: QuestionType[] = [
-  "hanzi-meaning",
-  "meaning-hanzi",
-  "pinyin-hanzi",
-  "hanzi-pinyin",
-];
 
 function shuffle<T>(arr: T[]): T[] {
   const copy = [...arr];
@@ -39,58 +26,59 @@ function buildOptions(pool: string[], answer: string): string[] {
 }
 
 // Nilai kata untuk tiap tipe soal: jawaban (atau prompt) yang dipakai di opsi.
-function poolValue(word: VocabWord, type: QuestionType): string {
+function poolValue(word: VocabItem, type: QuestionType): string {
   switch (type) {
-    case "hanzi-meaning":
+    case "term-meaning":
       return word.meaning;
-    case "meaning-hanzi":
-    case "pinyin-hanzi":
-      return word.hanzi;
-    case "hanzi-pinyin":
-      return word.pinyin;
+    case "meaning-term":
+    case "reading-term":
+      return word.term;
+    case "term-reading":
+      return word.reading ?? "";
   }
 }
 
-// Kata dianggap "sama jawabannya" bila berbagi nilai prompt (meaning/pinyin).
-// Misal 吧 & 吗 sama-sama "partikel tanya", 他 & 她 sama-sama "tā".
-function promptKey(word: VocabWord, type: QuestionType): string {
-  return type === "meaning-hanzi" || type === "hanzi-meaning"
+// Kata dianggap "sama jawabannya" bila berbagi nilai prompt (meaning/reading).
+// Mis. 吧 & 吗 sama-sama "partikel tanya", 他 & 她 sama-sama "tā".
+function promptKey(word: VocabItem, type: QuestionType): string {
+  return type === "meaning-term" || type === "term-meaning"
     ? word.meaning
-    : word.pinyin;
+    : word.reading ?? "";
 }
 
 export function generateMockTest(
-  words: VocabWord[],
+  words: VocabItem[],
+  types: QuestionType[],
   count: number,
 ): MockQuestion[] {
   const selected = shuffle(words).slice(0, Math.min(count, words.length));
 
   return selected.map((word, i) => {
-    const type = QUESTION_TYPES[i % QUESTION_TYPES.length];
+    const type = types[i % types.length];
     let prompt = "";
     let answer = "";
 
     switch (type) {
-      case "hanzi-meaning":
-        prompt = word.hanzi;
+      case "term-meaning":
+        prompt = word.term;
         answer = word.meaning;
         break;
-      case "meaning-hanzi":
+      case "meaning-term":
         prompt = word.meaning;
-        answer = word.hanzi;
+        answer = word.term;
         break;
-      case "pinyin-hanzi":
-        prompt = word.pinyin;
-        answer = word.hanzi;
+      case "reading-term":
+        prompt = word.reading ?? "";
+        answer = word.term;
         break;
-      case "hanzi-pinyin":
-        prompt = word.hanzi;
-        answer = word.pinyin;
+      case "term-reading":
+        prompt = word.term;
+        answer = word.reading ?? "";
         break;
     }
 
-    // Buang semua opsi yang dimiliki kata lain dengan meaning/pinyin yang sama,
-    // agar tidak ada "jawaban benar ganda" atau soal yang identik.
+    // Buang semua opsi yang dimiliki kata lain dengan meaning/reading yang
+    // sama, agar tidak ada "jawaban benar ganda" atau soal yang identik.
     const excluded = new Set(
       words
         .filter((w) => promptKey(w, type) === promptKey(word, type))

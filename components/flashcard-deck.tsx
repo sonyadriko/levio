@@ -7,11 +7,10 @@ import { Icon } from "@/components/icons";
 import { ProgressBar } from "@/components/progress-bar";
 import { Pill } from "@/components/pill";
 import { Confetti } from "@/components/confetti";
-import { countWordsByLevel } from "@/lib/hsk";
-import { useLevelWords } from "@/lib/hsk/use-level-words";
-import { allLevels, getLevelMeta } from "@/lib/hsk/levels";
+import { useLevelWords } from "@/lib/languages/use-level-words";
+import { defaultModule, getLanguageModule } from "@/lib/languages";
 import { todayKey } from "@/lib/date";
-import type { HskLevel, VocabWord } from "@/lib/hsk/types";
+import type { VocabItem } from "@/lib/languages/types";
 
 function shuffle<T>(arr: T[]): T[] {
   const copy = [...arr];
@@ -22,10 +21,12 @@ function shuffle<T>(arr: T[]): T[] {
   return copy;
 }
 
-export function FlashcardDeck() {
+export function FlashcardDeck({ moduleId }: { moduleId?: string }) {
+  const activeModule =
+    getLanguageModule(moduleId ?? "") ?? defaultModule();
   const { progress, recordReview } = useProgress();
   const { t } = useLanguage();
-  const [level, setLevel] = useState<HskLevel>(1);
+  const [level, setLevel] = useState<number>(1);
   const [flipped, setFlipped] = useState(false);
   const submitting = useRef(false);
   const dragStartX = useRef<number | null>(null);
@@ -34,13 +35,13 @@ export function FlashcardDeck() {
   const [dragX, setDragX] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [session, setSession] = useState<{
-    deck: VocabWord[];
+    deck: VocabItem[];
     index: number;
     correct: number;
     xp: number;
   } | null>(null);
 
-  const words = useLevelWords(level);
+  const words = useLevelWords(activeModule, level);
 
   const dueWords = useMemo(() => {
     const today = todayKey();
@@ -111,18 +112,20 @@ export function FlashcardDeck() {
     }
   };
 
+  const levelName = activeModule.levelName(level);
+
   if (!session) {
     return (
       <div className="flex flex-col gap-4">
         <div className="flex flex-wrap gap-2">
-          {allLevels().map((l) => (
+          {activeModule.levels().map((meta) => (
             <Pill
-              key={l}
-              selected={level === l}
-              disabled={countWordsByLevel(l) === 0}
-              onClick={() => setLevel(l)}
+              key={meta.index}
+              selected={level === meta.index}
+              disabled={activeModule.countWordsByLevel(meta.index) === 0}
+              onClick={() => setLevel(meta.index)}
             >
-              HSK {l}
+              {meta.name}
             </Pill>
           ))}
         </div>
@@ -140,7 +143,7 @@ export function FlashcardDeck() {
           <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-8 text-center dark:border-stone-700 dark:bg-stone-950">
             <Icon name="pen" className="mx-auto h-8 w-8 text-stone-400" />
             <p className="mt-3 text-sm font-medium text-stone-600 dark:text-stone-300">
-              {t("deck.noDue", { level: getLevelMeta(level).name })}
+              {t("deck.noDue", { level: levelName })}
             </p>
             <button
               onClick={() => startSession(true)}
@@ -153,10 +156,7 @@ export function FlashcardDeck() {
           <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-8 text-center dark:border-stone-700 dark:bg-stone-950">
             <Icon name="pen" className="mx-auto h-8 w-8 text-stone-400" />
             <p className="mt-3 text-sm font-medium text-stone-600 dark:text-stone-300">
-              {t("deck.due", {
-                n: dueWords.length,
-                level: getLevelMeta(level).name,
-              })}
+              {t("deck.due", { n: dueWords.length, level: levelName })}
             </p>
             <p className="mt-1 text-xs text-stone-400">{t("deck.tapHint")}</p>
             <button
@@ -253,14 +253,16 @@ export function FlashcardDeck() {
           >
             <span className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-2xl border border-stone-200 bg-white p-8 text-center [backface-visibility:hidden] dark:border-stone-800 dark:bg-stone-950">
               <span className="text-5xl font-bold tracking-tight">
-                {word.hanzi}
+                {word.term}
               </span>
               <span className="mt-4 text-xs text-stone-400">
                 {t("deck.tapFlip")}
               </span>
             </span>
             <span className="absolute inset-0 flex flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border border-teal-300 bg-teal-50 p-8 text-center [backface-visibility:hidden] [transform:rotateY(180deg)] dark:border-teal-700 dark:bg-teal-600/10">
-              <span className="text-4xl font-bold">{word.pinyin}</span>
+              {word.reading && (
+                <span className="text-4xl font-bold">{word.reading}</span>
+              )}
               <span className="mt-2 text-xl font-semibold text-stone-700 dark:text-stone-200">
                 {word.meaning}
               </span>
@@ -269,7 +271,12 @@ export function FlashcardDeck() {
                   {word.example}
                   {word.exampleMeaning && (
                     <span className="block text-xs">
-                      {word.examplePinyin} · {word.exampleMeaning}
+                      {word.exampleReading && (
+                        <>
+                          {word.exampleReading} ·{" "}
+                        </>
+                      )}
+                      {word.exampleMeaning}
                     </span>
                   )}
                 </p>

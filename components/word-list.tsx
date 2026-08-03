@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { useProgress } from "@/components/progress-provider";
 import { useLanguage } from "@/components/language-provider";
 import { Icon } from "@/components/icons";
-import type { VocabWord } from "@/lib/hsk/types";
+import type { LanguageModule, VocabItem } from "@/lib/languages/types";
 
 function normalizePinyin(s: string): string {
   return s
@@ -16,10 +16,16 @@ function normalizePinyin(s: string): string {
     .replace(/[^a-z]/g, "");
 }
 
-export function WordList({ words }: { words: VocabWord[] }) {
+export function WordList({
+  words,
+  module,
+}: {
+  words: VocabItem[];
+  module: LanguageModule;
+}) {
   const { progress, recordReview } = useProgress();
   const { t } = useLanguage();
-  const [selected, setSelected] = useState<VocabWord | null>(null);
+  const [selected, setSelected] = useState<VocabItem | null>(null);
   const [flipped, setFlipped] = useState(false);
   const [mode, setMode] = useState<"recognize" | "type">("recognize");
   const [typed, setTyped] = useState("");
@@ -29,7 +35,9 @@ export function WordList({ words }: { words: VocabWord[] }) {
   } | null>(null);
   const submitting = useRef(false);
 
-  const openWord = (word: VocabWord) => {
+  const supportsTyping = module.supportsTyping;
+
+  const openWord = (word: VocabItem) => {
     setSelected(word);
     setFlipped(false);
     setMode("recognize");
@@ -60,9 +68,9 @@ export function WordList({ words }: { words: VocabWord[] }) {
     if (!selected || submitting.current) return;
     if (typed.trim() === "") return;
     submitting.current = true;
-    const ok = normalizePinyin(typed) === normalizePinyin(selected.pinyin);
+    const ok = normalizePinyin(typed) === normalizePinyin(selected.reading ?? "");
     recordReview(selected, ok);
-    setFeedback({ correct: ok, answer: selected.pinyin });
+    setFeedback({ correct: ok, answer: selected.reading });
     queueMicrotask(() => {
       submitting.current = false;
     });
@@ -106,10 +114,12 @@ export function WordList({ words }: { words: VocabWord[] }) {
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block text-base font-semibold leading-tight">
-                    {word.hanzi}{" "}
-                    <span className="ml-2 text-sm font-medium text-stone-500 dark:text-stone-400">
-                      {word.pinyin}
-                    </span>
+                    {word.term}
+                    {word.reading && (
+                      <span className="ml-2 text-sm font-medium text-stone-500 dark:text-stone-400">
+                        {word.reading}
+                      </span>
+                    )}
                   </span>
                   <span className="block text-sm text-stone-600 dark:text-stone-300">
                     {word.meaning}
@@ -152,17 +162,19 @@ export function WordList({ words }: { words: VocabWord[] }) {
                 >
                   {t("word.recognize")}
                 </button>
-                <button
-                  type="button"
-                  onClick={() => switchMode("type")}
-                  className={`h-8 rounded-lg px-3 text-xs font-semibold transition-colors ${
-                    mode === "type"
-                      ? "bg-white text-stone-900 shadow-sm dark:bg-stone-900 dark:text-stone-100"
-                      : "text-stone-500 dark:text-stone-400"
-                  }`}
-                >
-                  {t("word.type")}
-                </button>
+                {supportsTyping && (
+                  <button
+                    type="button"
+                    onClick={() => switchMode("type")}
+                    className={`h-8 rounded-lg px-3 text-xs font-semibold transition-colors ${
+                      mode === "type"
+                        ? "bg-white text-stone-900 shadow-sm dark:bg-stone-900 dark:text-stone-100"
+                        : "text-stone-500 dark:text-stone-400"
+                    }`}
+                  >
+                    {t("word.type")}
+                  </button>
+                )}
               </div>
               <button
                 type="button"
@@ -190,16 +202,18 @@ export function WordList({ words }: { words: VocabWord[] }) {
                   >
                     <span className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-2xl border border-stone-200 bg-white p-6 text-center [backface-visibility:hidden] dark:border-stone-800 dark:bg-stone-950">
                       <span className="text-5xl font-bold tracking-tight">
-                        {selected.hanzi}
+                        {selected.term}
                       </span>
                       <span className="mt-4 text-xs text-stone-400">
                         {t("deck.tapFlip")}
                       </span>
                     </span>
                     <span className="absolute inset-0 flex flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border border-teal-300 bg-teal-50 p-6 text-center [backface-visibility:hidden] [transform:rotateY(180deg)] dark:border-teal-700 dark:bg-teal-600/10">
-                      <span className="text-3xl font-bold">
-                        {selected.pinyin}
-                      </span>
+                      {selected.reading && (
+                        <span className="text-3xl font-bold">
+                          {selected.reading}
+                        </span>
+                      )}
                       <span className="mt-2 text-xl font-semibold text-stone-700 dark:text-stone-200">
                         {selected.meaning}
                       </span>
@@ -208,7 +222,11 @@ export function WordList({ words }: { words: VocabWord[] }) {
                           {selected.example}
                           {selected.exampleMeaning && (
                             <span className="block text-xs">
-                              {selected.examplePinyin} ·{" "}
+                              {selected.exampleReading && (
+                                <>
+                                  {selected.exampleReading} ·{" "}
+                                </>
+                              )}
                               {selected.exampleMeaning}
                             </span>
                           )}
@@ -245,7 +263,7 @@ export function WordList({ words }: { words: VocabWord[] }) {
             ) : (
               <div className="flex min-h-48 flex-col justify-center rounded-2xl border border-stone-200 bg-white p-6 dark:border-stone-800 dark:bg-stone-950">
                 <p className="text-center text-5xl font-bold tracking-tight">
-                  {selected.hanzi}
+                  {selected.term}
                 </p>
                 <p className="mt-3 text-center text-sm font-medium text-stone-600 dark:text-stone-300">
                   {selected.meaning}

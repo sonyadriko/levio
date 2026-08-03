@@ -1,14 +1,14 @@
 "use client";
 
 import { useProgress } from "@/components/progress-provider";
-import type { HskLevel } from "@/lib/hsk/types";
-import { countWordsByLevel } from "@/lib/hsk";
+import type { LanguageModule } from "@/lib/languages/types";
 
 function levelWordsFromProgress(
   progress: ReturnType<typeof useProgress>["progress"],
-  level: HskLevel,
+  module: LanguageModule,
+  level: number,
 ): { reviewed: number; mastered: number } {
-  const prefix = `hsk${level}-`;
+  const prefix = module.wordIdPrefix(level);
   let reviewed = 0;
   let mastered = 0;
   for (const [id, wp] of Object.entries(progress.words)) {
@@ -19,12 +19,18 @@ function levelWordsFromProgress(
   return { reviewed, mastered };
 }
 
-export function LevelProgress({ level }: { level: HskLevel }) {
+export function LevelProgress({
+  module,
+  level,
+}: {
+  module: LanguageModule;
+  level: number;
+}) {
   const { progress } = useProgress();
 
-  const total = countWordsByLevel(level);
+  const total = module.countWordsByLevel(level);
   const { reviewed, mastered } = progress
-    ? levelWordsFromProgress(progress, level)
+    ? levelWordsFromProgress(progress, module, level)
     : { reviewed: 0, mastered: 0 };
   const masteredPct = total === 0 ? 0 : Math.round((mastered / total) * 100);
 

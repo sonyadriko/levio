@@ -9,10 +9,9 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import type { VocabWord } from "@/lib/hsk/types";
 import {
   applyGymXp,
-  applyLevelPass,
+  applyModuleLevelPass,
   applyReview,
   applyTest,
   applyXp,
@@ -40,9 +39,9 @@ import {
 
 interface ProgressContextValue {
   progress: ProgressState;
-  recordReview: (word: VocabWord, correct: boolean) => void;
+  recordReview: (word: { id: string }, correct: boolean) => void;
   recordTest: (correct: number, total: number) => number;
-  recordLevelPass: (level: number) => void;
+  recordLevelPass: (moduleId: string, level: number) => void;
   awardXp: (xp: number) => void;
   awardGymXp: (xp: number) => void;
   resetProgress: () => Promise<boolean>;
@@ -85,9 +84,12 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
   const pullDone = useRef(false);
   const [pullDoneCount, setPullDoneCount] = useState(0);
 
-  const recordReview = useCallback((word: VocabWord, correct: boolean) => {
-    setProgress(applyReview(getSnapshot(), word, correct));
-  }, []);
+  const recordReview = useCallback(
+    (word: { id: string }, correct: boolean) => {
+      setProgress(applyReview(getSnapshot(), word, correct));
+    },
+    [],
+  );
 
   const recordTest = useCallback((correct: number, total: number): number => {
     const { state, awarded } = applyTest(getSnapshot(), correct, total);
@@ -95,8 +97,8 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
     return awarded;
   }, []);
 
-  const recordLevelPass = useCallback((level: number) => {
-    setProgress(applyLevelPass(getSnapshot(), level));
+  const recordLevelPass = useCallback((moduleId: string, level: number) => {
+    setProgress(applyModuleLevelPass(getSnapshot(), moduleId, level));
   }, []);
 
   const awardXp = useCallback((xp: number) => {

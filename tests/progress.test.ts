@@ -3,12 +3,14 @@ import {
   MAX_TEST_XP_PER_DAY,
   applyGymXp,
   applyLevelPass,
+  applyModuleLevelPass,
   applyReview,
   applyTest,
   emptyProgress,
   mergeProgress,
   sanitizeProgress,
   testXp,
+  unlockedFor,
   type ProgressState,
   type WordProgress,
 } from "../lib/progress";
@@ -99,6 +101,58 @@ describe("applyLevelPass", () => {
   it("kap di MAX_HSK_LEVEL (6)", () => {
     const state = applyLevelPass(makeState({ unlockedUpTo: 6 }), 6);
     expect(state.unlockedUpTo).toBe(6);
+  });
+});
+
+describe("applyModuleLevelPass & unlockedFor", () => {
+  it("buka level berikutnya per modul (english)", () => {
+    const state = applyModuleLevelPass(emptyProgress(), "english", 1);
+    expect(unlockedFor(state, "english")).toBe(2);
+    expect(unlockedFor(state, "hsk")).toBe(1);
+  });
+
+  it("tidak mengganggu unlock modul lain", () => {
+    const hsk = applyModuleLevelPass(emptyProgress(), "hsk", 1);
+    expect(hsk.unlockedUpTo).toBe(2);
+    const english = applyModuleLevelPass(hsk, "english", 1);
+    expect(unlockedFor(english, "hsk")).toBe(2);
+    expect(unlockedFor(english, "english")).toBe(2);
+  });
+
+  it("kap di MAX_LEVEL untuk modul lain", () => {
+    const state = applyModuleLevelPass(emptyProgress(), "english", 6);
+    expect(unlockedFor(state, "english")).toBe(6);
+  });
+
+  it("unlockedFor fallback 1 untuk modul tanpa data", () => {
+    expect(unlockedFor(emptyProgress(), "english")).toBe(1);
+    expect(unlockedFor(emptyProgress(), "unknown")).toBe(1);
+  });
+
+  it("sanitize mempertahankan unlockedByModule", () => {
+    const state = sanitizeProgress({
+      xp: 1,
+      unlockedUpTo: 3,
+      unlockedByModule: { hsk: 3, english: 2 },
+    });
+    expect(state!.unlockedByModule.hsk).toBe(3);
+    expect(state!.unlockedByModule.english).toBe(2);
+    expect(unlockedFor(state!, "english")).toBe(2);
+  });
+
+  it("merge mengambil maksimum unlockedByModule per modul", () => {
+    const a = makeState({
+      unlockedByModule: { hsk: 2, english: 2 },
+      unlockedUpTo: 2,
+    });
+    const b = makeState({
+      unlockedByModule: { hsk: 3, english: 1 },
+      unlockedUpTo: 3,
+    });
+    const merged = mergeProgress(a, b);
+    expect(merged.unlockedUpTo).toBe(3);
+    expect(unlockedFor(merged, "hsk")).toBe(3);
+    expect(unlockedFor(merged, "english")).toBe(2);
   });
 });
 

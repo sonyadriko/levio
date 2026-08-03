@@ -8,15 +8,10 @@ import { ProgressBar } from "@/components/progress-bar";
 import { Pill } from "@/components/pill";
 import { Confetti } from "@/components/confetti";
 import { useCountUp } from "@/lib/use-count-up";
-import { countWordsByLevel } from "@/lib/hsk";
-import { useLevelWords } from "@/lib/hsk/use-level-words";
-import { allLevels, getLevelMeta } from "@/lib/hsk/levels";
-import {
-  generateMockTest,
-  type MockQuestion,
-  type QuestionType,
-} from "@/lib/hsk/mock-test";
-import type { HskLevel } from "@/lib/hsk/types";
+import { useLevelWords } from "@/lib/languages/use-level-words";
+import { defaultModule, getLanguageModule } from "@/lib/languages";
+import { generateMockTest, type MockQuestion } from "@/lib/languages/mock-test";
+import type { QuestionType } from "@/lib/languages/types";
 
 const QUESTION_COUNTS = [10, 20, 40];
 const TIME_OPTIONS = [
@@ -113,9 +108,14 @@ function ResultView({
                 className="rounded-lg bg-stone-50 p-3 text-sm dark:bg-stone-900"
               >
                 <p className="font-medium">
-                  {q.word.hanzi}{" "}
+                  {q.word.term}{" "}
                   <span className="text-xs font-normal text-stone-400">
-                    {q.word.pinyin} · {q.word.meaning}
+                    {q.word.reading && (
+                      <>
+                        {q.word.reading} ·{" "}
+                      </>
+                    )}
+                    {q.word.meaning}
                   </span>
                 </p>
                 <p className="mt-1 text-xs text-red-500">
@@ -133,11 +133,13 @@ function ResultView({
   );
 }
 
-export function MockTest() {
+export function MockTest({ moduleId }: { moduleId?: string }) {
+  const activeModule =
+    getLanguageModule(moduleId ?? "") ?? defaultModule();
   const { recordTest } = useProgress();
   const { t } = useLanguage();
 
-  const [level, setLevel] = useState<HskLevel>(1);
+  const [level, setLevel] = useState<number>(1);
   const [count, setCount] = useState(20);
   const [timeLimit, setTimeLimit] = useState(TIME_OPTIONS[1].seconds);
   const [questions, setQuestions] = useState<MockQuestion[] | null>(null);
@@ -147,7 +149,7 @@ export function MockTest() {
   const [result, setResult] = useState<QuizResult | null>(null);
   const deadline = useRef<number | null>(null);
 
-  const words = useLevelWords(level);
+  const words = useLevelWords(activeModule, level);
   const submitted = useRef(false);
 
   const submitQuiz = useCallback(() => {
@@ -179,7 +181,7 @@ export function MockTest() {
   }, [questions, result]);
 
   const startQuiz = () => {
-    const quiz = generateMockTest(words, count);
+    const quiz = generateMockTest(words, activeModule.questionTypes, count);
     if (quiz.length === 0) return;
     submitted.current = false;
     setQuestions(quiz);
@@ -209,16 +211,16 @@ export function MockTest() {
             {t("mock.level")}
           </label>
           <div className="flex flex-wrap gap-2">
-            {allLevels().map((l) => {
-              const available = countWordsByLevel(l) > 0;
+            {activeModule.levels().map((meta) => {
+              const available = activeModule.countWordsByLevel(meta.index) > 0;
               return (
                 <Pill
-                  key={l}
-                  selected={level === l}
+                  key={meta.index}
+                  selected={level === meta.index}
                   disabled={!available}
-                  onClick={() => setLevel(l)}
+                  onClick={() => setLevel(meta.index)}
                 >
-                  HSK {l}
+                  {meta.name}
                 </Pill>
               );
             })}
@@ -261,10 +263,16 @@ export function MockTest() {
             {t("mock.summary", {
               n: count,
               m: words.length,
-              level: getLevelMeta(level).name,
+              level: activeModule.levelName(level),
             })}
           </p>
-          <p className="mt-1 text-xs text-stone-400">{t("mock.typesHint")}</p>
+          <p className="mt-1 text-xs text-stone-400">
+            {t("mock.typesHint", {
+              types: activeModule.questionTypes
+                .map((qt) => t(`qtype.${qt}`))
+                .join(", "),
+            })}
+          </p>
           <button
             onClick={startQuiz}
             disabled={words.length === 0}

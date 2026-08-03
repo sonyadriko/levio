@@ -8,21 +8,30 @@ import { Lesson } from "@/components/lesson";
 import { LevelTest } from "@/components/level-test";
 import { SentencePractice } from "@/components/sentence-practice";
 import { WordList } from "@/components/word-list";
-import { useLevelWords } from "@/lib/hsk/use-level-words";
-import { MAX_HSK_LEVEL } from "@/lib/progress";
+import { useLevelWords } from "@/lib/languages/use-level-words";
+import { defaultModule, getLanguageModule } from "@/lib/languages";
+import { unlockedFor } from "@/lib/progress";
 import type { HskLevel } from "@/lib/hsk/types";
 
 // Konten dinamis halaman level: memutuskan terkunci/terbuka, menampilkan
-// pelajaran, latihan kalimat, daftar kata, dan tes kelulusan (wisuda).
-export function LevelContent({ level }: { level: HskLevel }) {
+// pelajaran (modul yang mendukung), latihan kalimat, daftar kata, dan tes
+// kelulusan (wisuda).
+export function LevelContent({
+  moduleId,
+  level,
+}: {
+  moduleId: string;
+  level: number;
+}) {
   const { progress, recordLevelPass } = useProgress();
   const { t } = useLanguage();
-  const words = useLevelWords(level);
+  const languageModule = getLanguageModule(moduleId) ?? defaultModule();
+  const words = useLevelWords(languageModule, level);
 
-  const locked = level > progress.unlockedUpTo;
+  const locked = level > unlockedFor(progress, languageModule.id);
 
   if (locked) {
-    const prev = (level - 1) as HskLevel;
+    const prev = level - 1;
     return (
       <section className="flex flex-col gap-4">
         <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-6 text-center dark:border-stone-700 dark:bg-stone-950">
@@ -30,31 +39,37 @@ export function LevelContent({ level }: { level: HskLevel }) {
             <Icon name="lock" className="h-6 w-6 text-stone-400" />
           </span>
           <h2 className="mt-3 text-lg font-bold">
-            {t("level.gateTitle", { level })}
+            {t("level.gateTitle", { name: languageModule.levelName(level) })}
           </h2>
           <p className="mx-auto mt-1 max-w-sm text-sm text-stone-500 dark:text-stone-400">
-            {t("level.gateDesc", { level, prev })}
+            {t("level.gateDesc", {
+              name: languageModule.levelName(level),
+              prev: languageModule.levelName(prev),
+            })}
           </p>
         </div>
         <LevelTest
+          module={languageModule}
           level={prev}
           variant="gate"
-          onPass={() => recordLevelPass(prev)}
+          onPass={() => recordLevelPass(languageModule.id, prev)}
         />
       </section>
     );
   }
 
-  const frontier = progress.unlockedUpTo === level;
-  const next = Math.min(MAX_HSK_LEVEL, level + 1);
+  const frontier = unlockedFor(progress, languageModule.id) === level;
+  const next = Math.min(languageModule.maxLevel, level + 1);
 
   return (
     <div className="flex flex-col gap-6">
-      <Lesson level={level} />
-      <SentencePractice level={level} />
-      <WordList words={words} />
+      {languageModule.supportsLesson && <Lesson level={level as HskLevel} />}
+      {languageModule.supportsSentences && (
+        <SentencePractice level={level as HskLevel} />
+      )}
+      <WordList words={words} module={languageModule} />
 
-      {frontier && level < MAX_HSK_LEVEL && (
+      {frontier && level < languageModule.maxLevel && (
         <div className="flex flex-col gap-3">
           <div className="flex items-start gap-3 rounded-2xl border border-dashed border-teal-300 bg-teal-50/60 p-4 dark:border-teal-800 dark:bg-teal-950/40">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-teal-100 dark:bg-teal-900">
@@ -62,39 +77,49 @@ export function LevelContent({ level }: { level: HskLevel }) {
             </span>
             <div>
               <h2 className="text-sm font-semibold">
-                {t("level.graduateTitle", { level })}
+                {t("level.graduateTitle", {
+                  name: languageModule.levelName(level),
+                })}
               </h2>
               <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
-                {t("level.graduateDesc", { level, next })}
+                {t("level.graduateDesc", {
+                  name: languageModule.levelName(level),
+                  next: languageModule.levelName(next),
+                })}
               </p>
             </div>
           </div>
           <LevelTest
+            module={languageModule}
             level={level}
             variant="graduate"
-            onPass={() => recordLevelPass(level)}
+            onPass={() => recordLevelPass(languageModule.id, level)}
           />
         </div>
       )}
 
-      {frontier && level === MAX_HSK_LEVEL && (
+      {frontier && level === languageModule.maxLevel && (
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-950/40">
           <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
-            {t("level.maxReached", { level })}
+            {t("level.maxReached", {
+              name: languageModule.levelName(level),
+            })}
           </p>
         </div>
       )}
 
-      {progress.unlockedUpTo === next && next !== level && (
+      {unlockedFor(progress, languageModule.id) === next && next !== level && (
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-950/40">
           <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
-            {t("level.unlockedNext", { next })}
+            {t("level.unlockedNext", {
+              next: languageModule.levelName(next),
+            })}
           </p>
           <Link
-            href={`/learn/hsk/${next}`}
+            href={`/learn/${languageModule.id}/${next}`}
             className="mt-2 inline-flex h-10 items-center rounded-xl border border-emerald-300 px-4 text-sm font-semibold text-emerald-700 transition-colors hover:bg-emerald-100 active:scale-[0.98] dark:border-emerald-700 dark:text-emerald-400 dark:hover:bg-emerald-900"
           >
-            {t("level.continueTo", { next })}
+            {t("level.continueTo", { next: languageModule.levelName(next) })}
           </Link>
         </div>
       )}
