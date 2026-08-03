@@ -1,4 +1,4 @@
-export const APP_VERSION = "0.12.0";
+export const APP_VERSION = "0.12.1";
 
 export interface ReleaseNote {
   version: string;
@@ -9,6 +9,15 @@ export interface ReleaseNote {
 // Riwayat rilis singkat untuk ditampilkan di aplikasi (Profil → "Yang Baru").
 // Urutan: terbaru di atas. Detail lengkap ada di CHANGELOG.md.
 export const RELEASE_NOTES: ReleaseNote[] = [
+  {
+    version: "0.12.1",
+    date: "2026-08-03",
+    highlightKeys: [
+      "release.0.12.1.h1",
+      "release.0.12.1.h2",
+      "release.0.12.1.h3",
+    ],
+  },
   {
     version: "0.12.0",
     date: "2026-08-03",
