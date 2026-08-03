@@ -20,6 +20,18 @@ selalu disinkronkan saat rilis (lihat `docs/CONTRIBUTING` tidak ada; aturan ada 
 
 ---
 
+## [0.13.0] — 2026-08-03
+
+### Ditambahkan
+- **Kosakata English CEFR B1–C2:** data baru `lib/english/data/{b1,b2,c1,c2}.ts` (50 kata per level, arti bahasa Indonesia + contoh kalimat) — total kosakata English **300** kata.
+- **Kurikulum English lengkap A1–C2:** level 3–6 otomatis aktif di flashcard, daftar kata & mock test (gate `countWordsByLevel() > 0`); deskripsi level & modul tidak lagi "segera tersedia".
+
+### Teknis
+- `lib/english/data/counts.ts` → `ENGLISH_COUNTS` penuh, `ENGLISH_TOTAL = 300`.
+- `lib/languages/english.ts` → loader level 3–6 (dynamic import).
+
+---
+
 ## [0.12.1] — 2026-08-03
 
 ### Diperbaiki
