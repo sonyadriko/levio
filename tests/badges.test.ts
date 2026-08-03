@@ -67,20 +67,20 @@ describe("getBadges", () => {
     expect(badge.current).toBe(100);
   });
 
-  it("badge graduate-1 diraih setelah membuka level 2", () => {
+  it("badge graduate-hsk-1 diraih setelah membuka level 2", () => {
     const badges = getBadges(makeProgress({ unlockedUpTo: 2 }));
-    expect(badges.find((b) => b.id === "graduate-1")!.earned).toBe(true);
+    expect(badges.find((b) => b.id === "graduate-hsk-1")!.earned).toBe(true);
   });
 
-  it("badge master-hsk1 menghitung kata hsk1 yang dikuasai", () => {
+  it("badge master-hsk-1 menghitung kata hsk1 yang dikuasai", () => {
     const progress = makeProgress({ words: masteredWords(["hsk1-1", "hsk1-2", "hsk1-3"]) });
-    const badge = getBadges(progress).find((b) => b.id === "master-hsk1")!;
+    const badge = getBadges(progress).find((b) => b.id === "master-hsk-1")!;
     expect(badge.earned).toBe(false);
     expect(badge.current).toBe(3);
     expect(badge.target).toBeGreaterThan(3);
   });
 
-  it("hanya kata berawalan hsk1 yang dihitung untuk master-hsk1", () => {
+  it("hanya kata berawalan hsk1 yang dihitung untuk master-hsk-1", () => {
     const progress = makeProgress({
       words: {
         ...masteredWords(["hsk1-1", "hsk1-2", "hsk2-1"]),
@@ -94,7 +94,22 @@ describe("getBadges", () => {
         },
       },
     });
-    const badge = getBadges(progress).find((b) => b.id === "master-hsk1")!;
+    const badge = getBadges(progress).find((b) => b.id === "master-hsk-1")!;
     expect(badge.current).toBe(2);
+  });
+
+  it("badge master-english-1 menghitung kata en-a1- yang dikuasai", () => {
+    const progress = makeProgress({ words: masteredWords(["en-a1-1", "en-a1-2"]) });
+    const badge = getBadges(progress).find((b) => b.id === "master-english-1")!;
+    expect(badge).toBeDefined();
+    expect(badge.current).toBe(2);
+    expect(badge.target).toBe(50);
+  });
+
+  it("badge graduate-english-1 diraih setelah membuka level 2 (english)", () => {
+    const progress = makeProgress({ unlockedByModule: { hsk: 1, english: 2 } });
+    const badge = getBadges(progress).find((b) => b.id === "graduate-english-1")!;
+    expect(badge).toBeDefined();
+    expect(badge.earned).toBe(true);
   });
 });

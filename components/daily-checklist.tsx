@@ -18,7 +18,6 @@ export function DailyChecklist() {
   const activity = progress?.activityByDate ?? {};
   const today = activity[todayKey()] ?? { xp: 0, reviews: 0, tests: 0, newWords: 0 };
   const { vocab, reviews: reviewTarget, xp: xpTarget } = settings.dailyTargets;
-  const level = progress?.unlockedUpTo ?? 1;
 
   const tasks: {
     labelKey: string;
@@ -30,7 +29,7 @@ export function DailyChecklist() {
   }[] = [
     {
       labelKey: "checklist.learn.label",
-      vars: { n: vocab, level },
+      vars: { n: vocab },
       metaKey: "checklist.learn.meta",
       done: (today.newWords ?? 0) >= vocab,
       href: "/learn",
@@ -54,7 +53,7 @@ export function DailyChecklist() {
     },
     {
       labelKey: "checklist.test.label",
-      vars: { level },
+      vars: {},
       metaKey: "checklist.test.meta",
       done: today.tests >= 1,
       href: "/mock-test",
