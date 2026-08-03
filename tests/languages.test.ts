@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getLanguageModule, allLanguageModules } from "../lib/languages";
+import { methodsFor } from "../lib/languages/methods";
 import { generateMockTest } from "../lib/languages/mock-test";
 import type { VocabItem } from "../lib/languages/types";
 
@@ -9,6 +10,32 @@ describe("language modules", () => {
     expect(ids).toContain("hsk");
     expect(ids).toContain("english");
     expect(ids).toContain("japanese");
+  });
+
+  it("metode belajar per modul sesuai kemampuan", () => {
+    const ids = (m: string) => methodsFor(getLanguageModule(m)!).map((x) => x.id);
+    expect(ids("hsk")).toEqual([
+      "flashcard",
+      "lesson",
+      "sentence",
+      "listening",
+      "reading",
+      "typing",
+      "mockTest",
+    ]);
+    expect(ids("english")).toEqual(["flashcard", "mockTest"]);
+    expect(ids("japanese")).toEqual(["flashcard", "kana", "mockTest"]);
+  });
+
+  it("setiap metode punya penjelasan apa & kenapa + href valid", () => {
+    for (const mod of allLanguageModules()) {
+      for (const method of methodsFor(mod)) {
+        expect(method.titleKey.length).toBeGreaterThan(0);
+        expect(method.descKey.length).toBeGreaterThan(0);
+        expect(method.whyKey.length).toBeGreaterThan(0);
+        expect(method.href(mod).startsWith("/")).toBe(true);
+      }
+    }
   });
 
   it("english punya 6 level CEFR A1–C2", () => {
