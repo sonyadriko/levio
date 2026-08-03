@@ -10,6 +10,7 @@ dengan scope ringkas. Rincian pola menambah modul: [`modules.md`](./modules.md).
 | v0.10.0 | Gym V2: database latihan, grafik progress, rest timer | ✅ rilis |
 | v0.11.0 | Gym cloud sync, program multi-minggu, streak gabungan belajar+gym, domain `levio.space` | ✅ rilis |
 | v0.12.0 | Modul belajar multi-bahasa: English (CEFR) A1–A2 | ✅ rilis |
+| v0.13.0 | English B1–C2 (data kosakata lengkap 300 kata) | 🚧 in progress |
 | v4.x | Modul Financial Planner | 🕓 draft |
 
 ## Selesai
@@ -20,6 +21,9 @@ dengan scope ringkas. Rincian pola menambah modul: [`modules.md`](./modules.md).
   modul **English (CEFR)** iterasi pertama: flashcard, daftar kata, mock test
   (data A1–A2, 100 kata). HSK backward-compatible (`/learn/hsk`, redirect
   `/learn/{n}`). Rincian pola: [`modules.md`](./modules.md).
+- **English B1–C2 (v0.13.0):** data kosakata CEFR B1–C2 ditambahkan (50 kata per
+  level, total 300 kata) — semua 6 level English kini punya isi untuk flashcard,
+  daftar kata, dan mock test.
 - **Gym V2 lengkap (v0.9.0–v0.11.0):** sesi + template, database 56 latihan,
   grafik progress (1RM/beban/volume), rest timer, item gym di Daily Checklist,
   sync cloud (Supabase), program multi-minggu (PPL 4 pekan) dengan target
