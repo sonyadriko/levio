@@ -20,6 +20,23 @@ selalu disinkronkan saat rilis (lihat `docs/CONTRIBUTING` tidak ada; aturan ada 
 
 ---
 
+## [0.12.0] — 2026-08-03
+
+### Ditambahkan
+- **Belajar multi-bahasa:** refactor modul belajar HSK menjadi arsitektur generik — hub `/learn` menampilkan pilihan modul, rute `app/learn/[lang]/[level]` melayani semua bahasa (SSG), redirect legacy `/learn/{n}` → `/learn/hsk/{n}` tetap berlaku.
+- **Modul English (CEFR):** iterasi pertama A1–A2 (100 kosakata, arti bahasa Indonesia) untuk flashcard, daftar kata & mock test; level B1–C2 tampil untuk roadmap. Latihan bertuliskan (lesson/susun kalimat) dan mengetik pinyin hanya untuk modul CJK (HSK).
+- **Progress per modul:** `unlockedByModule` + helper `unlockedFor` — level terbuka dihitung terpisah per bahasa; HSK tetap kompatibel (legacy `unlockedUpTo`).
+- **Mock test & flashcards per modul:** `/practice` & `/mock-test` menerima `?module=`; tipe soal menyesuaikan kemampuan modul (English: kata↔arti; HSK: + pelafalan).
+
+### Teknis
+- `lib/languages/` (types, loader dengan cache+subscribe, mock-test generik, adapter HSK, modul English, registry) + `lib/english/` (data & level CEFR).
+- Komponen belajar digeneralisasi dan menerima `moduleId` (objek modul berisi fungsi sehingga tidak dilewatkan lintas boundary RSC).
+
+### Catatan
+- English data awal terbatas (A1–A2); pengisian B1–C2 menyusul di rilis berikutnya.
+
+---
+
 ## [0.11.0] — 2026-08-03
 
 ### Ditambahkan
