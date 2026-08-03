@@ -5,13 +5,10 @@ import { useProgress } from "@/components/progress-provider";
 import { useLanguage } from "@/components/language-provider";
 import { Icon } from "@/components/icons";
 import { ProgressBar } from "@/components/progress-bar";
-import { MIN_PASS_PCT, MAX_HSK_LEVEL } from "@/lib/progress";
-import { useLevelWords } from "@/lib/hsk/use-level-words";
-import {
-  generateMockTest,
-  type MockQuestion,
-} from "@/lib/hsk/mock-test";
-import type { HskLevel } from "@/lib/hsk/types";
+import { MIN_PASS_PCT } from "@/lib/progress";
+import { useLevelWords } from "@/lib/languages/use-level-words";
+import { generateMockTest, type MockQuestion } from "@/lib/languages/mock-test";
+import type { LanguageModule } from "@/lib/languages/types";
 
 const TEST_COUNT = 10;
 
@@ -27,17 +24,19 @@ interface QuizResult {
 // Tes kelulusan: skor minimal MIN_PASS_PCT untuk membuka level berikutnya.
 // Dipakai di dua tempat: (1) gate level terkunci, (2) wisuda level frontier.
 export function LevelTest({
+  module,
   level,
   variant,
   onPass,
 }: {
-  level: HskLevel;
+  module: LanguageModule;
+  level: number;
   variant: "gate" | "graduate";
   onPass: () => void;
 }) {
   const { recordTest } = useProgress();
   const { t } = useLanguage();
-  const words = useLevelWords(level);
+  const words = useLevelWords(module, level);
 
   const [questions, setQuestions] = useState<MockQuestion[] | null>(null);
   const [index, setIndex] = useState(0);
@@ -45,10 +44,12 @@ export function LevelTest({
   const [result, setResult] = useState<QuizResult | null>(null);
   const submitted = useRef(false);
 
-  const nextLevel = Math.min(MAX_HSK_LEVEL, level + 1) as HskLevel;
+  const nextLevel = Math.min(module.maxLevel, level + 1);
+  const levelName = module.levelName(level);
+  const nextName = module.levelName(nextLevel);
 
   const start = () => {
-    const quiz = generateMockTest(words, TEST_COUNT);
+    const quiz = generateMockTest(words, module.questionTypes, TEST_COUNT);
     if (quiz.length === 0) return;
     submitted.current = false;
     setQuestions(quiz);
@@ -82,9 +83,9 @@ export function LevelTest({
         variant === "gate"
           ? "levelTest.introGate"
           : "levelTest.introGraduate",
-        { cur: level, next: nextLevel, p: MIN_PASS_PCT },
+        { cur: levelName, next: nextName, p: MIN_PASS_PCT },
       ),
-    [variant, level, nextLevel, t],
+    [variant, levelName, nextName, t],
   );
 
   if (result) {
@@ -112,7 +113,7 @@ export function LevelTest({
         </div>
         {passed && (
           <p className="mt-2 text-sm text-stone-500 dark:text-stone-400">
-            {t("levelTest.passNote", { next: nextLevel })}
+            {t("levelTest.passNote", { next: nextName })}
           </p>
         )}
         <button
@@ -130,7 +131,7 @@ export function LevelTest({
       <div className="rounded-2xl border border-stone-200 bg-white p-6 text-center dark:border-stone-800 dark:bg-stone-950">
         <Icon name="chart" className="mx-auto h-8 w-8 text-teal-600 dark:text-teal-500" />
         <h3 className="mt-3 text-base font-bold">
-          {t("levelTest.title", { n: level })}
+          {t("levelTest.title", { name: levelName })}
         </h3>
         <p className="mx-auto mt-2 max-w-sm text-sm text-stone-500 dark:text-stone-400">
           {introDescription}
@@ -162,7 +163,7 @@ export function LevelTest({
           {t("levelTest.question", { i: index + 1, t: questions.length })}
         </span>
         <span className="font-medium text-teal-700 dark:text-teal-600">
-          {t("levelTest.title", { n: level })}
+          {t("levelTest.title", { name: levelName })}
         </span>
       </div>
       <ProgressBar value={pct} />

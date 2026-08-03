@@ -7,11 +7,13 @@ import { LevelProgress } from "@/components/level-progress";
 import { PageHeader } from "@/components/page-header";
 import { T } from "@/components/translate";
 import { useProgress } from "@/components/progress-provider";
-import { hskLevels } from "@/lib/hsk/levels";
-import { countWordsByLevel, totalWordCount } from "@/lib/hsk";
+import { getLanguageModule } from "@/lib/languages";
+import { unlockedFor } from "@/lib/progress";
 
-export default function HskPage() {
+export function ModuleLevelList({ moduleId }: { moduleId: string }) {
   const { progress } = useProgress();
+  const languageModule = getLanguageModule(moduleId);
+  if (!languageModule) return null;
 
   return (
     <div className="flex flex-col gap-6">
@@ -19,18 +21,23 @@ export default function HskPage() {
         <BackLink href="/learn" labelKey="learn.backToModules" />
         <PageHeader
           icon="book"
-          title={<T id="learn.title" />}
-          subtitle={<T id="learn.subtitle" vars={{ n: totalWordCount() }} />}
+          title={<T id={languageModule.nameKey} />}
+          subtitle={
+            <T
+              id="learn.subtitle"
+              vars={{ n: languageModule.totalWordCount() }}
+            />
+          }
         />
       </div>
 
       <section className="flex flex-col gap-3">
-        {hskLevels.map((meta) => {
-          const locked = meta.level > progress.unlockedUpTo;
+        {languageModule.levels().map((meta) => {
+          const locked = meta.index > unlockedFor(progress, languageModule.id);
           return (
             <Link
-              key={meta.level}
-              href={`/learn/hsk/${meta.level}`}
+              key={meta.index}
+              href={`/learn/${languageModule.id}/${meta.index}`}
               className="rounded-xl border border-stone-200 bg-white p-4 transition-colors hover:border-teal-300 dark:border-stone-800 dark:bg-stone-950 dark:hover:border-teal-700"
             >
               <div className="flex items-center justify-between gap-3">
@@ -42,11 +49,7 @@ export default function HskPage() {
                         : "bg-teal-700 text-white"
                     }`}
                   >
-                    {locked ? (
-                      <Icon name="lock" className="h-5 w-5" />
-                    ) : (
-                      meta.level
-                    )}
+                    {locked ? <Icon name="lock" className="h-5 w-5" /> : meta.name}
                   </span>
                   <div>
                     <p
@@ -60,12 +63,14 @@ export default function HskPage() {
                       <p className="text-xs text-stone-400">
                         <T
                           id="level.unlockHint"
-                          vars={{ n: meta.level - 1 }}
+                          vars={{
+                            name: languageModule.levelName(meta.index - 1),
+                          }}
                         />
                       </p>
                     ) : (
                       <p className="text-xs text-stone-500 dark:text-stone-400">
-                        <T id={`levelDesc.${meta.level}`} />
+                        <T id={languageModule.levelDescriptionKey(meta.index)} />
                       </p>
                     )}
                   </div>
@@ -73,13 +78,16 @@ export default function HskPage() {
                 <span className="shrink-0 text-sm font-medium text-stone-400">
                   <T
                     id="learn.wordCount"
-                    vars={{ n: countWordsByLevel(meta.level) }}
+                    vars={{ n: languageModule.countWordsByLevel(meta.index) }}
                   />
                 </span>
               </div>
               {!locked && (
                 <div className="mt-3">
-                  <LevelProgress level={meta.level} />
+                  <LevelProgress
+                    module={languageModule}
+                    level={meta.index}
+                  />
                 </div>
               )}
             </Link>
