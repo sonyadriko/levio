@@ -37,7 +37,7 @@ Langkah-langkah berikut adalah pola yang dipakai (berlaku untuk bahasa baru lain
 
 3. **Halaman & komponen**: otomatis — `app/learn/[lang]` + `app/learn/[lang]/[level]`, hub `/learn`, `/practice?module=`, `/mock-test?module=` membaca registry. Komponen generik (`WordList`, `FlashcardDeck`, `MockTest`, `LevelTest`, `LevelProgress`) sudah berbasis `VocabItem`.
 
-4. **Kemampuan modul**: set `supports*` dan `questionTypes` sesuai konten (mis. Jepang dengan huruf → `supportsTyping` dsb.). Rute CJK (susun kalimat, mendengarkan, membaca) di `/practice` hanya tampil untuk `hsk`.
+4. **Kemampuan modul**: set `supports*` dan `questionTypes` sesuai konten (mis. Jepang dengan huruf → `supportsTyping` dsb.). Rute CJK (susun kalimat, mendengarkan, membaca) di `/practice` hanya tampil untuk `hsk`. Untuk latihan sistem huruf (mis. kana Jepang) yang bukan kosakata, tambahkan field opsional `script` pada modul (`{ path, titleKey, descKey, icon }`) — muncul sebagai kartu di atas daftar level, dengan progres lokal terpisah dari SRS (pola `lib/japanese/kana.ts` + `lib/kana-progress.ts`, storage `levio.kana.v1`).
 
 > Target desain: **komponen belajar tidak peduli bahasanya**. Mereka hanya menerima `VocabItem[]` (`{ term, reading?, meaning, ... }`) + callback. Perbedaan bahasa hanya di data & label UI.
 

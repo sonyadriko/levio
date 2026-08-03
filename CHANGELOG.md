@@ -20,6 +20,18 @@ selalu disinkronkan saat rilis (lihat `docs/CONTRIBUTING` tidak ada; aturan ada 
 
 ---
 
+## [0.14.0] — 2026-08-03
+
+### Ditambahkan
+- **Kosakata Japanese JLPT N4–N1:** data baru `lib/japanese/data/{n4,n3,n2,n1}.ts` (100 kata per level, arti Bahasa Indonesia + contoh kalimat) — total kosakata Jepang **500** kata.
+- **Kurikulum Jepang lengkap N5–N1:** level 2–5 otomatis aktif di flashcard, daftar kata & mock test (gate `countWordsByLevel() > 0`); deskripsi level & modul tidak lagi "segera tersedia".
+
+### Teknis
+- `lib/japanese/data/counts.ts` → `JAPANESE_COUNTS` penuh, `JAPANESE_TOTAL = 500`.
+- `lib/languages/japanese.ts` → loader level 2–5 (dynamic import).
+
+---
+
 ## [0.13.0] — 2026-08-03
 
 ### Ditambahkan

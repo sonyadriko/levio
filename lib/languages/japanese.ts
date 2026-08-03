@@ -26,6 +26,12 @@ export const japaneseModule: LanguageModule = {
   supportsTyping: false,
   supportsLesson: false,
   supportsSentences: false,
+  script: {
+    path: "/learn/japanese/kana",
+    titleKey: "kana.title",
+    descKey: "kana.desc",
+    icon: "あ",
+  },
   // Reading (hiragana) tersedia → semua tipe soal generik dipakai.
   questionTypes: [
     "term-meaning",
