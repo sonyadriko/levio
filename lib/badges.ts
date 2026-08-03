@@ -1,13 +1,15 @@
-import { countWordsByLevel } from "./hsk";
-import type { HskLevel } from "./hsk/types";
+import { allLanguageModules } from "./languages";
+import type { LanguageModule } from "./languages/types";
 import type { IconName } from "./nav";
-import type { ProgressState } from "./progress";
+import { unlockedFor, type ProgressState } from "./progress";
 
 export interface BadgeStatus {
   id: string;
   icon: IconName;
   titleKey: string;
   descKey: string;
+  titleVars?: Record<string, string | number>;
+  descVars?: Record<string, string | number>;
   earned: boolean;
   current: number;
   target: number;
@@ -18,20 +20,14 @@ interface BadgeDef {
   icon: IconName;
   titleKey: string;
   descKey: string;
+  titleVars?: Record<string, string | number>;
+  descVars?: Record<string, string | number>;
   value: (progress: ProgressState) => number;
   target: number;
 }
 
-function masteredInLevel(progress: ProgressState, level: HskLevel): number {
-  const prefix = `hsk${level}-`;
-  let count = 0;
-  for (const [id, wp] of Object.entries(progress.words)) {
-    if (id.startsWith(prefix) && wp.mastered) count += 1;
-  }
-  return count;
-}
-
-const badges: BadgeDef[] = [
+// Badge yang tidak terikat bahasa/modul tertentu.
+const baseBadges: BadgeDef[] = [
   {
     id: "first-steps",
     icon: "star",
@@ -81,30 +77,6 @@ const badges: BadgeDef[] = [
     target: 100,
   },
   {
-    id: "master-hsk1",
-    icon: "book",
-    titleKey: "badge.masterHsk1",
-    descKey: "badge.masterHsk1Desc",
-    value: (p) => masteredInLevel(p, 1),
-    target: countWordsByLevel(1),
-  },
-  {
-    id: "master-hsk2",
-    icon: "book",
-    titleKey: "badge.masterHsk2",
-    descKey: "badge.masterHsk2Desc",
-    value: (p) => masteredInLevel(p, 2),
-    target: countWordsByLevel(2),
-  },
-  {
-    id: "graduate-1",
-    icon: "trophy",
-    titleKey: "badge.graduate1",
-    descKey: "badge.graduate1Desc",
-    value: (p) => (p.unlockedUpTo > 1 ? 1 : 0),
-    target: 1,
-  },
-  {
     id: "tests-10",
     icon: "pen",
     titleKey: "badge.tests10",
@@ -114,6 +86,58 @@ const badges: BadgeDef[] = [
   },
 ];
 
+function masteredInLevel(
+  progress: ProgressState,
+  module: LanguageModule,
+  level: number,
+): number {
+  const prefix = module.wordIdPrefix(level);
+  let count = 0;
+  for (const [id, wp] of Object.entries(progress.words)) {
+    if (id.startsWith(prefix) && wp.mastered) count += 1;
+  }
+  return count;
+}
+
+// Badge per modul × level: "master" = kuasai semua kosakata level; "graduate"
+// = lulus tes kelulusan level 1 (membuka level 2). Digenerate dari registry
+// modul sehingga otomatis mengikuti data & bahasa yang tersedia.
+function languageBadges(): BadgeDef[] {
+  const defs: BadgeDef[] = [];
+  for (const languageModule of allLanguageModules()) {
+    for (const meta of languageModule.levels()) {
+      const total = languageModule.countWordsByLevel(meta.index);
+      if (total <= 0) continue;
+      const name = languageModule.levelName(meta.index);
+      defs.push({
+        id: `master-${languageModule.id}-${meta.index}`,
+        icon: "book",
+        titleKey: "badge.masterLevel",
+        descKey: "badge.masterLevelDesc",
+        titleVars: { level: name },
+        descVars: { level: name },
+        value: (p) => masteredInLevel(p, languageModule, meta.index),
+        target: total,
+      });
+    }
+    if (languageModule.totalWordCount() > 0) {
+      defs.push({
+        id: `graduate-${languageModule.id}-1`,
+        icon: "trophy",
+        titleKey: "badge.graduateLevel",
+        descKey: "badge.graduateLevelDesc",
+        titleVars: { level: languageModule.levelName(1) },
+        descVars: { level: languageModule.levelName(1) },
+        value: (p) => (unlockedFor(p, languageModule.id) > 1 ? 1 : 0),
+        target: 1,
+      });
+    }
+  }
+  return defs;
+}
+
+const badges: BadgeDef[] = [...baseBadges, ...languageBadges()];
+
 export function getBadges(progress: ProgressState): BadgeStatus[] {
   return badges.map((badge) => {
     const current = Math.min(badge.value(progress), badge.target);
@@ -122,6 +146,8 @@ export function getBadges(progress: ProgressState): BadgeStatus[] {
       icon: badge.icon,
       titleKey: badge.titleKey,
       descKey: badge.descKey,
+      titleVars: badge.titleVars,
+      descVars: badge.descVars,
       earned: current >= badge.target,
       current,
       target: badge.target,

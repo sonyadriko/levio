@@ -6,8 +6,8 @@ import { useLanguage } from "@/components/language-provider";
 import { Icon } from "@/components/icons";
 import { StatCard } from "@/components/stat-card";
 import { XP_PER_LEVEL } from "@/lib/progress";
-import { countWordsByLevel } from "@/lib/hsk";
-import { allLevels } from "@/lib/hsk/levels";
+import { allLanguageModules } from "@/lib/languages";
+import type { LanguageModule } from "@/lib/languages/types";
 import {
   dailySeries,
   heatmap,
@@ -101,12 +101,13 @@ function TotalsRow({ totals }: { totals: PeriodTotals }) {
   );
 }
 
-function LevelProgress() {
+function ModuleLevelProgress({ module }: { module: LanguageModule }) {
   const { progress } = useProgress();
   const { t } = useLanguage();
-  const levels = allLevels()
-    .map((level) => {
-      const prefix = `hsk${level}-`;
+  const levels = module
+    .levels()
+    .map((meta) => {
+      const prefix = module.wordIdPrefix(meta.index);
       let reviewed = 0;
       let mastered = 0;
       for (const [id, wp] of Object.entries(progress.words)) {
@@ -114,32 +115,27 @@ function LevelProgress() {
         reviewed += 1;
         if (wp.mastered) mastered += 1;
       }
-      return { level, total: countWordsByLevel(level), reviewed, mastered };
+      return {
+        meta,
+        total: module.countWordsByLevel(meta.index),
+        reviewed,
+        mastered,
+      };
     })
     .filter((l) => l.total > 0);
 
   if (levels.length === 0) return null;
 
   return (
-    <section className="rounded-2xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-950">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-sm font-semibold">{t("stats.perLevel")}</h2>
-        <div className="flex items-center gap-3 text-[11px] text-stone-500 dark:text-stone-400">
-          <span className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-teal-200 dark:bg-teal-800" />
-            {t("stats.perLevelReviewed")}
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-teal-600 dark:bg-teal-500" />
-            {t("stats.perLevelMastered")}
-          </span>
-        </div>
-      </div>
-      <div className="flex flex-col gap-3">
+    <div>
+      <h3 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+        {t(module.nameKey)}
+      </h3>
+      <div className="mt-2.5 flex flex-col gap-3">
         {levels.map((level) => (
-          <div key={level.level} className="flex items-center gap-3">
+          <div key={level.meta.index} className="flex items-center gap-3">
             <span className="w-12 shrink-0 text-xs font-semibold text-stone-500 dark:text-stone-400">
-              HSK {level.level}
+              {level.meta.name}
             </span>
             <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-stone-100 dark:bg-stone-800">
               <div
@@ -160,7 +156,7 @@ function LevelProgress() {
           </div>
         ))}
       </div>
-    </section>
+    </div>
   );
 }
 
@@ -278,7 +274,26 @@ export function StatsDashboard() {
         </div>
       </section>
 
-      <LevelProgress />
+      <section className="rounded-2xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-950">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-sm font-semibold">{t("stats.perLevel")}</h2>
+          <div className="flex items-center gap-3 text-[11px] text-stone-500 dark:text-stone-400">
+            <span className="flex items-center gap-1.5">
+              <span className="h-2 w-2 rounded-full bg-teal-200 dark:bg-teal-800" />
+              {t("stats.perLevelReviewed")}
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="h-2 w-2 rounded-full bg-teal-600 dark:bg-teal-500" />
+              {t("stats.perLevelMastered")}
+            </span>
+          </div>
+        </div>
+        <div className="flex flex-col gap-5">
+          {allLanguageModules().map((m) => (
+            <ModuleLevelProgress key={m.id} module={m} />
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

@@ -737,10 +737,10 @@ function ProfileSections({
                 )}
               </div>
               <p className="text-sm font-semibold leading-tight">
-                {t(badge.titleKey)}
+                {t(badge.titleKey, badge.titleVars)}
               </p>
               <p className="text-[11px] leading-snug text-stone-500 dark:text-stone-400">
-                {t(badge.descKey)}
+                {t(badge.descKey, badge.descVars)}
               </p>
               <div className="mt-auto flex items-center gap-1.5">
                 <div className="h-1 flex-1 overflow-hidden rounded-full bg-stone-200 dark:bg-stone-800">

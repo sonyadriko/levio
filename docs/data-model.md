@@ -198,7 +198,7 @@ Sumber kode: `lib/progress.ts`.
 
 ### Badge (derivasi, tanpa storage)
 
-Badge **tidak disimpan** — dihitung ulang dari `ProgressState` oleh `lib/badges.ts` (`getBadges(progress)`). Target badge kosakata ditarik dari `lib/hsk/data.ts`, jadi otomatis ikut bertambah saat data baru ditambahkan. Menambah badge = cukup tambah `BadgeDef` + kunci i18n (id/en).
+Badge **tidak disimpan** — dihitung ulang dari `ProgressState` oleh `lib/badges.ts` (`getBadges(progress)`). Badge kosakata ("master") dan kelulusan ("graduate") digenerate per modul × level dari registry `lib/languages/`, sehingga otomatis mengikuti bahasa & data yang tersedia. Menambah badge = cukup tambah `BadgeDef` + kunci i18n (id/en).
 
 ### Pengingat harian (`levio.reminder.v1`)
 
