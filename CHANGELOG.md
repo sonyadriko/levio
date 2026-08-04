@@ -20,7 +20,7 @@ selalu disinkronkan saat rilis (lihat `docs/CONTRIBUTING` tidak ada; aturan ada 
 
 ---
 
-## [Unreleased]
+## [0.17.0] — 2026-08-04
 
 ### Ditambahkan
 - **Mode Bicara** (mode ke-6 di paket tematik): lafalkan kata lalu dinilai dari pengenalan suara (`SpeechRecognition`, bahasa sesuai `speechLang`) dengan pencocokan ternormalisasi terhadap term/reading; fallback penilaian sendiri bila peramban tidak mendukung, mikrofon gagal, atau tidak ada ucapan yang terbaca.
