@@ -15,16 +15,9 @@
  */
 
 import type { VocabItem } from "../languages/types";
+import type { ThemeId, ThemePack } from "../themes/types";
 
-export type JapaneseThemeId = "travel" | "office" | "food" | "daily";
-
-export interface JapaneseTheme {
-  id: JapaneseThemeId;
-  titleKey: string;
-  descKey: string;
-  icon: string;
-  words: VocabItem[];
-}
+export type JapaneseTheme = ThemePack;
 
 function w(
   id: string,
@@ -35,7 +28,7 @@ function w(
   example: string,
   exampleReading: string,
   exampleMeaning: string,
-  themes: JapaneseThemeId[],
+  themes: ThemeId[],
 ): VocabItem {
   return {
     id,
@@ -181,7 +174,7 @@ const daily: VocabItem[] = [
   w("ja-theme-daily-008", "一緒", "いっしょ", "bersama", 2, "一緒に昼ご飯を食べましょう。", "いっしょにひるごはんをたべましょう。", "Mari makan siang bersama.", ["daily"]),
 ];
 
-export const JAPANESE_THEMES: JapaneseTheme[] = [
+export const JAPANESE_THEMES: ThemePack[] = [
   {
     id: "travel",
     titleKey: "theme.travel.title",
@@ -214,10 +207,10 @@ export const JAPANESE_THEMES: JapaneseTheme[] = [
 
 export function getJapaneseTheme(
   id: string,
-): JapaneseTheme | undefined {
+): ThemePack | undefined {
   return JAPANESE_THEMES.find((theme) => theme.id === id);
 }
 
-export function allJapaneseThemes(): JapaneseTheme[] {
+export function allJapaneseThemes(): ThemePack[] {
   return JAPANESE_THEMES;
 }
