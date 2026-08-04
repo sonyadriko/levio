@@ -380,6 +380,41 @@ describe("isLeech", () => {
   });
 });
 
+describe("drill kata sulit (rehabilitasi leech)", () => {
+  it("review benar yang konsisten menghapus status leech", () => {
+    const leech = {
+      reviews: 6,
+      correct: 2,
+      mastered: false,
+      nextReview: null,
+      ease: 1.3,
+      repetitions: 0,
+    } as WordProgress;
+    expect(isLeech(leech)).toBe(true);
+
+    let state = makeState({ words: { [word.id]: leech } });
+    for (let i = 0; i < 4; i++) {
+      state = applyReview(state, word, true);
+    }
+    expect(state.words[word.id].correct).toBe(6);
+    expect(isLeech(state.words[word.id])).toBe(false);
+  });
+
+  it("status leech tetap ada bila akurasi belum pulih", () => {
+    const leech = {
+      reviews: 6,
+      correct: 2,
+      mastered: false,
+      nextReview: null,
+      ease: 1.3,
+      repetitions: 0,
+    } as WordProgress;
+    let state = makeState({ words: { [word.id]: leech } });
+    state = applyReview(state, word, false);
+    expect(isLeech(state.words[word.id])).toBe(true);
+  });
+});
+
 describe("newWordsLearnedToday / newWordsRemaining", () => {
   it("menghitung kata baru yang sudah dipelajari hari ini", () => {
     const state = makeState({
