@@ -25,10 +25,20 @@ selalu disinkronkan saat rilis (lihat `docs/CONTRIBUTING` tidak ada; aturan ada 
 ### Ditambahkan
 - **Kosakata Japanese JLPT N4–N1:** data baru `lib/japanese/data/{n4,n3,n2,n1}.ts` (100 kata per level, arti Bahasa Indonesia + contoh kalimat) — total kosakata Jepang **500** kata.
 - **Kurikulum Jepang lengkap N5–N1:** level 2–5 otomatis aktif di flashcard, daftar kata & mock test (gate `countWordsByLevel() > 0`); deskripsi level & modul tidak lagi "segera tersedia".
+- **Latihan kana:** pengenalan & menulis hiragana/katakana (`/learn/japanese/kana`) — alfabet, grid known, drill romaji↔kana, tracing, progres terpisah dari SRS vocab.
+- **Metode belajar per modul:** hub `/learn` kini menampilkan metode tiap modul (Flashcard, Latihan, Mock Test) dengan deskripsi singkat dan tombol mulai.
+- **Paket Tematik Jepang:** 4 paket berbasis situasi — Perjalanan (32), Kantor (27), Makanan (28), Sehari-hari (29) — dengan 5 jenis latihan: flashcard, kuis pilihan, mengetik arti, mencocokkan, dan dengar-pilih (text-to-speech).
+
+### Diperbaiki
+- Audio mode "Dengar" hanya bisa diputar sekali (Chrome mengabaikan `speak()` tepat setelah `cancel()`).
+- Kuis & mode dengar macet setelah soal ke-1 (pilihan tidak di-reset saat lanjut soal).
+- Banner penjelasan (`theme.why`) & bagian "Kenapa:" dihub dihapus — penjelasan disampaikan langsung, bukan ditampilkan di aplikasi.
 
 ### Teknis
 - `lib/japanese/data/counts.ts` → `JAPANESE_COUNTS` penuh, `JAPANESE_TOTAL = 500`.
 - `lib/languages/japanese.ts` → loader level 2–5 (dynamic import).
+- `lib/japanese/themes.ts` + `components/theme-practice.tsx` → pack tematik & 5 mode latihan; rute SSG `/learn/japanese/themes/[theme]`.
+- `lib/languages/types.ts` → `VocabItem.themes?` opsional; kata reuse id JLPT agar progres SRS menyatu.
 
 ---
 
