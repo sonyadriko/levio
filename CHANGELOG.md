@@ -20,6 +20,23 @@ selalu disinkronkan saat rilis (lihat `docs/CONTRIBUTING` tidak ada; aturan ada 
 
 ---
 
+## [0.15.0] — 2026-08-04
+
+### Ditambahkan
+- **Paket Tematik untuk English & HSK:** perluasan pack berbasis situasi dari pilot Jepang — kini 3 bahasa × 4 paket (Perjalanan, Kantor, Makanan, Sehari-hari), total 12 rute latihan (flashcard, kuis pilihan, mengetik arti, mencocokkan, dengar-pilih).
+- **Text-to-speech per bahasa** pada mode "Dengar": en-US untuk English, zh-CN untuk Mandarin (pinyin), ja-JP untuk Jepang.
+
+### Diperbaiki
+- Banner penjelasan (`theme.why`) di halaman pack tematik dihapus — penjelasan disampaikan langsung, bukan ditampilkan di aplikasi.
+
+### Teknis
+- `lib/themes/types.ts` → tipe generik `ThemePack`; `lib/languages/themes.ts` → registry pack per bahasa + kode TTS.
+- Data pack: `lib/english/themes.ts` (travel 31, office 30, food 36, daily 35) & `lib/hsk/themes.ts` (travel 32, office 29, food 34, daily 35) — kata kurikulum dipakai ulang dengan id sama agar progres SRS menyatu.
+- Rute `app/learn/[lang]/themes/[theme]` (SSG, `dynamicParams=false`) menggantikan rute khusus japanese.
+- `components/theme-practice.tsx` → menerima `ThemePack` + `speechLang`; `module-level-list.tsx` memakai registry lintas bahasa.
+
+---
+
 ## [0.14.0] — 2026-08-03
 
 ### Ditambahkan
