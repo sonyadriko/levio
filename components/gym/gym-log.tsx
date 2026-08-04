@@ -64,7 +64,7 @@ function SessionCard({
         </button>
         <ChevronDown
           className={cn(
-            "size-4 shrink-0 text-stone-400 transition-transform",
+            "size-4 shrink-0 text-stone-400 transition-transform duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]",
             expanded ? "rotate-180" : "",
           )}
         />
@@ -80,7 +80,7 @@ function SessionCard({
       </div>
 
       {expanded ? (
-        <div className="mt-3 flex flex-col gap-2 border-t border-stone-100 pt-3 dark:border-stone-800">
+        <div className="animate-slide-down mt-3 flex flex-col gap-2 border-t border-stone-100 pt-3 dark:border-stone-800">
           {session.exercises.map((exercise) => (
             <div key={exercise.id} className="flex flex-col gap-1">
               <div className="flex flex-wrap items-center gap-2">

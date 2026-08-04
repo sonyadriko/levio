@@ -147,7 +147,7 @@ export function FlashcardDeck({ moduleId }: { moduleId?: string }) {
             </p>
             <button
               onClick={() => startSession(true)}
-              className="mt-4 h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 active:scale-[0.97] sm:w-auto sm:px-8"
+              className="mt-4 h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 btn-squish sm:w-auto sm:px-8"
             >
               {t("deck.reviewAll")}
             </button>
@@ -161,7 +161,7 @@ export function FlashcardDeck({ moduleId }: { moduleId?: string }) {
             <p className="mt-1 text-xs text-stone-400">{t("deck.tapHint")}</p>
             <button
               onClick={() => startSession()}
-              className="mt-4 h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 active:scale-[0.97] sm:w-auto sm:px-8"
+              className="mt-4 h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 btn-squish sm:w-auto sm:px-8"
             >
               {t("deck.start")}
             </button>
@@ -191,7 +191,7 @@ export function FlashcardDeck({ moduleId }: { moduleId?: string }) {
         </p>
         <button
           onClick={() => (dueWords.length === 0 ? setSession(null) : startSession())}
-          className="mt-5 h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 active:scale-[0.97] sm:w-auto sm:px-8"
+          className="mt-5 h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 btn-squish sm:w-auto sm:px-8"
         >
           {t("deck.again")}
         </button>
@@ -297,14 +297,14 @@ export function FlashcardDeck({ moduleId }: { moduleId?: string }) {
           <div className="grid grid-cols-2 gap-3">
           <button
             onClick={() => answer(false)}
-            className="flex h-14 items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white text-sm font-semibold text-stone-600 transition-colors hover:border-red-300 hover:text-red-600 active:scale-[0.97] dark:border-stone-800 dark:bg-stone-950 dark:text-stone-300"
+            className="flex h-14 items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white text-sm font-semibold text-stone-600 transition-colors hover:border-red-300 hover:text-red-600 btn-squish dark:border-stone-800 dark:bg-stone-950 dark:text-stone-300"
           >
             <Icon name="check" className="h-5 w-5 rotate-90" />
             {t("deck.notMemorized")}
           </button>
           <button
             onClick={() => answer(true)}
-            className="flex h-14 items-center justify-center gap-2 rounded-xl bg-emerald-600 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 active:scale-[0.97]"
+            className="flex h-14 items-center justify-center gap-2 rounded-xl bg-emerald-600 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 btn-squish"
           >
             <Icon name="check" className="h-5 w-5" />
             {t("deck.memorized")}

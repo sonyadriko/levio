@@ -192,13 +192,13 @@ export function Lesson({ level }: { level: HskLevel }) {
             type="button"
             onClick={start}
             disabled={allLearned}
-            className="h-11 rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white transition-colors hover:bg-teal-800 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40"
+            className="h-11 rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white transition-colors hover:bg-teal-800 btn-squish disabled:cursor-not-allowed disabled:opacity-40"
           >
             {t("lesson.start")}
           </button>
           <Link
             href="/practice"
-            className="flex h-11 items-center rounded-xl border border-stone-200 px-4 text-sm font-semibold text-stone-600 transition-colors hover:border-teal-300 hover:text-teal-700 active:scale-[0.97] dark:border-stone-800 dark:bg-stone-950 dark:text-stone-300"
+            className="flex h-11 items-center rounded-xl border border-stone-200 px-4 text-sm font-semibold text-stone-600 transition-colors hover:border-teal-300 hover:text-teal-700 btn-squish dark:border-stone-800 dark:bg-stone-950 dark:text-stone-300"
           >
             <Icon name="pen" className="mr-2 h-4 w-4" />
             {t("lesson.practice")}
@@ -247,7 +247,7 @@ export function Lesson({ level }: { level: HskLevel }) {
         <button
           type="button"
           onClick={introNext}
-          className="mt-4 h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 active:scale-[0.97]"
+          className="mt-4 h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 btn-squish"
         >
           {session.introIndex + 1 >= session.words.length
             ? t("lesson.introStart")
@@ -285,7 +285,7 @@ export function Lesson({ level }: { level: HskLevel }) {
         <div className="mx-auto mt-5 max-w-xs space-y-2">
           <Link
             href="/practice"
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 active:scale-[0.97]"
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 btn-squish"
           >
             <Icon name="pen" className="h-4 w-4" />
             {t("lesson.practice")}
@@ -293,7 +293,7 @@ export function Lesson({ level }: { level: HskLevel }) {
           <button
             type="button"
             onClick={exit}
-            className="h-12 w-full rounded-xl border border-stone-200 text-sm font-semibold text-stone-600 transition-colors hover:border-teal-300 hover:text-teal-700 active:scale-[0.97] dark:border-stone-800 dark:text-stone-300"
+            className="h-12 w-full rounded-xl border border-stone-200 text-sm font-semibold text-stone-600 transition-colors hover:border-teal-300 hover:text-teal-700 btn-squish dark:border-stone-800 dark:text-stone-300"
           >
             {t("lesson.exit")}
           </button>
@@ -388,7 +388,7 @@ export function Lesson({ level }: { level: HskLevel }) {
           <button
             type="button"
             onClick={advance}
-            className="mt-3 h-11 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 active:scale-[0.97]"
+            className="mt-3 h-11 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 btn-squish"
           >
             {t("lesson.continue")}
           </button>

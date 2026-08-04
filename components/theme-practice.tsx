@@ -120,7 +120,7 @@ function ResultView({
         </p>
         <button
           onClick={onAgain}
-          className="mt-4 h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 active:scale-[0.97] sm:w-auto sm:px-8"
+          className="mt-4 h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 btn-squish sm:w-auto sm:px-8"
         >
           {t("theme.again")}
         </button>
@@ -175,7 +175,7 @@ function FlashcardMode({
           <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-center">
             <button
               onClick={onRestart}
-              className="h-12 rounded-xl bg-teal-700 px-6 text-sm font-semibold text-white transition-colors hover:bg-teal-800 active:scale-[0.97]"
+              className="h-12 rounded-xl bg-teal-700 px-6 text-sm font-semibold text-white transition-colors hover:bg-teal-800 btn-squish"
             >
               {t("theme.again")}
             </button>
@@ -237,14 +237,14 @@ function FlashcardMode({
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={() => answer(false)}
-            className="flex h-14 items-center justify-center rounded-xl border border-stone-200 bg-white text-sm font-semibold text-stone-600 transition-colors hover:border-red-300 hover:text-red-600 active:scale-[0.97] dark:border-stone-800 dark:bg-stone-950 dark:text-stone-300"
+            className="flex h-14 items-center justify-center rounded-xl border border-stone-200 bg-white text-sm font-semibold text-stone-600 transition-colors hover:border-red-300 hover:text-red-600 btn-squish dark:border-stone-800 dark:bg-stone-950 dark:text-stone-300"
           >
             <Icon name="check" className="mr-2 h-5 w-5 rotate-90" />
             {t("deck.notMemorized")}
           </button>
           <button
             onClick={() => answer(true)}
-            className="flex h-14 items-center justify-center rounded-xl bg-emerald-600 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 active:scale-[0.97]"
+            className="flex h-14 items-center justify-center rounded-xl bg-emerald-600 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 btn-squish"
           >
             <Icon name="check" className="mr-2 h-5 w-5" />
             {t("deck.memorized")}
@@ -348,7 +348,7 @@ function QuizMode({
       {picked && (
         <button
           onClick={advance}
-          className="h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 active:scale-[0.97]"
+          className="h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 btn-squish"
         >
           {t("mock.next")}
         </button>
@@ -435,7 +435,7 @@ function TypeMode({
           <button
             onClick={submit}
             disabled={!value.trim()}
-            className="h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40"
+            className="h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 btn-squish disabled:cursor-not-allowed disabled:opacity-40"
           >
             {t("theme.check")}
           </button>
@@ -456,7 +456,7 @@ function TypeMode({
             )}
             <button
               onClick={next}
-              className="mt-3 h-11 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 active:scale-[0.97]"
+              className="mt-3 h-11 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 btn-squish"
             >
               {t("mock.next")}
             </button>
@@ -553,7 +553,7 @@ function MatchMode({
             <button
               key={card.key}
               onClick={() => tap(card.key)}
-              className={`flex min-h-16 items-center justify-center rounded-xl border p-2 text-center text-xs font-medium transition-colors active:scale-[0.97] sm:min-h-20 sm:text-sm ${
+              className={`flex min-h-16 items-center justify-center rounded-xl border p-2 text-center text-xs font-medium transition-colors btn-squish sm:min-h-20 sm:text-sm ${
                 isMatched
                   ? "border-emerald-500 bg-emerald-50 text-emerald-700 dark:border-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400"
                   : isOpen
@@ -576,7 +576,7 @@ function MatchMode({
           <div className="flex flex-col gap-2 sm:flex-row">
             <button
               onClick={onRestart}
-              className="h-11 rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white transition-colors hover:bg-teal-800 active:scale-[0.97]"
+              className="h-11 rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white transition-colors hover:bg-teal-800 btn-squish"
             >
               {t("theme.again")}
             </button>
@@ -662,7 +662,7 @@ function ListenMode({
         <button
           onClick={() => speak(word.reading ?? word.term, speechLang)}
           disabled={!audioOk}
-          className="flex h-16 w-16 items-center justify-center rounded-full bg-teal-700 text-white transition-colors hover:bg-teal-800 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40"
+          className="flex h-16 w-16 items-center justify-center rounded-full bg-teal-700 text-white transition-colors hover:bg-teal-800 btn-squish disabled:cursor-not-allowed disabled:opacity-40"
           aria-label={t("theme.listen.play")}
         >
           <Icon name="volume" className="h-8 w-8" />
@@ -712,7 +712,7 @@ function ListenMode({
             setPicked(null);
             setIndex((i) => i + 1);
           }}
-          className="h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 active:scale-[0.97]"
+          className="h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 btn-squish"
         >
           {t("mock.next")}
         </button>

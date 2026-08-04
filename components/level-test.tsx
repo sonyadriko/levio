@@ -118,7 +118,7 @@ export function LevelTest({
         )}
         <button
           onClick={passed ? onPass : start}
-          className="mt-5 h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 active:scale-[0.97] sm:w-auto sm:px-8"
+          className="mt-5 h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 btn-squish sm:w-auto sm:px-8"
         >
           {passed ? t("levelTest.continue") : t("levelTest.retry")}
         </button>
@@ -142,7 +142,7 @@ export function LevelTest({
         <button
           onClick={start}
           disabled={words.length === 0}
-          className="mt-4 h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto sm:px-8"
+          className="mt-4 h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 btn-squish disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto sm:px-8"
         >
           {words.length === 0 ? t("common.loading") : t("levelTest.start")}
         </button>
@@ -220,7 +220,7 @@ export function LevelTest({
               if (index + 1 >= questions.length) submit();
               else setIndex(index + 1);
             }}
-            className="h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 active:scale-[0.97]"
+            className="h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 btn-squish"
           >
             {index + 1 >= questions.length
               ? t("levelTest.results")

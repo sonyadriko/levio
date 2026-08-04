@@ -6,6 +6,7 @@ import { useProgress } from "@/components/progress-provider";
 import { useLanguage } from "@/components/language-provider";
 import { useSettings } from "@/components/settings-provider";
 import { Icon } from "@/components/icons";
+import { ChevronDown } from "lucide-react";
 import { StatCard } from "@/components/stat-card";
 import { ReminderCard } from "@/components/reminder-card";
 import { todayKey } from "@/lib/date";
@@ -50,7 +51,7 @@ function TargetStepper({
         >
           −
         </button>
-        <span className="w-10 text-center text-sm font-bold tabular-nums">
+        <span key={value} className="animate-count-bump w-10 text-center text-sm font-bold tabular-nums">
           {value}
         </span>
         <button
@@ -916,6 +917,11 @@ function ProfileSections({
         >
           <Icon name="star" className="h-4 w-4" />
           {t("profile.whatsNew")}
+          <ChevronDown
+            className={`size-4 transition-transform duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] ${
+              showWhatsNew ? "rotate-180" : ""
+            }`}
+          />
         </button>
         {showWhatsNew && (
           <div className="animate-slide-down mt-3 rounded-xl border border-stone-200 bg-stone-50 p-4 dark:border-stone-800 dark:bg-stone-900">

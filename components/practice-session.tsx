@@ -135,7 +135,7 @@ export function ChoicePracticeSession({
           <button
             onClick={start}
             disabled={!available || questionCount === 0}
-            className="mt-4 h-11 rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white transition-colors hover:bg-teal-800 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40"
+            className="mt-4 h-11 rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white transition-colors hover:bg-teal-800 btn-squish disabled:cursor-not-allowed disabled:opacity-40"
           >
             {!available || questionCount === 0
               ? t("common.loading")
@@ -179,7 +179,7 @@ export function ChoicePracticeSession({
         </p>
         <button
           onClick={start}
-          className="mt-4 h-11 rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white transition-colors hover:bg-teal-800 active:scale-[0.97]"
+          className="mt-4 h-11 rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white transition-colors hover:bg-teal-800 btn-squish"
         >
           {t(againKey)}
         </button>
@@ -252,7 +252,7 @@ export function ChoicePracticeSession({
             </p>
             <button
               onClick={advance}
-              className="h-11 shrink-0 rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white transition-colors hover:bg-teal-800 active:scale-[0.97]"
+              className="h-11 shrink-0 rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white transition-colors hover:bg-teal-800 btn-squish"
             >
               {index + 1 >= session.length ? t(doneCtaKey) : t(nextKey)}
             </button>

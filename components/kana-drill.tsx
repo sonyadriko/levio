@@ -188,7 +188,7 @@ export function KanaDrill({
               type="button"
               disabled={revealed}
               onClick={() => answer(option)}
-              className={`flex h-16 items-center justify-center rounded-xl border text-lg font-bold transition-colors active:scale-[0.97] ${stateClass}`}
+              className={`flex h-16 items-center justify-center rounded-xl border text-lg font-bold transition-colors btn-squish ${stateClass}`}
             >
               {option}
             </button>
