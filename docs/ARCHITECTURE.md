@@ -90,7 +90,6 @@ components/
 ├── service-worker-register.tsx → daftarkan /sw.js untuk offline (client, production only)
 ├── confetti.tsx          → efek confetti ringan (CSS keyframe, tanpa dependensi)
 ├── progress-ring.tsx     → lingkaran progress SVG (stroke-dashoffset)
-├── placeholder-page.tsx  → UI "dalam pengembangan"
 └── gym/
     ├── use-gym.ts        → hook state gym (useSyncExternalStore localStorage `levio.gym.v2`)
     ├── gym-session-form.tsx → editor sesi: ExerciseCard, rest timer, AddExerciseSheet (pemilih DB)

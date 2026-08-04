@@ -519,9 +519,6 @@ const dict: Record<Locale, Record<string, string>> = {
     "gym.progress.chartHint": "est. 1RM (Epley) per sesi",
     "gym.progress.noChartData": "Belum cukup data untuk grafik.",
 
-    "placeholder.inProgress":
-      "Modul ini sedang dikembangkan — masuk rencana rilis:",
-
     "auth.signIn": "Masuk",
     "auth.signOut": "Keluar",
     "auth.title": "Akun Levio",
@@ -1196,9 +1193,6 @@ const dict: Record<Locale, Record<string, string>> = {
     "gym.progress.recent": "Recent sessions",
     "gym.progress.chartHint": "est. 1RM (Epley) per session",
     "gym.progress.noChartData": "Not enough data for a chart.",
-
-    "placeholder.inProgress":
-      "This module is under development — coming soon:",
 
     "auth.signIn": "Sign in",
     "auth.signOut": "Sign out",
