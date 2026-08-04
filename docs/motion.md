@@ -38,13 +38,14 @@ bermakna (mendukung belajar), dan tidak menjadi hiasan yang berisik.
 | **Toast Overshoot** | Sistem `components/toast.tsx` (baru) | masuk: `cubic-bezier(0.18, 1.25, 0.4, 1)`; keluar: ease-in | Tidak ada toast global sebelumnya (baru inline banner di profil & sync-banner). Feedback ringan di atas konten tanpa memindah layout; kurva overshoot konsisten dengan bahasa spring. Dipakai pertama di: selesai mode **Match**. |
 | **Tab Pill Glide** | `components/sliding-tabs.tsx` (baru) dipasang di switcher **5 mode latihan** | `cubic-bezier(0.65, 0, 0.35, 1)` (glide) | Indikator aktif yang mengukur lebar tombol lalu meluncur memberi feedback "posisi saya" langsung — krusial pada switcher mode yang sering diganti (flashcard/kuis/ketik/cocok/dengar). |
 | **Number Counter bump** | `components/spring-counter.tsx` (baru) dipakai di XP (`home-stats`) & skor (`mock-test`) | `cubic-bezier(0.34, 1.56, 0.64, 1)` | Digit "berbentur" saat XP/skor bertambah memperkuat rasa pencapaian; melanjutkan pola `useCountUp` yang sudah ada (tinggal menambah overshoot kecil). |
-| Accordion Spring | `<details>` log gym & "Yang Baru" (belum dianimasi) | `cubic-bezier(0.16,1,0.3,1)` + chevron `(0.34,1.56,0.64,1)` | Chevron putar-spring + body glide membuat expand/collapse hidup; `details` native tetap dapat keyboard/focus. **Catatan:** batasi konten pendek agar tak layout thrash. |
-| Squish Button | tombol aksi utama ("Periksa"/"Selanjutnya") | cepat `0.08s` turun, pegas `0.5s` kembali | Tekan terasa fisik; mensampling `active:scale` saat ini. Asimetris (turun cepat, pulang bouncy) = kunci terasa responsif. |
-| Choice Chips | pill filter mode/tag otot | `(0.34,1.56,0.64,1)` | Sudah sejalan `animate-pop`; tinggal konsisten. |
-| Quantity Stepper | target harian di profil | value bump `(0.34,1.56,0.64,1)` + `tabular-nums` | Digit tidak "menari" saat berubah. |
+| Accordion Spring | `<details>` log gym & "Yang Baru" (belum dianimasi) | `cubic-bezier(0.16,1,0.3,1)` + chevron `(0.34,1.56,0.64,1)` | Chevron putar-spring + body glide membuat expand/collapse hidup; `details` native tetap dapat keyboard/focus. **Catatan:** batasi konten pendek agar tak layout thrash. ✅ diimplementasi |
+| Squish Button | tombol aksi utama ("Periksa"/"Selanjutnya") | cepat `0.08s` turun, pegas `0.5s` kembali | Tekan terasa fisik; mensampling `active:scale` saat ini. Asimetris (turun cepat, pulang bouncy) = kunci terasa responsif. ✅ diimplementasi |
+| Choice Chips | pill filter mode/tag otot | `(0.34,1.56,0.64,1)` | Sudah sejalan `animate-pop`; tinggal konsisten. ✅ diimplementasi |
+| Quantity Stepper | target harian di profil | value bump `(0.34,1.56,0.64,1)` + `tabular-nums` | Digit tidak "menari" saat berubah. ✅ diimplementasi |
 
-> "Sudah diadopsi" pada langkah pertama: **Toast**, **Tab Pill**, **Number bump**
-> (3 item implementasi). Sisanya ditandai untuk langkah berikut bila relevan.
+> Sudah diadopsi langkah pertama: **Toast**, **Tab Pill**, **Number bump**.
+> Langkah kedua: **Accordion Spring**, **Squish Button**, **Choice Chips**,
+> **Quantity Stepper** — semuanya sudah diimplementasi (v0.17.0).
 
 ## ❌ Tidak diadopsi (beserta alasan)
 
@@ -75,6 +76,10 @@ Ditambahkan ke `@theme` (`app/globals.css`):
 --animate-toast-out:   toast-out 200ms ease-in both;
 --animate-count-bump:  count-bump 400ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
 ```
+
+Untuk Squish Button ditambahkan util CSS biasa (bukan token): `.btn-squish`
+(asimetris: `:active` durasi 0.08s + scale 0.97, kembali 0.5s spring). Util
+unlayered agar menang atas `transition-colors` Tailwind pada tombol.
 
 Plus guard reduced-motion global (nonaktifkan semua animasi/transisi).
 

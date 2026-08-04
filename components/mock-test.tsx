@@ -74,7 +74,7 @@ function ResultView({
         </p>
         <button
           onClick={onRetake}
-          className="mt-4 h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 active:scale-[0.97] sm:w-auto sm:px-8"
+          className="mt-4 h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 btn-squish sm:w-auto sm:px-8"
         >
           {t("mock.retake")}
         </button>
@@ -274,7 +274,7 @@ export function MockTest({ moduleId }: { moduleId?: string }) {
           <button
             onClick={startQuiz}
             disabled={words.length === 0}
-            className="mt-4 h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto sm:px-8"
+            className="mt-4 h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 btn-squish disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto sm:px-8"
           >
             {words.length === 0 ? t("common.loading") : t("mock.start")}
           </button>
@@ -357,7 +357,7 @@ export function MockTest({ moduleId }: { moduleId?: string }) {
                 setIndex(index + 1);
               }
             }}
-            className="h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 active:scale-[0.97]"
+            className="h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 btn-squish"
           >
             {index + 1 >= questions.length ? t("mock.results") : t("mock.next")}
           </button>

@@ -39,7 +39,7 @@ export function ModuleHubCard({ module }: { module: LanguageModule }) {
           <span>
             <T id="learn.methodsTitle" vars={{ n: methods.length }} />
           </span>
-          <span className="text-stone-400 transition-transform group-open:rotate-180">
+          <span className="text-stone-400 transition-transform duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] group-open:rotate-180">
             ▾
           </span>
         </summary>

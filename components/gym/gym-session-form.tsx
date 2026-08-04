@@ -220,7 +220,7 @@ function ExerciseCard({
                 className={cn(
                   "rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors",
                   selected
-                    ? "bg-teal-600 text-white"
+                    ? "animate-pop bg-teal-600 text-white"
                     : "bg-stone-100 text-stone-600 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700",
                 )}
               >
@@ -341,7 +341,7 @@ function AddExerciseSheet({
             className={cn(
               "rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors",
               muscle === null
-                ? "bg-teal-600 text-white"
+                ? "animate-pop bg-teal-600 text-white"
                 : "bg-stone-100 text-stone-600 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700",
             )}
           >
@@ -355,7 +355,7 @@ function AddExerciseSheet({
               className={cn(
                 "rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors",
                 muscle === group
-                  ? "bg-teal-600 text-white"
+                  ? "animate-pop bg-teal-600 text-white"
                   : "bg-stone-100 text-stone-600 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700",
               )}
             >
