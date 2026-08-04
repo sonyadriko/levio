@@ -11,8 +11,8 @@ dengan scope ringkas. Rincian pola menambah modul: [`modules.md`](./modules.md).
 | v0.11.0 | Gym cloud sync, program multi-minggu, streak gabungan belajar+gym, domain `levio.space` | ✅ rilis |
 | v0.12.0 | Modul belajar multi-bahasa: English (CEFR) A1–A2 | ✅ rilis |
 | v0.13.0 | English B1–C2 (data kosakata lengkap 300 kata) | ✅ rilis |
-| v0.14.0 | Modul Japanese (JLPT lengkap N5–N1, 500 kosakata) | ✅ rilis |
-| v0.15.0 | Kana practice: pengenalan + menulis hiragana/katakana | 🚧 in progress |
+| v0.14.0 | Modul Japanese (JLPT lengkap N5–N1, 500 kosakata) + Kana practice | ✅ rilis |
+| v0.15.0 | Paket Tematik untuk English & HSK + TTS per bahasa | ✅ rilis |
 | v4.x | Modul Financial Planner | 🕓 draft |
 
 ## Selesai
@@ -29,10 +29,15 @@ dengan scope ringkas. Rincian pola menambah modul: [`modules.md`](./modules.md).
 - **Japanese JLPT (v0.14.0):** modul bahasa ketiga terdaftar — kosakata lengkap
   **N5–N1 (500 kata**, kanji/kana → `term`, hiragana → `reading`) untuk
   flashcard, daftar kata & mock test (4 tipe soal).
-- **Kana practice (v0.15.0):** latihan sistem huruf Jepang terpisah dari SRS
+- **Kana practice (v0.14.0):** latihan sistem huruf Jepang terpisah dari SRS
   vocab — pengenalan romaji↔kana (drill 4 opsi) dan menulis (tracing di atas
   siluet + self-grade), progres lokal `levio.kana.v1` (104 huruf per alfabet).
   Entri lewat kartu "Latihan Kana" di halaman modul Japanese.
+- **Paket Tematik multi-bahasa (v0.15.0):** perluasan pack berbasis situasi dari
+  pilot Jepang ke English & HSK — 3 bahasa × 4 paket (Perjalanan, Kantor,
+  Makanan, Sehari-hari), 12 rute latihan (flashcard, kuis, mengetik,
+  mencocokkan, dengar) dengan TTS per bahasa (en-US / zh-CN / ja-JP). Kata
+  kurikulum dipakai ulang dengan id sama agar progres SRS menyatu.
 - **Gym V2 lengkap (v0.9.0–v0.11.0):** sesi + template, database 56 latihan,
   grafik progress (1RM/beban/volume), rest timer, item gym di Daily Checklist,
   sync cloud (Supabase), program multi-minggu (PPL 4 pekan) dengan target
