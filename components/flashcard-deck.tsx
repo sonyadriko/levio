@@ -11,6 +11,7 @@ import { Confetti } from "@/components/confetti";
 import { useLevelWords } from "@/lib/languages/use-level-words";
 import { defaultModule, getLanguageModule } from "@/lib/languages";
 import { todayKey } from "@/lib/date";
+import { isLeech } from "@/lib/progress";
 import type { VocabItem } from "@/lib/languages/types";
 
 function shuffle<T>(arr: T[]): T[] {
@@ -75,9 +76,23 @@ export function FlashcardDeck({ moduleId }: { moduleId?: string }) {
 
   const hasDeck = dueWords.length > 0 || newWordsDeck.length > 0;
 
-  const startSession = (reviewAll = false) => {
+  // Kata "sulit" (leech) di level ini — butuh latihan terfokus.
+  const leechWords = useMemo(
+    () =>
+      words.filter((w) => {
+        const wp = progress.words[w.id];
+        return Boolean(wp && isLeech(wp));
+      }),
+    [words, progress],
+  );
+
+  const startSession = (reviewAll = false, leechOnly = false) => {
     const deck = shuffle(
-      reviewAll ? words : [...dueWords, ...newWordsDeck],
+      leechOnly
+        ? leechWords
+        : reviewAll
+          ? words
+          : [...dueWords, ...newWordsDeck],
     );
     if (deck.length === 0) return;
     setSession({ deck, index: 0, correct: 0, xp: 0 });
@@ -177,6 +192,15 @@ export function FlashcardDeck({ moduleId }: { moduleId?: string }) {
             >
               {t("deck.reviewAll")}
             </button>
+            {leechWords.length > 0 && (
+              <button
+                onClick={() => startSession(false, true)}
+                className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-amber-300 bg-amber-50 text-sm font-semibold text-amber-700 transition-colors hover:bg-amber-100 btn-squish dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300 dark:hover:bg-amber-950/70 sm:w-auto sm:px-8"
+              >
+                <Icon name="flame" className="h-5 w-5" />
+                {t("deck.leechDrill", { n: leechWords.length })}
+              </button>
+            )}
           </div>
         ) : (
           <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-8 text-center dark:border-stone-700 dark:bg-stone-950">
@@ -202,6 +226,15 @@ export function FlashcardDeck({ moduleId }: { moduleId?: string }) {
             >
               {t("deck.start")}
             </button>
+            {leechWords.length > 0 && (
+              <button
+                onClick={() => startSession(false, true)}
+                className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-amber-300 bg-amber-50 text-sm font-semibold text-amber-700 transition-colors hover:bg-amber-100 btn-squish dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300 dark:hover:bg-amber-950/70 sm:w-auto sm:px-8"
+              >
+                <Icon name="flame" className="h-5 w-5" />
+                {t("deck.leechDrill", { n: leechWords.length })}
+              </button>
+            )}
           </div>
         )}
       </div>

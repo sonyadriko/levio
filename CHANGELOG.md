@@ -20,6 +20,13 @@ selalu disinkronkan saat rilis (lihat `docs/CONTRIBUTING` tidak ada; aturan ada 
 
 ---
 
+## [Unreleased]
+
+### Ditambahkan
+- **Drill kata sulit (leech):** tombol "Latihan Kata Sulit" di deck flashcard muncul saat ada kata leech di level terpilih — buka sesi flashcard terfokus untuk kata-kata sulit saja.
+
+---
+
 ## [0.17.0] — 2026-08-04
 
 ### Ditambahkan
