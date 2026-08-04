@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useProgress } from "@/components/progress-provider";
 import { useLanguage } from "@/components/language-provider";
 import { Icon } from "@/components/icons";
+import { isLeech } from "@/lib/progress";
 import type { LanguageModule, VocabItem } from "@/lib/languages/types";
 
 function normalizePinyin(s: string): string {
@@ -126,6 +127,14 @@ export function WordList({
                   </span>
                 </span>
                 <span className="shrink-0 text-xs text-stone-400">
+                  {wp && isLeech(wp) && (
+                    <span
+                      title={t("word.leechHint")}
+                      className="mr-2 rounded-md bg-amber-100 px-1.5 py-0.5 font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                    >
+                      {t("word.leech")}
+                    </span>
+                  )}
                   {wp ? `✓ ${wp.reviews}x` : t("common.new")}
                 </span>
               </button>
@@ -147,7 +156,19 @@ export function WordList({
               <span>
                 {(() => {
                   const wp = progress?.words[selected.id];
-                  return wp ? `✓ ${wp.reviews}x` : t("common.new");
+                  return (
+                    <>
+                      {wp && isLeech(wp) && (
+                        <span
+                          title={t("word.leechHint")}
+                          className="mr-2 rounded-md bg-amber-100 px-1.5 py-0.5 font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                        >
+                          {t("word.leech")}
+                        </span>
+                      )}
+                      {wp ? `✓ ${wp.reviews}x` : t("common.new")}
+                    </>
+                  );
                 })()}
               </span>
               <div className="flex gap-1 rounded-xl bg-stone-100 p-1 dark:bg-stone-800/70">

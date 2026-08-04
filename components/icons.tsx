@@ -55,6 +55,12 @@ const paths: Record<IconName, React.ReactNode> = {
       <path d="M15.5 8.5a5 5 0 0 1 0 7M18.4 5.6a8.5 8.5 0 0 1 0 12.8" />
     </>
   ),
+  mic: (
+    <>
+      <rect x="9" y="2" width="6" height="12" rx="3" />
+      <path d="M5 11a7 7 0 0 0 14 0M12 18v4M8 22h8" />
+    </>
+  ),
 };
 
 export function Icon({

@@ -102,6 +102,29 @@ function defaultWordProgress(): WordProgress {
   };
 }
 
+// Kata "leech": sudah direview cukup banyak tapi akurasi tetap rendah —
+// butuh perhatian ekstra, ditandai di daftar kata (bukan dihukum SRS).
+export function isLeech(wp: WordProgress): boolean {
+  return wp.reviews >= 4 && wp.correct / wp.reviews < 0.35;
+}
+
+// Jumlah kata baru yang sudah dipelajari hari ini (dari activity log).
+export function newWordsLearnedToday(
+  state: ProgressState,
+  today = todayKey(),
+): number {
+  return state.activityByDate[today]?.newWords ?? 0;
+}
+
+// Sisa kuota kata baru hari ini — dipakai SRS untuk membatasi kartu baru.
+export function newWordsRemaining(
+  state: ProgressState,
+  cap: number,
+  today = todayKey(),
+): number {
+  return Math.max(0, cap - newWordsLearnedToday(state, today));
+}
+
 function normalizeWordProgress(w: Partial<WordProgress>): WordProgress {
   return {
     reviews: w.reviews ?? 0,

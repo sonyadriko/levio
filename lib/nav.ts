@@ -12,7 +12,8 @@ export type IconName =
   | "lock"
   | "trophy"
   | "star"
-  | "volume";
+  | "volume"
+  | "mic";
 
 export interface NavItem {
   labelKey: string;

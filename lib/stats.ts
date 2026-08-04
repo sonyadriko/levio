@@ -219,3 +219,58 @@ export function summarize(progress: ProgressState) {
     lastYear: yearKeyOf(new Date()),
   };
 }
+
+// Rata-rata kata baru per hari kalender dalam `days` hari terakhir —
+// dasar proyeksi kapan sebuah level selesai. 0 bila tidak ada aktivitas.
+export function avgNewWordsPerDay(
+  activity: Record<string, ActivityDay>,
+  days = 30,
+): number {
+  let sum = 0;
+  const start = addDays(new Date(), -(days - 1));
+  const startKey = dateKeyOf(start);
+  for (const [key, day] of Object.entries(activity)) {
+    if (key < startKey) continue;
+    sum += day.newWords ?? 0;
+  }
+  return Math.round((sum / days) * 10) / 10;
+}
+
+export interface RetentionMetrics {
+  reviewed: number;
+  mastered: number;
+  leeches: number;
+  dueToday: number;
+  remembered: number;
+  retentionRate: number;
+}
+
+// Proksi retensi: dari semua kata yang pernah direview, berapa yang jadwal
+// review berikutnya masih di masa depan (dianggap "diingat" hari ini).
+export function retentionMetrics(progress: ProgressState): RetentionMetrics {
+  const today = dateKeyOf(new Date());
+  const words = Object.values(progress.words);
+  const reviewed = words.length;
+  const mastered = words.filter((w) => w.mastered).length;
+  const leeches = words.filter((w) => w.reviews >= 4 && w.correct / w.reviews < 0.35).length;
+  const dueToday = words.filter(
+    (w) => w.nextReview && w.nextReview <= today,
+  ).length;
+  const remembered = Math.max(0, reviewed - dueToday);
+  const retentionRate = reviewed > 0 ? Math.round((remembered / reviewed) * 100) : 0;
+  return { reviewed, mastered, leeches, dueToday, remembered, retentionRate };
+}
+
+// Proyeksi selesai sebuah level: berapa hari lagi sampai seluruh kata
+// dikuasai, berdasar kecepatan kata baru 30 hari terakhir. null = tak terhitung.
+export function estimateDaysToMaster(
+  progress: ProgressState,
+  totalWords: number,
+  mastered: number,
+): number | null {
+  const remaining = Math.max(0, totalWords - mastered);
+  if (remaining === 0) return 0;
+  const pace = avgNewWordsPerDay(progress.activityByDate);
+  if (pace <= 0) return null;
+  return Math.ceil(remaining / pace);
+}

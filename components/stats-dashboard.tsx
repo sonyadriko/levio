@@ -10,9 +10,11 @@ import { allLanguageModules } from "@/lib/languages";
 import type { LanguageModule } from "@/lib/languages/types";
 import {
   dailySeries,
+  estimateDaysToMaster,
   heatmap,
   heatmapLevel,
   monthlySeries,
+  retentionMetrics,
   summarize,
   totalsThisMonth,
   totalsThisWeek,
@@ -132,29 +134,41 @@ function ModuleLevelProgress({ module }: { module: LanguageModule }) {
         {t(module.nameKey)}
       </h3>
       <div className="mt-2.5 flex flex-col gap-3">
-        {levels.map((level) => (
-          <div key={level.meta.index} className="flex items-center gap-3">
-            <span className="w-12 shrink-0 text-xs font-semibold text-stone-500 dark:text-stone-400">
-              {level.meta.name}
-            </span>
-            <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-stone-100 dark:bg-stone-800">
-              <div
-                className="absolute inset-y-0 left-0 bg-teal-200 dark:bg-teal-800"
-                style={{ width: `${(level.reviewed / level.total) * 100}%` }}
-              />
-              <div
-                className="absolute inset-y-0 left-0 bg-teal-600 dark:bg-teal-500"
-                style={{ width: `${(level.mastered / level.total) * 100}%` }}
-              />
+        {levels.map((level) => {
+          const days = estimateDaysToMaster(progress, level.total, level.mastered);
+          return (
+            <div key={level.meta.index} className="flex items-center gap-3">
+              <span className="w-12 shrink-0 text-xs font-semibold text-stone-500 dark:text-stone-400">
+                {level.meta.name}
+              </span>
+              <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-stone-100 dark:bg-stone-800">
+                <div
+                  className="absolute inset-y-0 left-0 bg-teal-200 dark:bg-teal-800"
+                  style={{ width: `${(level.reviewed / level.total) * 100}%` }}
+                />
+                <div
+                  className="absolute inset-y-0 left-0 bg-teal-600 dark:bg-teal-500"
+                  style={{ width: `${(level.mastered / level.total) * 100}%` }}
+                />
+              </div>
+              <div className="w-20 shrink-0 text-right">
+                <span className="block text-[11px] tabular-nums text-stone-500 dark:text-stone-400">
+                  {t("stats.masteredOf", {
+                    mastered: level.mastered,
+                    total: level.total,
+                  })}
+                </span>
+                <span className="block text-[10px] tabular-nums text-stone-400">
+                  {days === null
+                    ? "—"
+                    : days === 0
+                      ? t("stats.estDone")
+                      : t("stats.estDays", { n: days })}
+                </span>
+              </div>
             </div>
-            <span className="w-16 shrink-0 text-right text-[11px] tabular-nums text-stone-500 dark:text-stone-400">
-              {t("stats.masteredOf", {
-                mastered: level.mastered,
-                total: level.total,
-              })}
-            </span>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -167,6 +181,7 @@ export function StatsDashboard() {
 
   const activity = progress.activityByDate;
   const summary = useMemo(() => summarize(progress), [progress]);
+  const retention = useMemo(() => retentionMetrics(progress), [progress]);
   const level = Math.floor(progress.xp / XP_PER_LEVEL) + 1;
 
   const series = useMemo(() => {
@@ -220,6 +235,31 @@ export function StatsDashboard() {
         <StatCard label={t("stats.totalReview")} value={summary.completedReviews} icon="pen" />
         <StatCard label={t("stats.activeDays")} value={summary.activeDays} icon="chart" />
       </div>
+
+      <section className="rounded-2xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-950">
+        <h2 className="mb-3 text-sm font-semibold">{t("stats.retentionTitle")}</h2>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <StatCard
+            label={t("stats.retention")}
+            value={`${retention.retentionRate}%`}
+            icon="check"
+          />
+          <StatCard
+            label={t("stats.remembered")}
+            value={retention.remembered}
+            icon="book"
+          />
+          <StatCard
+            label={t("stats.dueToday")}
+            value={retention.dueToday}
+            icon="pen"
+          />
+          <StatCard label={t("stats.leeches")} value={retention.leeches} icon="flame" />
+        </div>
+        <p className="mt-3 text-[11px] leading-relaxed text-stone-400">
+          {t("stats.retentionHint")}
+        </p>
+      </section>
 
       {summary.lastTest && (
         <div className="flex items-center gap-3 rounded-xl border border-teal-200 bg-teal-50 p-3.5 dark:border-teal-800 dark:bg-teal-500/10">
