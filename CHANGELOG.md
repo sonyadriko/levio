@@ -20,6 +20,24 @@ selalu disinkronkan saat rilis (lihat `docs/CONTRIBUTING` tidak ada; aturan ada 
 
 ---
 
+## [Unreleased]
+
+### Ditambahkan
+- **Mode Bicara** (mode ke-6 di paket tematik): lafalkan kata lalu dinilai dari pengenalan suara (`SpeechRecognition`, bahasa sesuai `speechLang`) dengan pencocokan ternormalisasi terhadap term/reading; fallback penilaian sendiri bila peramban tidak mendukung, mikrofon gagal, atau tidak ada ucapan yang terbaca.
+- **SRS cap kata baru per hari:** deck review membatasi kartu baru ke kuota harian `Target Harian → Kosakata/hari` (default 10, dipakai bersama semua modul); layar idle menampilkan jumlah ulasan + kata baru tersisa.
+- **Deteksi kata sulit (leech):** kata dengan ≥4 review dan akurasi < 35% ditandai badge "Kata sulit" di daftar kata (daftar & detail), plus terhitung di halaman Statistik.
+- **Statistik retensi & proyeksi:** panel "Retensi & Kesehatan" (retensi hari ini, kata diingat, jatuh tempo, kata sulit) dan proyeksi selesai per level ("±N hari") berdasar kecepatan kata baru 30 hari terakhir.
+
+### Teknis
+- `lib/progress.ts`: `isLeech`, `newWordsLearnedToday`, `newWordsRemaining`.
+- `lib/stats.ts`: `retentionMetrics`, `avgNewWordsPerDay`, `estimateDaysToMaster`.
+- `theme-practice.tsx`: `SpeakMode` + tipe `SpeechRecognitionLike` lokal (tanpa `any`); ikon `mic` baru di `lib/nav.ts` & `components/icons.tsx`.
+- `flashcard-deck.tsx`: pemisahan kata due vs baru + pemotongan kuota harian.
+- `stats-dashboard.tsx`: panel retensi + kolom proyeksi di `ModuleLevelProgress`.
+- `word-list.tsx`: badge leech; `profile-view.tsx`: hint kuota kata baru di bawah Target Harian.
+
+---
+
 ## [0.16.0] — 2026-08-04
 
 ### Ditambahkan

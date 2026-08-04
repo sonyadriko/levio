@@ -802,6 +802,9 @@ function ProfileSections({
                 value={settings.dailyTargets.vocab}
                 onChange={(value) => setDailyTargets({ vocab: value })}
               />
+              <p className="px-1 text-xs text-stone-400">
+                {t("profile.targetVocabHint")}
+              </p>
               <TargetStepper
                 label={t("profile.targetReviews")}
                 value={settings.dailyTargets.reviews}

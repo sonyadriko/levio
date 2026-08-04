@@ -7,7 +7,10 @@ import {
   applyReview,
   applyTest,
   emptyProgress,
+  isLeech,
   mergeProgress,
+  newWordsLearnedToday,
+  newWordsRemaining,
   sanitizeProgress,
   testXp,
   unlockedFor,
@@ -351,5 +354,55 @@ describe("mergeProgress", () => {
     const a = makeState({ unlockedUpTo: 3 });
     const b = makeState({ unlockedUpTo: 5 });
     expect(mergeProgress(a, b).unlockedUpTo).toBe(5);
+  });
+});
+
+describe("isLeech", () => {
+  it("menandai kata dengan banyak review tapi akurasi rendah", () => {
+    expect(
+      isLeech({ reviews: 6, correct: 2, mastered: false, nextReview: null, ease: 1.3, repetitions: 0 }),
+    ).toBe(true);
+    expect(
+      isLeech({ reviews: 5, correct: 1, mastered: false, nextReview: null, ease: 1.3, repetitions: 0 }),
+    ).toBe(true);
+  });
+
+  it("tidak menandai kata dengan sedikit review atau akurasi cukup", () => {
+    expect(
+      isLeech({ reviews: 3, correct: 1, mastered: false, nextReview: null, ease: 1.3, repetitions: 0 }),
+    ).toBe(false);
+    expect(
+      isLeech({ reviews: 6, correct: 3, mastered: false, nextReview: null, ease: 1.3, repetitions: 0 }),
+    ).toBe(false);
+    expect(
+      isLeech({ reviews: 6, correct: 4, mastered: true, nextReview: null, ease: 2.5, repetitions: 4 }),
+    ).toBe(false);
+  });
+});
+
+describe("newWordsLearnedToday / newWordsRemaining", () => {
+  it("menghitung kata baru yang sudah dipelajari hari ini", () => {
+    const state = makeState({
+      activityByDate: { [todayKey()]: { xp: 30, reviews: 3, tests: 0, newWords: 4 } },
+    });
+    expect(newWordsLearnedToday(state)).toBe(4);
+    expect(newWordsLearnedToday(emptyProgress())).toBe(0);
+  });
+
+  it("memberi sisa kuota hingga 0 (tidak negatif)", () => {
+    const state = makeState({
+      activityByDate: { [todayKey()]: { xp: 30, reviews: 3, tests: 0, newWords: 4 } },
+    });
+    expect(newWordsRemaining(state, 10)).toBe(6);
+    expect(newWordsRemaining(state, 4)).toBe(0);
+    expect(newWordsRemaining(state, 2)).toBe(0);
+    expect(newWordsRemaining(emptyProgress(), 10)).toBe(10);
+  });
+
+  it("applyReview mencatat kata baru hanya pada review pertama", () => {
+    const first = applyReview(emptyProgress(), { id: "w1" }, true);
+    expect(first.activityByDate[todayKey()].newWords).toBe(1);
+    const second = applyReview(first, { id: "w1" }, true);
+    expect(second.activityByDate[todayKey()].newWords).toBe(1);
   });
 });

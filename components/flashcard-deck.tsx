@@ -3,6 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import { useProgress } from "@/components/progress-provider";
 import { useLanguage } from "@/components/language-provider";
+import { useSettings } from "@/components/settings-provider";
 import { Icon } from "@/components/icons";
 import { ProgressBar } from "@/components/progress-bar";
 import { Pill } from "@/components/pill";
@@ -26,6 +27,7 @@ export function FlashcardDeck({ moduleId }: { moduleId?: string }) {
     getLanguageModule(moduleId ?? "") ?? defaultModule();
   const { progress, recordReview } = useProgress();
   const { t } = useLanguage();
+  const { settings } = useSettings();
   const [level, setLevel] = useState<number>(1);
   const [flipped, setFlipped] = useState(false);
   const submitting = useRef(false);
@@ -43,16 +45,40 @@ export function FlashcardDeck({ moduleId }: { moduleId?: string }) {
 
   const words = useLevelWords(activeModule, level);
 
+  // Kata yang sudah punya progres SRS dan jatuh tempo hari ini.
   const dueWords = useMemo(() => {
     const today = todayKey();
     return words.filter((w) => {
       const wp = progress.words[w.id];
-      return !wp || !wp.nextReview || wp.nextReview <= today;
+      return wp && wp.nextReview && wp.nextReview <= today;
     });
   }, [words, progress]);
 
+  // Kata baru (belum pernah direview) — dibatasi kuota harian `vocab`.
+  const newWords = useMemo(
+    () => words.filter((w) => !progress.words[w.id]),
+    [words, progress],
+  );
+  const newRemaining = useMemo(
+    () =>
+      Math.max(
+        0,
+        settings.dailyTargets.vocab -
+          (progress.activityByDate[todayKey()]?.newWords ?? 0),
+      ),
+    [progress, settings.dailyTargets.vocab],
+  );
+  const newWordsDeck = useMemo(
+    () => shuffle(newWords).slice(0, newRemaining),
+    [newWords, newRemaining],
+  );
+
+  const hasDeck = dueWords.length > 0 || newWordsDeck.length > 0;
+
   const startSession = (reviewAll = false) => {
-    const deck = shuffle(reviewAll ? words : dueWords);
+    const deck = shuffle(
+      reviewAll ? words : [...dueWords, ...newWordsDeck],
+    );
     if (deck.length === 0) return;
     setSession({ deck, index: 0, correct: 0, xp: 0 });
     setFlipped(false);
@@ -139,7 +165,7 @@ export function FlashcardDeck({ moduleId }: { moduleId?: string }) {
               <span className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-stone-200/80 to-transparent dark:via-stone-800" />
             </div>
           </div>
-        ) : dueWords.length === 0 ? (
+        ) : !hasDeck ? (
           <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-8 text-center dark:border-stone-700 dark:bg-stone-950">
             <Icon name="pen" className="mx-auto h-8 w-8 text-stone-400" />
             <p className="mt-3 text-sm font-medium text-stone-600 dark:text-stone-300">
@@ -156,7 +182,18 @@ export function FlashcardDeck({ moduleId }: { moduleId?: string }) {
           <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-8 text-center dark:border-stone-700 dark:bg-stone-950">
             <Icon name="pen" className="mx-auto h-8 w-8 text-stone-400" />
             <p className="mt-3 text-sm font-medium text-stone-600 dark:text-stone-300">
-              {t("deck.due", { n: dueWords.length, level: levelName })}
+              {dueWords.length === 0
+                ? t("deck.newOnly", {
+                    n: newWordsDeck.length,
+                    level: levelName,
+                  })
+                : newWordsDeck.length > 0
+                  ? t("deck.dueWithNew", {
+                      n: dueWords.length,
+                      m: newWordsDeck.length,
+                      level: levelName,
+                    })
+                  : t("deck.due", { n: dueWords.length, level: levelName })}
             </p>
             <p className="mt-1 text-xs text-stone-400">{t("deck.tapHint")}</p>
             <button
@@ -190,7 +227,7 @@ export function FlashcardDeck({ moduleId }: { moduleId?: string }) {
           })}
         </p>
         <button
-          onClick={() => (dueWords.length === 0 ? setSession(null) : startSession())}
+          onClick={() => (hasDeck ? startSession() : setSession(null))}
           className="mt-5 h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 btn-squish sm:w-auto sm:px-8"
         >
           {t("deck.again")}

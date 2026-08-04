@@ -14,7 +14,7 @@ import type { IconName } from "@/lib/nav";
 import type { ThemePack } from "@/lib/themes/types";
 import type { VocabItem } from "@/lib/languages/types";
 
-type Mode = "flashcard" | "quiz" | "type" | "match" | "listen";
+type Mode = "flashcard" | "quiz" | "type" | "match" | "listen" | "speak";
 
 function shuffle<T>(arr: T[]): T[] {
   const copy = [...arr];
@@ -46,6 +46,7 @@ const MODE_META: { id: Mode; icon: IconName; titleKey: string; descKey: string }
   { id: "type", icon: "pen", titleKey: "theme.mode.type.title", descKey: "theme.mode.type.desc" },
   { id: "match", icon: "star", titleKey: "theme.mode.match.title", descKey: "theme.mode.match.desc" },
   { id: "listen", icon: "volume", titleKey: "theme.mode.listen.title", descKey: "theme.mode.listen.desc" },
+  { id: "speak", icon: "mic", titleKey: "theme.mode.speak.title", descKey: "theme.mode.speak.desc" },
 ];
 
 function buildOptions(word: VocabItem, pool: VocabItem[]): string[] {
@@ -721,6 +722,240 @@ function ListenMode({
   );
 }
 
+// ---- Mode Bicara: Web Speech API (SpeechRecognition) dengan fallback
+// self-grade. Realistis untuk English & HSK (pinyin); bahasa lain tetap
+// bisa dipakai lewat penilaian sendiri.
+interface SpeechEvent {
+  results: { [index: number]: { [index: number]: { transcript: string } } };
+}
+
+interface SpeechRecognitionLike {
+  lang: string;
+  interimResults: boolean;
+  maxAlternatives: number;
+  continuous: boolean;
+  onresult: ((event: SpeechEvent) => void) | null;
+  onerror: (() => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+  abort: () => void;
+}
+
+type SpeechRecognitionCtor = new () => SpeechRecognitionLike;
+
+function getSpeechRecognitionCtor(): SpeechRecognitionCtor | null {
+  if (typeof window === "undefined") return null;
+  const win = window as unknown as {
+    SpeechRecognition?: SpeechRecognitionCtor;
+    webkitSpeechRecognition?: SpeechRecognitionCtor;
+  };
+  return win.SpeechRecognition ?? win.webkitSpeechRecognition ?? null;
+}
+
+function normalizeSpeech(s: string): string {
+  return s
+    .trim()
+    .toLowerCase()
+    .replace(/[.,!?;:'"。！？，、…]/g, "")
+    .replace(/\s+/g, " ");
+}
+
+function matchSpoken(transcript: string, word: VocabItem): boolean {
+  const heard = normalizeSpeech(transcript);
+  if (!heard) return false;
+  const targets = [word.term, word.reading]
+    .filter((v): v is string => Boolean(v))
+    .map(normalizeSpeech);
+  return targets.some((target) => {
+    if (!target) return false;
+    if (heard === target) return true;
+    return heard.includes(target) || target.includes(heard);
+  });
+}
+
+function SpeakMode({
+  words,
+  speechLang,
+  onExit,
+  onRestart,
+}: {
+  words: VocabItem[];
+  speechLang: string;
+  onExit: () => void;
+  onRestart: () => void;
+}) {
+  const { t } = useLanguage();
+  const { recordReview } = useProgress();
+  const [queue] = useState<VocabItem[]>(() => shuffle(words));
+  const [index, setIndex] = useState(0);
+  const [correct, setCorrect] = useState(0);
+  const [listening, setListening] = useState(false);
+  const [heard, setHeard] = useState("");
+  const [graded, setGraded] = useState<boolean | null>(null);
+  const recRef = useRef<SpeechRecognitionLike | null>(null);
+  const word = queue[index];
+  const done = index >= queue.length;
+
+  const supported = useMemo(() => getSpeechRecognitionCtor() !== null, []);
+
+  useEffect(() => {
+    return () => {
+      recRef.current?.abort();
+      recRef.current = null;
+      cancelSpeech();
+    };
+  }, []);
+
+  const grade = (ok: boolean, spoken: string) => {
+    if (!word || graded !== null) return;
+    recRef.current?.stop();
+    recRef.current = null;
+    recordReview(word, ok);
+    if (ok) setCorrect((c) => c + 1);
+    setHeard(spoken);
+    setGraded(ok);
+    setListening(false);
+  };
+
+  const listen = () => {
+    if (!word || listening) return;
+    const Ctor = getSpeechRecognitionCtor();
+    if (!Ctor) return;
+    setListening(true);
+    setHeard("");
+    const rec = new Ctor();
+    recRef.current = rec;
+    rec.lang = speechLang;
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+    rec.continuous = false;
+    rec.onresult = (event) => {
+      const spoken = event.results[0]?.[0]?.transcript ?? "";
+      grade(matchSpoken(spoken, word), spoken);
+    };
+    rec.onerror = () => setListening(false);
+    rec.onend = () => setListening(false);
+    try {
+      rec.start();
+    } catch {
+      setListening(false);
+    }
+  };
+
+  const next = () => {
+    setGraded(null);
+    setHeard("");
+    setIndex((i) => i + 1);
+  };
+
+  if (done) {
+    return <ResultView correct={correct} total={words.length} onAgain={onRestart} />;
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between text-sm text-stone-500 dark:text-stone-400">
+        <span>{t("deck.card", { i: index + 1, t: words.length })}</span>
+        <button onClick={onExit} className="text-xs font-medium transition-colors hover:text-stone-600">
+          {t("lesson.exit")}
+        </button>
+      </div>
+      <ProgressBar value={((index + 1) / words.length) * 100} />
+
+      <div className="rounded-2xl border border-stone-200 bg-white p-6 text-center dark:border-stone-800 dark:bg-stone-950">
+        <p className="text-xs font-medium uppercase tracking-wide text-stone-400">
+          {t("theme.speak.ask")}
+        </p>
+        <p className="mt-3 text-3xl font-bold tracking-tight">{word.term}</p>
+        {word.reading && (
+          <p className="mt-1 text-lg text-stone-500 dark:text-stone-400">
+            {word.reading}
+          </p>
+        )}
+        <div className="mt-4 flex items-center justify-center gap-3">
+          <button
+            onClick={() => speak(word.reading ?? word.term, speechLang)}
+            aria-label={t("theme.speak.listen")}
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-500 transition-colors hover:border-teal-300 hover:text-teal-700 btn-squish dark:border-stone-800 dark:bg-stone-950 dark:text-stone-400"
+          >
+            <Icon name="volume" className="h-5 w-5" />
+          </button>
+          <button
+            onClick={listen}
+            disabled={listening || !supported}
+            aria-label={t(listening ? "theme.speak.listening" : "theme.speak.mic")}
+            className={`flex h-16 w-16 items-center justify-center rounded-full text-white transition-colors btn-squish disabled:cursor-not-allowed disabled:opacity-40 ${
+              listening
+                ? "animate-pulse bg-red-500 hover:bg-red-600"
+                : "bg-teal-700 hover:bg-teal-800"
+            }`}
+          >
+            <Icon name="mic" className="h-7 w-7" />
+          </button>
+        </div>
+        <p aria-live="polite" className="mt-3 min-h-4 text-xs text-stone-500 dark:text-stone-400">
+          {listening ? t("theme.speak.listening") : t("theme.speak.hint")}
+        </p>
+        {!supported && (
+          <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">
+            {t("theme.speak.notSupported")}
+          </p>
+        )}
+      </div>
+
+      {graded === null ? (
+        <div className="rounded-xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-950">
+          <p className="text-center text-xs font-medium text-stone-400">
+            {t("theme.speak.selfGrade")}
+          </p>
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            <button
+              onClick={() => grade(false, "")}
+              className="flex h-12 items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white text-sm font-semibold text-stone-600 transition-colors hover:border-red-300 hover:text-red-600 btn-squish dark:border-stone-800 dark:bg-stone-950 dark:text-stone-300"
+            >
+              <Icon name="check" className="h-5 w-5 rotate-90" />
+              {t("theme.speak.fail")}
+            </button>
+            <button
+              onClick={() => grade(true, "")}
+              className="flex h-12 items-center justify-center gap-2 rounded-xl bg-emerald-600 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 btn-squish"
+            >
+              <Icon name="check" className="h-5 w-5" />
+              {t("theme.speak.success")}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div
+          className={`animate-pop rounded-xl border p-4 text-center text-sm font-medium ${
+            graded
+              ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-500/10 dark:text-emerald-400"
+              : "border-red-200 bg-red-50 text-red-600 dark:border-red-900 dark:bg-red-500/10 dark:text-red-400"
+          }`}
+        >
+          {graded ? (
+            t("theme.speak.correct")
+          ) : heard ? (
+            t("theme.speak.wrong", {
+              heard,
+              answer: word.reading ?? word.term,
+            })
+          ) : (
+            t("theme.speak.wrongShort", { answer: word.reading ?? word.term })
+          )}
+          <button
+            onClick={next}
+            className="mt-3 h-11 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 btn-squish"
+          >
+            {t("mock.next")}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function ThemePractice({
   theme,
   speechLang,
@@ -779,6 +1014,9 @@ export function ThemePractice({
         {mounted && mode === "match" && <MatchMode {...props} />}
         {mounted && mode === "listen" && (
           <ListenMode {...props} speechLang={speechLang} />
+        )}
+        {mounted && mode === "speak" && (
+          <SpeakMode {...props} speechLang={speechLang} />
         )}
       </div>
     </div>

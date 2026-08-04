@@ -14,6 +14,7 @@ dengan scope ringkas. Rincian pola menambah modul: [`modules.md`](./modules.md).
 | v0.14.0 | Modul Japanese (JLPT lengkap N5–N1, 500 kosakata) + Kana practice | ✅ rilis |
 | v0.15.0 | Paket Tematik untuk English & HSK + TTS per bahasa | ✅ rilis |
 | v0.16.0 | Spring motion (toast, tab pill, counter) + pemilihan mode latihan persisten | ✅ rilis |
+| v0.17.0 | Mode Bicara + SRS cap kata baru & deteksi leech + statistik retensi & proyeksi | 🚧 dikerjakan |
 | v4.x | Modul Financial Planner | 🕓 draft |
 
 ## Selesai
@@ -39,6 +40,11 @@ dengan scope ringkas. Rincian pola menambah modul: [`modules.md`](./modules.md).
   (keputusan detail di [`motion.md`](./motion.md)). Pemilihan mode latihan
   menjadi switcher tab persisten (langsung ke flashcard), notifikasi toast saat
   sesi Mencocokkan selesai.
+- **Mode Bicara + SRS cap & leech + retensi (v0.17.0):** mode ke-6 "Bicara" di
+  paket tematik memakai `SpeechRecognition` (fallback self-grade); SRS membatasi
+  kartu baru ke kuota harian (`Kosakata/hari`) dan menandai kata sulit (leech);
+  Statistik menampilkan panel retensi serta proyeksi selesai per level
+  ("±N hari") berdasar kecepatan kata baru 30 hari terakhir.
 - **Paket Tematik multi-bahasa (v0.15.0):** perluasan pack berbasis situasi dari
   pilot Jepang ke English & HSK — 3 bahasa × 4 paket (Perjalanan, Kantor,
   Makanan, Sehari-hari), 12 rute latihan (flashcard, kuis, mengetik,
