@@ -8,7 +8,7 @@ import { T } from "@/components/translate";
 import { ProgressBar } from "@/components/progress-bar";
 import { Confetti } from "@/components/confetti";
 import type { IconName } from "@/lib/nav";
-import type { JapaneseTheme } from "@/lib/japanese/themes";
+import type { ThemePack } from "@/lib/themes/types";
 import type { VocabItem } from "@/lib/languages/types";
 
 type Mode = "flashcard" | "quiz" | "type" | "match" | "listen";
@@ -63,14 +63,13 @@ function buildOptions(word: VocabItem, pool: VocabItem[]): string[] {
 
 let pendingSpeak: number | null = null;
 
-function speak(reading: string): void {
+function speak(reading: string, speechLang: string): void {
   if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
   if (pendingSpeak !== null) window.clearTimeout(pendingSpeak);
   const synth = window.speechSynthesis;
   synth.cancel();
   const utter = new SpeechSynthesisUtterance(reading);
-  utter.lang = "ja-JP";
-  utter.rate = 0.85;
+  utter.lang = speechLang;
   // Bug Chrome: speak() yang dipanggil langsung setelah cancel() sering
   // diabaikan sehingga audio hanya bisa diputar sekali. Pisahkan ke task
   // berikutnya dengan jeda agar cancel() selesai diproses dulu.
@@ -591,10 +590,12 @@ function MatchMode({
 
 function ListenMode({
   words,
+  speechLang,
   onExit,
   onRestart,
 }: {
   words: VocabItem[];
+  speechLang: string;
   onExit: () => void;
   onRestart: () => void;
 }) {
@@ -627,9 +628,9 @@ function ListenMode({
   useEffect(() => {
     if (!word || typeof window === "undefined") return;
     if (!("speechSynthesis" in window)) return;
-    const timer = setTimeout(() => speak(word.reading ?? word.term), 250);
+    const timer = setTimeout(() => speak(word.reading ?? word.term, speechLang), 250);
     return () => clearTimeout(timer);
-  }, [word]);
+  }, [word, speechLang]);
 
   const pick = (option: string) => {
     if (!word || picked) return;
@@ -654,7 +655,7 @@ function ListenMode({
       <ProgressBar value={((index + 1) / words.length) * 100} />
       <div className="flex flex-col items-center gap-3 rounded-2xl border border-stone-200 bg-white p-6 text-center dark:border-stone-800 dark:bg-stone-950">
         <button
-          onClick={() => speak(word.reading ?? word.term)}
+          onClick={() => speak(word.reading ?? word.term, speechLang)}
           disabled={!audioOk}
           className="flex h-16 w-16 items-center justify-center rounded-full bg-teal-700 text-white transition-colors hover:bg-teal-800 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40"
           aria-label={t("theme.listen.play")}
@@ -715,7 +716,13 @@ function ListenMode({
   );
 }
 
-export function ThemePractice({ theme }: { theme: JapaneseTheme }) {
+export function ThemePractice({
+  theme,
+  speechLang,
+}: {
+  theme: ThemePack;
+  speechLang: string;
+}) {
   const { t } = useLanguage();
   const [mode, setMode] = useState<Mode | null>(null);
   const [sessionKey, setSessionKey] = useState(0);
@@ -778,7 +785,7 @@ export function ThemePractice({ theme }: { theme: JapaneseTheme }) {
       {mode === "quiz" && <QuizMode {...props} />}
       {mode === "type" && <TypeMode {...props} />}
       {mode === "match" && <MatchMode {...props} />}
-      {mode === "listen" && <ListenMode {...props} />}
+      {mode === "listen" && <ListenMode {...props} speechLang={speechLang} />}
     </div>
   );
 }
