@@ -14,7 +14,7 @@ dengan scope ringkas. Rincian pola menambah modul: [`modules.md`](./modules.md).
 | v0.14.0 | Modul Japanese (JLPT lengkap N5–N1, 500 kosakata) + Kana practice | ✅ rilis |
 | v0.15.0 | Paket Tematik untuk English & HSK + TTS per bahasa | ✅ rilis |
 | v0.16.0 | Spring motion (toast, tab pill, counter) + pemilihan mode latihan persisten | ✅ rilis |
-| v0.17.0 | Mode Bicara + SRS cap kata baru & deteksi leech + statistik retensi & proyeksi | 🚧 dikerjakan |
+| v0.17.0 | Mode Bicara + SRS cap kata baru & deteksi leech + statistik retensi & proyeksi | ✅ rilis |
 | v4.x | Modul Financial Planner | 🕓 draft |
 
 ## Selesai
