@@ -3,9 +3,11 @@ import {
   avgNewWordsPerDay,
   estimateDaysToMaster,
   retentionMetrics,
+  suggestDailyTarget,
 } from "../lib/stats";
 import { emptyProgress, type ProgressState } from "../lib/progress";
 import { dateKeyOf } from "../lib/date";
+import type { DailyTargets } from "../lib/settings";
 
 function daysAgo(days: number): string {
   const d = new Date();
@@ -79,5 +81,62 @@ describe("estimateDaysToMaster", () => {
     };
     // pace = 10/30 ≈ 0.3 → sisa 60 kata → 200 hari
     expect(estimateDaysToMaster(state, 100, 40)).toBe(200);
+  });
+});
+
+describe("suggestDailyTarget", () => {
+  const targets: DailyTargets = { vocab: 10, reviews: 15, xp: 100 };
+
+  function stateWithRetention(
+    reviewed: number,
+    retentionRate: number,
+    leeches = 0,
+  ): ProgressState {
+    const due = reviewed - Math.round((reviewed * retentionRate) / 100);
+    const words: ProgressState["words"] = {};
+    for (let i = 0; i < reviewed; i++) {
+      const isLeech = i < leeches;
+      words[`w${i}`] = {
+        reviews: isLeech ? 8 : 5,
+        correct: isLeech ? 2 : 4,
+        mastered: false,
+        nextReview: i < due ? daysAgo(0) : dateKeyOf(new Date(Date.now() + 86400000)),
+        ease: 2.5,
+        repetitions: 3,
+      };
+    }
+    return { ...emptyProgress(), words };
+  }
+
+  it("null saat belum ada kata direview", () => {
+    expect(suggestDailyTarget(emptyProgress(), targets)).toBeNull();
+  });
+
+  it("menyarankan menurunkan target saat retensi rendah", () => {
+    const s = stateWithRetention(20, 40); // retensi 40%
+    const suggestion = suggestDailyTarget(s, targets);
+    expect(suggestion).not.toBeNull();
+    expect(suggestion!.field).toBe("vocab");
+    expect(suggestion!.suggested).toBeLessThan(targets.vocab);
+    expect(suggestion!.reasonKey).toBe("profile.targetReasonRetention");
+  });
+
+  it("menyarankan menaikkan target saat retensi tinggi tanpa leech", () => {
+    const s = stateWithRetention(20, 100); // retensi 100%, 0 leech
+    const suggestion = suggestDailyTarget(s, targets);
+    expect(suggestion).not.toBeNull();
+    expect(suggestion!.field).toBe("vocab");
+    expect(suggestion!.suggested).toBeGreaterThan(targets.vocab);
+    expect(suggestion!.reasonKey).toBe("profile.targetReasonGood");
+  });
+
+  it("tidak menyarankan naik bila masih ada leech", () => {
+    const s = stateWithRetention(20, 100, 3);
+    expect(suggestDailyTarget(s, targets)).toBeNull();
+  });
+
+  it("null saat retensi di zona sehat (70–90)", () => {
+    const s = stateWithRetention(20, 75);
+    expect(suggestDailyTarget(s, targets)).toBeNull();
   });
 });

@@ -7,6 +7,7 @@ import {
   yearKeyOf,
 } from "./date";
 import type { ActivityDay, ProgressState } from "./progress";
+import type { DailyTargets } from "./settings";
 
 export interface PeriodTotals {
   xp: number;
@@ -273,4 +274,53 @@ export function estimateDaysToMaster(
   const pace = avgNewWordsPerDay(progress.activityByDate);
   if (pace <= 0) return null;
   return Math.ceil(remaining / pace);
+}
+
+export interface TargetSuggestion {
+  field: "vocab" | "reviews";
+  current: number;
+  suggested: number;
+  reasonKey: string;
+  reasonVars: Record<string, string | number>;
+}
+
+// Saran target harian adaptif berdasar retensi & leech:
+// - retensi rendah (<70%) → turunkan target kata baru agar tidak menumpuk;
+// - retensi tinggi & bersih leech → naikkan target kata baru.
+// null = data belum cukup / target sudah pas.
+export function suggestDailyTarget(
+  progress: ProgressState,
+  current: DailyTargets,
+): TargetSuggestion | null {
+  const retention = retentionMetrics(progress);
+  if (retention.reviewed === 0) return null;
+
+  if (retention.retentionRate < 70) {
+    const suggested = Math.max(3, Math.round(current.vocab * 0.7));
+    if (suggested < current.vocab) {
+      return {
+        field: "vocab",
+        current: current.vocab,
+        suggested,
+        reasonKey: "profile.targetReasonRetention",
+        reasonVars: { retention: retention.retentionRate },
+      };
+    }
+  } else if (
+    retention.retentionRate >= 90 &&
+    retention.leeches === 0 &&
+    retention.reviewed >= 10
+  ) {
+    const suggested = Math.min(20, current.vocab + 2);
+    if (suggested > current.vocab) {
+      return {
+        field: "vocab",
+        current: current.vocab,
+        suggested,
+        reasonKey: "profile.targetReasonGood",
+        reasonVars: { retention: retention.retentionRate },
+      };
+    }
+  }
+  return null;
 }

@@ -11,7 +11,7 @@ import { StatCard } from "@/components/stat-card";
 import { ReminderCard } from "@/components/reminder-card";
 import { todayKey } from "@/lib/date";
 import { XP_PER_LEVEL } from "@/lib/progress";
-import { summarize, totalsToday } from "@/lib/stats";
+import { summarize, suggestDailyTarget, totalsToday } from "@/lib/stats";
 import { getBadges } from "@/lib/badges";
 import { APP_VERSION, latestRelease } from "@/lib/version";
 import type { Locale } from "@/lib/i18n";
@@ -84,6 +84,10 @@ export function ProfileView() {
   const today = useMemo(() => totalsToday(progress.activityByDate), [progress]);
   const badges = useMemo(() => getBadges(progress), [progress]);
   const level = Math.floor(progress.xp / XP_PER_LEVEL) + 1;
+  const targetSuggestion = useMemo(
+    () => suggestDailyTarget(progress, settings.dailyTargets),
+    [progress, settings.dailyTargets],
+  );
   const initial = (settings.name.trim() || "L").slice(0, 1).toUpperCase();
 
   const showNotice = useCallback(
@@ -167,6 +171,7 @@ export function ProfileView() {
           handleImport={handleImport}
           handleReset={handleReset}
           fileRef={fileRef}
+          targetSuggestion={targetSuggestion}
         />
       </div>
     );
@@ -236,6 +241,7 @@ export function ProfileView() {
         handleImport={handleImport}
         handleReset={handleReset}
         fileRef={fileRef}
+        targetSuggestion={targetSuggestion}
       />
     </div>
   );
@@ -614,6 +620,7 @@ function ProfileSections({
   handleImport,
   handleReset,
   fileRef,
+  targetSuggestion,
 }: {
   t: (key: string, vars?: Record<string, string | number>) => string;
   settings: ReturnType<typeof useSettings>["settings"];
@@ -634,6 +641,7 @@ function ProfileSections({
   handleImport: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleReset: () => void;
   fileRef: React.RefObject<HTMLInputElement | null>;
+  targetSuggestion: ReturnType<typeof suggestDailyTarget>;
 }) {
   const [showWhatsNew, setShowWhatsNew] = useState(false);
   const release = latestRelease();
@@ -816,6 +824,38 @@ function ProfileSections({
                 onChange={(value) => setDailyTargets({ xp: value })}
               />
             </div>
+            {targetSuggestion && (
+              <div className="rounded-xl border border-amber-300 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/40">
+                <p className="flex items-center gap-1.5 text-sm font-semibold text-amber-800 dark:text-amber-300">
+                  <Icon name="flame" className="h-4 w-4" />
+                  {t("profile.targetSuggestion")}
+                </p>
+                <p className="mt-1 text-xs text-stone-600 dark:text-stone-300">
+                  {t(
+                    targetSuggestion.reasonKey,
+                    targetSuggestion.reasonVars,
+                  )}
+                </p>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setDailyTargets({
+                      [targetSuggestion.field]: targetSuggestion.suggested,
+                    })
+                  }
+                  className="mt-2 h-9 rounded-lg bg-amber-600 px-3 text-xs font-semibold text-white transition-colors hover:bg-amber-700 active:scale-[0.97] btn-squish"
+                >
+                  {t("profile.targetApply", {
+                    label: t(
+                      targetSuggestion.field === "vocab"
+                        ? "profile.targetVocab"
+                        : "profile.targetReviews",
+                    ),
+                    value: targetSuggestion.suggested,
+                  })}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </section>
