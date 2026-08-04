@@ -15,6 +15,8 @@ export const RELEASE_NOTES: ReleaseNote[] = [
     highlightKeys: [
       "release.0.14.0.h1",
       "release.0.14.0.h2",
+      "release.0.14.0.h3",
+      "release.0.14.0.h4",
     ],
   },
   {
