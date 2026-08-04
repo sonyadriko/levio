@@ -42,6 +42,7 @@ export function FlashcardDeck({ moduleId }: { moduleId?: string }) {
     index: number;
     correct: number;
     xp: number;
+    drill: boolean;
   } | null>(null);
 
   const words = useLevelWords(activeModule, level);
@@ -95,7 +96,7 @@ export function FlashcardDeck({ moduleId }: { moduleId?: string }) {
           : [...dueWords, ...newWordsDeck],
     );
     if (deck.length === 0) return;
-    setSession({ deck, index: 0, correct: 0, xp: 0 });
+    setSession({ deck, index: 0, correct: 0, xp: 0, drill: leechOnly });
     setFlipped(false);
   };
 
@@ -104,8 +105,13 @@ export function FlashcardDeck({ moduleId }: { moduleId?: string }) {
     submitting.current = true;
     const word = session.deck[session.index];
     recordReview(word, correct);
+    // Mode drill (kata sulit): kartu yang salah dikembalikan ke ujung deck
+    // sampai dijawab benar — "latihan sampai tuntas".
+    const deck =
+      session.drill && !correct ? [...session.deck, word] : session.deck;
     setSession({
       ...session,
+      deck,
       correct: session.correct + (correct ? 1 : 0),
       xp: session.xp + (correct ? 10 : 3),
       index: session.index + 1,
@@ -248,16 +254,20 @@ export function FlashcardDeck({ moduleId }: { moduleId?: string }) {
       <div className="animate-card-in rounded-2xl border border-stone-200 bg-white p-8 text-center dark:border-stone-800 dark:bg-stone-950">
         <Confetti />
         <p className="text-2xl font-black tracking-tight text-teal-600 dark:text-teal-400">
-          {pct}%
+          {session.drill ? "✓" : `${pct}%`}
         </p>
-        <p className="mt-2 text-lg font-bold">{t("deck.done")}</p>
+        <p className="mt-2 text-lg font-bold">
+          {session.drill ? t("deck.drillDone") : t("deck.done")}
+        </p>
         <p className="mt-2 text-sm text-stone-500 dark:text-stone-400">
-          {t("deck.summary", {
-            c: session.correct,
-            t: total,
-            p: pct,
-            xp: session.xp,
-          })}
+          {session.drill
+            ? t("deck.drillSummary", { t: total, xp: session.xp })
+            : t("deck.summary", {
+                c: session.correct,
+                t: total,
+                p: pct,
+                xp: session.xp,
+              })}
         </p>
         <button
           onClick={() => (hasDeck ? startSession() : setSession(null))}
@@ -279,6 +289,11 @@ export function FlashcardDeck({ moduleId }: { moduleId?: string }) {
         <span>
           {t("deck.card", { i: progressCount, t: total })}
         </span>
+        {session.drill && (
+          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+            {t("deck.drillHint")}
+          </span>
+        )}
         <span>+{session.xp} {t("common.xp")}</span>
       </div>
       <ProgressBar value={(progressCount / total) * 100} />

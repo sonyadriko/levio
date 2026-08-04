@@ -24,6 +24,13 @@ selalu disinkronkan saat rilis (lihat `docs/CONTRIBUTING` tidak ada; aturan ada 
 
 ### Ditambahkan
 - **Drill kata sulit (leech):** tombol "Latihan Kata Sulit" di deck flashcard muncul saat ada kata leech di level terpilih — buka sesi flashcard terfokus untuk kata-kata sulit saja.
+- **Drill sampai tuntas:** kartu yang salah dijawab di sesi drill kata sulit dikembalikan ke ujung deck sampai dijawab benar, dengan indikator "Diulang sampai benar" dan ringkasan "Semua kata sulit dikuasai".
+- **Target harian adaptif:** di Profil muncul kartu saran yang menurunkan target kata baru saat retensi rendah (<70%) atau menaikkannya saat retensi stabil tinggi tanpa leech — tombol Terapkan langsung mengubah target.
+
+### Teknis
+- `lib/stats.ts`: `suggestDailyTarget` (input retensi & leech dari `retentionMetrics`).
+- `components/flashcard-deck.tsx`: sesi drill dengan re-queue kartu salah (loop sampai benar).
+- `components/profile-view.tsx`: kartu saran target di bawah `TargetStepper`.
 
 ---
 
