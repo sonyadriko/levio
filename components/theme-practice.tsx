@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useProgress } from "@/components/progress-provider";
 import { useLanguage } from "@/components/language-provider";
 import { Icon } from "@/components/icons";
 import { T } from "@/components/translate";
 import { ProgressBar } from "@/components/progress-bar";
 import { Confetti } from "@/components/confetti";
+import { SlidingTabs } from "@/components/sliding-tabs";
+import { useToast } from "@/components/toast";
 import type { IconName } from "@/lib/nav";
 import type { ThemePack } from "@/lib/themes/types";
 import type { VocabItem } from "@/lib/languages/types";
@@ -482,6 +485,7 @@ function MatchMode({
 }) {
   const { t } = useLanguage();
   const { awardXp } = useProgress();
+  const { toast } = useToast();
   const pairCount = 6;
   const pairs = useMemo(() => shuffle(words).slice(0, pairCount), [words]);
   const [cards] = useState<MatchCard[]>(() =>
@@ -524,8 +528,9 @@ function MatchMode({
     if (matched.size === cards.length && cards.length > 0) {
       const xp = Math.max(8, Math.round(30 - moves * 2));
       awardXp(xp);
+      toast(t("theme.match.xp", { n: xp }), { variant: "success" });
     }
-  }, [matched, cards.length, moves, awardXp]);
+  }, [matched, cards.length, moves, awardXp, toast, t]);
 
   const done = cards.length > 0 && matched.size === cards.length;
 
@@ -723,69 +728,59 @@ export function ThemePractice({
   theme: ThemePack;
   speechLang: string;
 }) {
-  const { t } = useLanguage();
-  const [mode, setMode] = useState<Mode | null>(null);
+  const router = useRouter();
+  const [mode, setMode] = useState<Mode>("flashcard");
   const [sessionKey, setSessionKey] = useState(0);
+  // Hanya render isi latihan (berisi data acak) setelah mount di client, agar
+  // tidak ada mismatch hidrasi server↔client. setState di efek di sini adalah
+  // pola yang benar (deteksi mount) sehingga rule react-hooks dimatikan lokal.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+  }, []);
 
   const restart = () => setSessionKey((k) => k + 1);
 
-  if (!mode) {
-    return (
-      <div className="flex flex-col gap-4">
-        <p className="text-sm font-medium text-stone-600 dark:text-stone-300">
-          {t("theme.pickMode")}
-        </p>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {MODE_META.map((meta) => (
-            <button
-              key={meta.id}
-              onClick={() => setMode(meta.id)}
-              className="flex items-center gap-3 rounded-xl border border-stone-200 bg-white p-4 text-left transition-colors hover:border-teal-300 dark:border-stone-800 dark:bg-stone-950 dark:hover:border-teal-700"
-            >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-teal-700 text-white">
-                <Icon name={meta.icon} className="h-5 w-5" />
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold">
-                  <T id={meta.titleKey} />
-                </p>
-                <p className="text-xs text-stone-500 dark:text-stone-400">
-                  <T id={meta.descKey} />
-                </p>
-              </div>
-              <span className="text-stone-300 dark:text-stone-700">→</span>
-            </button>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
   const props = {
     words: theme.words,
-    onExit: () => setMode(null),
+    onExit: () => router.back(),
     onRestart: restart,
   };
 
   return (
-    <div key={`${mode}-${sessionKey}`} className="flex flex-col gap-4">
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => setMode(null)}
-          className="flex h-9 items-center gap-1 rounded-lg border border-stone-200 px-3 text-xs font-semibold text-stone-600 transition-colors hover:border-teal-300 hover:text-teal-700 dark:border-stone-800 dark:text-stone-300"
-        >
-          <Icon name="book" className="h-4 w-4" />
-          {t("theme.modes")}
-        </button>
-        <p className="text-xs font-medium text-stone-400">
-          <T id={MODE_META.find((m) => m.id === mode)!.titleKey} />
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
+        <SlidingTabs<Mode>
+          options={MODE_META.map((meta) => ({
+            id: meta.id,
+            label: (
+              <span className="flex items-center gap-1.5">
+                <Icon name={meta.icon} className="h-4 w-4" />
+                <T id={meta.titleKey} />
+              </span>
+            ),
+          }))}
+          active={mode}
+          onChange={(m) => {
+            setMode(m);
+            setSessionKey((k) => k + 1);
+          }}
+        />
+        <p className="text-xs text-stone-500 dark:text-stone-400">
+          <T id={MODE_META.find((m) => m.id === mode)!.descKey} />
         </p>
       </div>
-      {mode === "flashcard" && <FlashcardMode {...props} />}
-      {mode === "quiz" && <QuizMode {...props} />}
-      {mode === "type" && <TypeMode {...props} />}
-      {mode === "match" && <MatchMode {...props} />}
-      {mode === "listen" && <ListenMode {...props} speechLang={speechLang} />}
+
+      <div key={`${mode}-${sessionKey}`} className="flex flex-col gap-4">
+        {mounted && mode === "flashcard" && <FlashcardMode {...props} />}
+        {mounted && mode === "quiz" && <QuizMode {...props} />}
+        {mounted && mode === "type" && <TypeMode {...props} />}
+        {mounted && mode === "match" && <MatchMode {...props} />}
+        {mounted && mode === "listen" && (
+          <ListenMode {...props} speechLang={speechLang} />
+        )}
+      </div>
     </div>
   );
 }

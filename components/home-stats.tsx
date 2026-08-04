@@ -4,7 +4,7 @@ import { useProgress } from "@/components/progress-provider";
 import { useLanguage } from "@/components/language-provider";
 import { useGym } from "@/components/gym/use-gym";
 import { Icon } from "@/components/icons";
-import { useCountUp } from "@/lib/use-count-up";
+import { SpringCounter } from "@/components/spring-counter";
 import { emptyProgress, XP_PER_LEVEL } from "@/lib/progress";
 import { overallStreak } from "@/lib/habits";
 
@@ -21,8 +21,6 @@ export function HomeStats() {
     ? Object.values(progress.words).filter((w) => w.mastered).length
     : 0;
   const pct = Math.round((levelXp / XP_PER_LEVEL) * 100);
-  const shownXp = useCountUp(xp, 800);
-  const shownLevelXp = useCountUp(levelXp, 800);
 
   return (
     <section className="flex flex-col gap-3">
@@ -32,7 +30,7 @@ export function HomeStats() {
           {t("homeStats.streak", { n: streak })}
         </div>
         <span className="text-sm font-medium text-stone-500 dark:text-stone-400">
-          {shownXp} {t("common.xp")}
+          <SpringCounter value={xp} duration={800} /> {t("common.xp")}
         </span>
       </div>
 
@@ -42,7 +40,8 @@ export function HomeStats() {
             {t("common.level")} {level}
           </span>
           <span>
-            {shownLevelXp} / {XP_PER_LEVEL} {t("common.xp")}
+            <SpringCounter value={levelXp} duration={800} /> / {XP_PER_LEVEL}{" "}
+            {t("common.xp")}
           </span>
         </div>
         <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/20">
