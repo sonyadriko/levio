@@ -6,6 +6,7 @@ import { ProgressProvider } from "@/components/progress-provider";
 import { LanguageProvider } from "@/components/language-provider";
 import { SettingsProvider } from "@/components/settings-provider";
 import { ServiceWorkerRegister } from "@/components/service-worker-register";
+import { ToastProvider } from "@/components/toast";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -52,7 +53,9 @@ export default function RootLayout({
           <ProgressProvider>
             <LanguageProvider>
               <SettingsProvider>
-                <AppShell>{children}</AppShell>
+                <ToastProvider>
+                  <AppShell>{children}</AppShell>
+                </ToastProvider>
               </SettingsProvider>
             </LanguageProvider>
           </ProgressProvider>

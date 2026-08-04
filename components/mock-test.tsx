@@ -7,7 +7,7 @@ import { Icon } from "@/components/icons";
 import { ProgressBar } from "@/components/progress-bar";
 import { Pill } from "@/components/pill";
 import { Confetti } from "@/components/confetti";
-import { useCountUp } from "@/lib/use-count-up";
+import { SpringCounter } from "@/components/spring-counter";
 import { useLevelWords } from "@/lib/languages/use-level-words";
 import { defaultModule, getLanguageModule } from "@/lib/languages";
 import { generateMockTest, type MockQuestion } from "@/lib/languages/mock-test";
@@ -43,8 +43,6 @@ function ResultView({
 }) {
   const { t } = useLanguage();
   const pct = Math.round((result.correct / result.total) * 100);
-  const shownPct = useCountUp(pct);
-  const shownXp = useCountUp(result.xp, 900);
   const byType = new Map<QuestionType, { correct: number; total: number }>();
   result.questions.forEach((q) => {
     const cur = byType.get(q.type) ?? { correct: 0, total: 0 };
@@ -61,17 +59,17 @@ function ResultView({
       {pct >= 60 && <Confetti count={32} />}
       <div className="animate-slide-up rounded-2xl border border-stone-200 bg-white p-6 text-center dark:border-stone-800 dark:bg-stone-950">
         <p className="text-4xl font-black tracking-tight text-teal-600 dark:text-teal-400">
-          {shownPct}%
+          <SpringCounter value={pct} />%
         </p>
         <p className="mt-2 text-sm font-medium">
           {t("mock.score", {
-            p: shownPct,
+            p: pct,
             c: result.correct,
             t: result.total,
           })}
         </p>
         <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
-          +{shownXp} {t("common.xp")} ·{" "}
+          +<SpringCounter value={result.xp} duration={900} /> {t("common.xp")} ·{" "}
           {pct >= 60 ? t("mock.pass") : t("mock.fail")}
         </p>
         <button
