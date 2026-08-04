@@ -1,4 +1,4 @@
-const CACHE_NAME = "levio-shell-v8";
+const CACHE_NAME = "levio-shell-v9";
 const PRECACHE_URLS = ["/", "/manifest.webmanifest", "/icon-192.png", "/icon-512.png"];
 const PRECACHE_PATHNAMES = PRECACHE_URLS.map(
   (url) => new URL(url, self.location.origin).pathname,

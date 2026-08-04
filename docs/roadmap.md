@@ -13,6 +13,7 @@ dengan scope ringkas. Rincian pola menambah modul: [`modules.md`](./modules.md).
 | v0.13.0 | English B1–C2 (data kosakata lengkap 300 kata) | ✅ rilis |
 | v0.14.0 | Modul Japanese (JLPT lengkap N5–N1, 500 kosakata) + Kana practice | ✅ rilis |
 | v0.15.0 | Paket Tematik untuk English & HSK + TTS per bahasa | ✅ rilis |
+| v0.16.0 | Spring motion (toast, tab pill, counter) + pemilihan mode latihan persisten | ✅ rilis |
 | v4.x | Modul Financial Planner | 🕓 draft |
 
 ## Selesai
@@ -33,6 +34,11 @@ dengan scope ringkas. Rincian pola menambah modul: [`modules.md`](./modules.md).
   vocab — pengenalan romaji↔kana (drill 4 opsi) dan menulis (tracing di atas
   siluet + self-grade), progres lokal `levio.kana.v1` (104 huruf per alfabet).
   Entri lewat kartu "Latihan Kana" di halaman modul Japanese.
+- **Spring motion (v0.16.0):** tiga efek dari riset Kinetics — toast overshoot,
+  tab pill glide, dan number counter bump — konsisten dengan kurva spring Levio
+  (keputusan detail di [`motion.md`](./motion.md)). Pemilihan mode latihan
+  menjadi switcher tab persisten (langsung ke flashcard), notifikasi toast saat
+  sesi Mencocokkan selesai.
 - **Paket Tematik multi-bahasa (v0.15.0):** perluasan pack berbasis situasi dari
   pilot Jepang ke English & HSK — 3 bahasa × 4 paket (Perjalanan, Kantor,
   Makanan, Sehari-hari), 12 rute latihan (flashcard, kuis, mengetik,

@@ -20,6 +20,24 @@ selalu disinkronkan saat rilis (lihat `docs/CONTRIBUTING` tidak ada; aturan ada 
 
 ---
 
+## [0.16.0] — 2026-08-04
+
+### Ditambahkan
+- **Spring motion** dari riset [Kinetics](https://kinetics.colorion.co/) — tiga efek diadopsi konsisten dengan kurva spring Levio: **toast overshoot** (notifikasi meluncur masuk dengan sedikit memantul), **tab pill glide** (indikator mode meluncur mulus), dan **number counter bump** (angka XP/skor "loncat" saat berubah).
+- **Toast notifikasi:** muncul saat sesi Mencocokkan selesai (`+XP untuk sesi ini`, variant success); maksimal 3 sekaligus, tap untuk menutup.
+- **Pemilihan mode latihan persisten:** picker layar penuh diganti switcher tab di atas (Flashcard, Kuis, Mengetik, Mencocokkan, Dengar) — pack terbuka langsung ke flashcard.
+
+### Diperbaiki
+- Mismatch hidrasi server↔client pada mode latihan (data acak hanya dirender setelah mount di client).
+
+### Teknis
+- `components/toast.tsx` (ToastProvider + `useToast`), `components/sliding-tabs.tsx` (pill glide 400ms), `components/spring-counter.tsx` (count-up + bump 400ms) — keputusan lengkap di `docs/motion.md`.
+- `home-stats.tsx` & `mock-test.tsx` memakai `SpringCounter` menggantikan `useCountUp`.
+- `app/globals.css`: keyframes `toast-in`/`toast-out`/`count-bump` + blok `prefers-reduced-motion`.
+- `theme-practice.tsx`: switcher tab + gate `mounted`; kunci i18n `theme.pickMode`/`theme.modes` dihapus, `theme.match.xp` ditambahkan.
+
+---
+
 ## [0.15.0] — 2026-08-04
 
 ### Ditambahkan
