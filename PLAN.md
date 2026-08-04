@@ -99,16 +99,17 @@ Levio
 ### V2 — Modularitas + Jepang + Kesehatan (bulan ke-5–8)
 - [x] Refactor modul bahasa → generic "Language Module" (konfigurasi skrip, audio, deck per bahasa) — HSK + English + Japanese
 - [x] Bahasa Jepang: kurikulum JLPT N5 (kana → kosakata → kanji) — N5 starter live; N4–N1 menyusul
-- [ ] **Modul Gym (MVP → paritas kompetitor):**
+- [x] **Modul Gym (MVP → paritas kompetitor):**
   - [x] Log workout sesi (latihan, set per-row: beban/reps/done)
   - [x] Template rutinitas (Push/Pull/Legs PPL, Upper/Lower, Full Body)
   - [x] Streak latihan masuk ke sistem XP & kalender yang sama (10 XP/sesi, maks 30/hari)
   - [x] Rest timer per latihan (auto-start, skip, beep + vibrate, durasi pilihan)
   - [x] Database latihan (56 latihan: browse/cari/filter muscle group) + halaman detail
   - [x] Grafik progress per latihan (1RM/beban/volume) — rilis 0.10.0
-  - [ ] Sinkronisasi gym ke cloud (Supabase) — saat ini lokal
-  - [ ] Checklist harian "gym" (item workout di Daily Checklist)
-- [ ] Homepage unified: satu checklist "bahasa + gym" per hari
+  - [x] Sinkronisasi gym ke cloud (Supabase) — rilis 0.11.0
+  - [x] Checklist harian "gym" (item workout di Daily Checklist)
+  - [x] Streak gabungan belajar+gym + reminder workout — rilis 0.11.0
+- [x] Homepage unified: satu checklist "bahasa + gym" per hari
 
 ### V3 — English + Sempurnakan (bulan ke-9–12)
 - [ ] Modul English (kosakata, listening, grammar)
