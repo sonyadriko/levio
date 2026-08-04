@@ -35,9 +35,6 @@ export default async function ThemePage({
           subtitle={<T id={theme.descKey} />}
         />
       </div>
-      <p className="rounded-xl border border-stone-200 bg-white p-4 text-sm text-stone-500 dark:border-stone-800 dark:bg-stone-950 dark:text-stone-400">
-        <T id="theme.why" vars={{ n: theme.words.length }} />
-      </p>
       <ThemePractice theme={theme} />
     </div>
   );
