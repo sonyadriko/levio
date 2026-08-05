@@ -23,10 +23,13 @@ selalu disinkronkan saat rilis (lihat `docs/CONTRIBUTING` tidak ada; aturan ada 
 ## [Unreleased]
 
 ### Ditambahkan
+- **Papan peringkat mingguan:** `/leaderboard` menampilkan total XP minggu ini (XP aplikasi + gym) antar pemain yang tersinkron ke cloud, dengan posisi & penanda "Kamu", medali 3 besar, dan fallback nama profil.
 - **English listening:** latihan mendengarkan untuk modul English (CEFR) — dengar kata lalu pilih artinya, memakai proxy TTS dengan suara `en-US` (fallback Web Speech).
 - **English grammar:** latihan melengkapi kalimat (cloze) dari kalimat contoh kosakata CEFR — pilih kata yang tepat di antara opsi satu level.
 
 ### Teknis
+- `supabase/migrations/0009_add_leaderboard.sql`: fungsi `get_weekly_leaderboard()` (SECURITY DEFINER) mengagregasi `daily_activity` + `gym_xp_by_date` minggu ini; RPC via `/api/leaderboard`.
+- `lib/leaderboard.ts`: `leaderName` & `rankMedal` (murni, dites) + `components/leaderboard.tsx`.
 - `components/practice-session.tsx`: `ChoicePracticeSession` kini module-aware (pilih level per modul seperti mock test).
 - `lib/english/exercises.ts`: generator `generateEnglishListeningQuestions` & `generateEnglishGrammarQuestions` (murni, dites).
 - `lib/languages/methods.ts`: metode `grammar` untuk English + metode `listening` kini tersedia untuk English.
