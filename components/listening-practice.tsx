@@ -8,37 +8,76 @@ import {
   type ChoiceQ,
 } from "@/components/practice-session";
 import { generateListeningQuestions } from "@/lib/hsk/exercises";
-import type { VocabWord } from "@/lib/hsk/types";
+import type { HskLevel, VocabWord } from "@/lib/hsk/types";
+import { generateEnglishListeningQuestions } from "@/lib/english/exercises";
+import type { VocabItem } from "@/lib/languages/types";
+
+// Speech lang per modul (nilai fallback ke en-US untuk modul yang belum masuk).
+const SPEECH_LANG: Record<string, string> = {
+  hsk: "zh-CN",
+  english: "en-US",
+  japanese: "ja-JP",
+};
+
+function toHskWord(w: VocabItem): VocabWord {
+  return {
+    id: w.id,
+    hanzi: w.term,
+    pinyin: w.reading ?? "",
+    meaning: w.meaning,
+    hsk: w.level as HskLevel,
+    example: w.example,
+    examplePinyin: w.exampleReading,
+    exampleMeaning: w.exampleMeaning,
+  };
+}
 
 // Referensi stabil di module scope agar useMemo `build` di dalam
 // ChoicePracticeSession benar-benar efektif (tidak dibuat ulang per render).
-function buildListeningQuestions(words: VocabWord[]): ChoiceQ[] {
-  return generateListeningQuestions(words, 8) as ChoiceQ[];
+function buildListeningQuestions(
+  words: VocabItem[],
+  _level: number,
+  moduleId: string,
+): ChoiceQ[] {
+  if (moduleId === "english") {
+    return generateEnglishListeningQuestions(words, 8) as ChoiceQ[];
+  }
+  return generateListeningQuestions(words.map(toHskWord), 8) as ChoiceQ[];
 }
 
 // Mainkan suara kata: audio native lewat proxy TTS (/api/tts), fallback ke
 // Web Speech API (speechSynthesis) bila audio native gagal (mis. offline).
-function useSpeech() {
+function useSpeech(speechLang: string) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [fallback, setFallback] = useState(false);
 
-  const speakNative = useCallback((text: string) => {
-    const audio = audioRef.current ?? new Audio();
-    audioRef.current = audio;
-    audio.pause();
-    audio.src = `/api/tts?tl=zh-CN&text=${encodeURIComponent(text)}`;
-    audio.onerror = () => setFallback(true);
-    audio.play().catch(() => setFallback(true));
-  }, []);
+  // Proxy TTS hanya mengizinkan bahasa yang didaftarkan (zh-CN, en, id).
+  const proxyLang = speechLang === "en-US" ? "en" : speechLang;
 
-  const speakFallback = useCallback((text: string) => {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = "zh-CN";
-    utter.rate = 0.8;
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utter);
-  }, []);
+  const speakNative = useCallback(
+    (text: string) => {
+      const audio = audioRef.current ?? new Audio();
+      audioRef.current = audio;
+      audio.pause();
+      audio.src = `/api/tts?tl=${proxyLang}&text=${encodeURIComponent(text)}`;
+      audio.onerror = () => setFallback(true);
+      audio.play().catch(() => setFallback(true));
+    },
+    [proxyLang],
+  );
+
+  const speakFallback = useCallback(
+    (text: string) => {
+      if (typeof window === "undefined" || !("speechSynthesis" in window))
+        return;
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = speechLang;
+      utter.rate = 0.8;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utter);
+    },
+    [speechLang],
+  );
 
   const speak = useCallback(
     (text: string) => {
@@ -64,9 +103,10 @@ function useSpeech() {
   return { speak, supported: true };
 }
 
-export function ListeningPractice() {
+export function ListeningPractice({ moduleId }: { moduleId?: string }) {
   const { t } = useLanguage();
-  const { speak } = useSpeech();
+  const speechLang = SPEECH_LANG[moduleId ?? "hsk"] ?? "en-US";
+  const { speak } = useSpeech(speechLang);
   const autoPlayed = useRef<string | null>(null);
 
   const handleQuestionChange = useCallback(
@@ -81,6 +121,7 @@ export function ListeningPractice() {
 
   return (
     <ChoicePracticeSession
+      moduleId={moduleId}
       build={buildListeningQuestions}
       renderPrompt={(q) => (
         <div className="rounded-xl border border-stone-200 bg-stone-50 p-6 text-center dark:border-stone-800 dark:bg-stone-900">

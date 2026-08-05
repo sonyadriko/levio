@@ -7,9 +7,27 @@ import {
 } from "@/components/practice-session";
 import { generateReadingQuestions } from "@/lib/hsk/exercises";
 import type { HskLevel, VocabWord } from "@/lib/hsk/types";
+import type { VocabItem } from "@/lib/languages/types";
 
-function buildReadingQuestions(words: VocabWord[], level: HskLevel): ChoiceQ[] {
-  return generateReadingQuestions(words, level, 8).map((q) => ({
+function toHskWord(w: VocabItem): VocabWord {
+  return {
+    id: w.id,
+    hanzi: w.term,
+    pinyin: w.reading ?? "",
+    meaning: w.meaning,
+    hsk: w.level as HskLevel,
+    example: w.example,
+    examplePinyin: w.exampleReading,
+    exampleMeaning: w.exampleMeaning,
+  };
+}
+
+function buildReadingQuestions(
+  words: VocabItem[],
+  level: number,
+  _moduleId: string,
+): ChoiceQ[] {
+  return generateReadingQuestions(words.map(toHskWord), level as HskLevel, 8).map((q) => ({
     id: q.id,
     prompt: q.answer,
     options: q.options,
@@ -18,11 +36,12 @@ function buildReadingQuestions(words: VocabWord[], level: HskLevel): ChoiceQ[] {
   }));
 }
 
-export function ReadingPractice() {
+export function ReadingPractice({ moduleId }: { moduleId?: string }) {
   const { t } = useLanguage();
 
   return (
     <ChoicePracticeSession
+      moduleId={moduleId}
       build={buildReadingQuestions}
       renderPrompt={(q) => {
         const passage = q.passage ?? [];
