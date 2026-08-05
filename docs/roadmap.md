@@ -15,6 +15,7 @@ dengan scope ringkas. Rincian pola menambah modul: [`modules.md`](./modules.md).
 | v0.15.0 | Paket Tematik untuk English & HSK + TTS per bahasa | ✅ rilis |
 | v0.16.0 | Spring motion (toast, tab pill, counter) + pemilihan mode latihan persisten | ✅ rilis |
 | v0.17.0 | Mode Bicara + SRS cap kata baru & deteksi leech + statistik retensi & proyeksi | ✅ rilis |
+| v0.18.0 | Drill kata sulit sampai tuntas + target harian adaptif | ✅ rilis |
 | v4.x | Modul Financial Planner | 🕓 draft |
 
 ## Selesai
@@ -45,6 +46,10 @@ dengan scope ringkas. Rincian pola menambah modul: [`modules.md`](./modules.md).
   kartu baru ke kuota harian (`Kosakata/hari`) dan menandai kata sulit (leech);
   Statistik menampilkan panel retensi serta proyeksi selesai per level
   ("±N hari") berdasar kecepatan kata baru 30 hari terakhir.
+- **Drill kata sulit + target adaptif (v0.18.0):** tombol "Latihan Kata Sulit" di
+  deck SRS membuka sesi fokus kata leech dengan loop sampai benar (kartu salah
+  diulang); Profil menyarankan target kata baru harian berdasar retensi & leech
+  (turun saat <70%, naik saat stabil), bisa diterapkan sekali klik.
 - **Paket Tematik multi-bahasa (v0.15.0):** perluasan pack berbasis situasi dari
   pilot Jepang ke English & HSK — 3 bahasa × 4 paket (Perjalanan, Kantor,
   Makanan, Sehari-hari), 12 rute latihan (flashcard, kuis, mengetik,
