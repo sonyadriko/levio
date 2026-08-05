@@ -112,11 +112,12 @@ Levio
 - [x] Homepage unified: satu checklist "bahasa + gym" per hari
 
 ### V3 — English + Sempurnakan (bulan ke-9–12)
-- [ ] Modul English (kosakata, listening, grammar)
-- [ ] Bahasa Jepang lanjut ke JLPT N4
+- [x] Modul English (kosakata CEFR A1–C2, 300 kata + tematik) — rilis 0.12.0/0.13.0/0.15.0; listening & grammar belum
+- [x] Bahasa Jepang lanjut ke JLPT N4 — rilis 0.14.0 (N5–N1 lengkap, 500 kata)
+- [x] Import/export data, backup — di Profil (Ekspor/Impor/Reset, `levio.*.v1` + cloud sync)
 - [ ] Audio native speaker rekaman (sekarang: proxy TTS di `app/api/tts` ✅ V1)
 - [ ] Leaderboard mingguan
-- [ ] Import/export data, backup
+- [ ] English listening & grammar (latihan interaktif per level)
 
 ### Mobile Responsive (Sejak V1)
 - **Mobile-first design:** UI di-desain dan diuji untuk layar kecil (iPhone/Android) lebih dulu, lalu di-scale ke desktop.
