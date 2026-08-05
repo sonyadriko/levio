@@ -6,11 +6,10 @@ import { useLanguage } from "@/components/language-provider";
 import { ProgressBar } from "@/components/progress-bar";
 import { Pill } from "@/components/pill";
 import { Confetti } from "@/components/confetti";
-import { allLevels } from "@/lib/hsk/levels";
-import { countWordsByLevel } from "@/lib/hsk";
-import { useLevelWords } from "@/lib/hsk/use-level-words";
+import { useLevelWords } from "@/lib/languages/use-level-words";
+import { defaultModule, getLanguageModule } from "@/lib/languages";
+import type { VocabItem } from "@/lib/languages/types";
 import { useCountUp } from "@/lib/use-count-up";
-import type { HskLevel } from "@/lib/hsk/types";
 
 export const SESSION_SIZE = 8;
 export const XP_PER_CORRECT = 5;
@@ -23,9 +22,11 @@ export interface ChoiceQ {
   passage?: { hanzi: string; pinyin: string; meaning: string }[];
 }
 
-// Sesi latihan pilihan ganda generik (listening & reading):
-// pilih level -> jawab soal berurutan -> hasil + XP.
+// Sesi latihan pilihan ganda generik (listening, reading, grammar):
+// pilih level -> jawab soal berurutan -> hasil + XP. Module-aware seperti
+// MockTest, sehingga HSK & English bisa memakai sesi yang sama.
 export function ChoicePracticeSession({
+  moduleId,
   build,
   renderPrompt,
   onQuestionChange,
@@ -42,9 +43,10 @@ export function ChoicePracticeSession({
   scoreKey,
   againKey,
 }: {
-  build: (words: import("@/lib/hsk/types").VocabWord[], level: HskLevel) => ChoiceQ[];
-  renderPrompt: (q: ChoiceQ, level: HskLevel) => React.ReactNode;
-  onQuestionChange?: (q: ChoiceQ, level: HskLevel) => void;
+  moduleId?: string;
+  build: (words: VocabItem[], level: number, moduleId: string) => ChoiceQ[];
+  renderPrompt: (q: ChoiceQ, level: number) => React.ReactNode;
+  onQuestionChange?: (q: ChoiceQ, level: number) => void;
   titleKey: string;
   subtitleKey: string;
   startKey: string;
@@ -58,10 +60,12 @@ export function ChoicePracticeSession({
   scoreKey: string;
   againKey: string;
 }) {
+  const activeModule =
+    getLanguageModule(moduleId ?? "") ?? defaultModule();
   const { awardXp } = useProgress();
   const { t } = useLanguage();
 
-  const [level, setLevel] = useState<HskLevel>(1);
+  const [level, setLevel] = useState(1);
   const [session, setSession] = useState<ChoiceQ[] | null>(null);
   const [index, setIndex] = useState(0);
   const [correct, setCorrect] = useState(0);
@@ -69,11 +73,11 @@ export function ChoicePracticeSession({
   const [done, setDone] = useState(false);
   const [xpEarned, setXpEarned] = useState(0);
 
-  const words = useLevelWords(level);
+  const words = useLevelWords(activeModule, level);
 
   const questionCount = useMemo(
-    () => (words.length > 0 ? build(words, level).length : 0),
-    [words, level, build],
+    () => (words.length > 0 ? build(words, level, activeModule.id).length : 0),
+    [words, level, activeModule.id, build],
   );
 
   const activeQuestion = session?.[index];
@@ -89,7 +93,7 @@ export function ChoicePracticeSession({
   }, [activeQuestion, session, done, level, onQuestionChange]);
 
   const start = () => {
-    const questions = build(words, level);
+    const questions = build(words, level, activeModule.id);
     if (questions.length === 0) return;
     setSession(questions);
     setIndex(0);
@@ -99,7 +103,7 @@ export function ChoicePracticeSession({
     setXpEarned(0);
   };
 
-  if (!session || done) {
+  if (!session) {
     const available = words.length > 0;
     return (
       <section className="flex flex-col gap-4">
@@ -108,16 +112,16 @@ export function ChoicePracticeSession({
             {t("mock.level")}
           </label>
           <div className="flex flex-wrap gap-2">
-            {allLevels().map((l) => {
-              const hasData = countWordsByLevel(l) > 0;
+            {activeModule.levels().map((meta) => {
+              const hasData = activeModule.countWordsByLevel(meta.index) > 0;
               return (
                 <Pill
-                  key={l}
-                  selected={level === l}
+                  key={meta.index}
+                  selected={level === meta.index}
                   disabled={!hasData}
-                  onClick={() => setLevel(l)}
+                  onClick={() => setLevel(meta.index)}
                 >
-                  HSK {l}
+                  {meta.name}
                 </Pill>
               );
             })}

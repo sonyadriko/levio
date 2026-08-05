@@ -20,6 +20,23 @@ selalu disinkronkan saat rilis (lihat `docs/CONTRIBUTING` tidak ada; aturan ada 
 
 ---
 
+## [Unreleased]
+
+### Ditambahkan
+- **English listening:** latihan mendengarkan untuk modul English (CEFR) — dengar kata lalu pilih artinya, memakai proxy TTS dengan suara `en-US` (fallback Web Speech).
+- **English grammar:** latihan melengkapi kalimat (cloze) dari kalimat contoh kosakata CEFR — pilih kata yang tepat di antara opsi satu level.
+
+### Teknis
+- `components/practice-session.tsx`: `ChoicePracticeSession` kini module-aware (pilih level per modul seperti mock test).
+- `lib/english/exercises.ts`: generator `generateEnglishListeningQuestions` & `generateEnglishGrammarQuestions` (murni, dites).
+- `lib/languages/methods.ts`: metode `grammar` untuk English + metode `listening` kini tersedia untuk English.
+- `app/practice/grammar`: halaman baru; hub `/practice` menampilkan kartu latihan sesuai modul.
+
+### Diperbaiki
+- Layar hasil latihan mendengarkan/membaca/grammar tidak pernah tampil (kondisi `done` tertutup cabang awal `!session`) — kini skor + XP ditampilkan saat sesi selesai.
+
+---
+
 ## [0.18.0] — 2026-08-04
 
 ### Ditambahkan

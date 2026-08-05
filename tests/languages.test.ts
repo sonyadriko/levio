@@ -23,7 +23,12 @@ describe("language modules", () => {
       "typing",
       "mockTest",
     ]);
-    expect(ids("english")).toEqual(["flashcard", "mockTest"]);
+    expect(ids("english")).toEqual([
+      "flashcard",
+      "listening",
+      "grammar",
+      "mockTest",
+    ]);
     expect(ids("japanese")).toEqual(["flashcard", "kana", "mockTest"]);
   });
 

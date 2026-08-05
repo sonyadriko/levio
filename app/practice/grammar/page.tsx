@@ -1,21 +1,21 @@
 import { PageHeader } from "@/components/page-header";
-import { ReadingPractice } from "@/components/reading-practice";
+import { GrammarPractice } from "@/components/grammar-practice";
 import { T } from "@/components/translate";
 
-export default async function ReadingPage({
+export default async function GrammarPage({
   searchParams,
-}: PageProps<"/practice/reading">) {
+}: PageProps<"/practice/grammar">) {
   const { module: moduleId } = await searchParams;
 
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        icon="book"
-        accent="bg-violet-600"
-        title={<T id="read.title" />}
-        subtitle={<T id="read.subtitle" />}
+        icon="pen"
+        accent="bg-amber-600"
+        title={<T id="grammar.title" />}
+        subtitle={<T id="grammar.subtitle" />}
       />
-      <ReadingPractice
+      <GrammarPractice
         moduleId={typeof moduleId === "string" ? moduleId : undefined}
       />
     </div>
