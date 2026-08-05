@@ -372,6 +372,16 @@ const dict: Record<Locale, Record<string, string>> = {
     "word.wrong": "Jawaban: {answer}",
     "word.next": "Lanjut",
 
+    "leaderboard.title": "Papan Peringkat Mingguan",
+    "leaderboard.subtitle": "Bandingkan XP minggu ini dengan pemain lain.",
+    "leaderboard.loading": "Memuat peringkat…",
+    "leaderboard.empty": "Belum ada data minggu ini. Ikut latihan lalu sinkronkan dulu!",
+    "leaderboard.disabled": "Papan peringkat butuh masuk akun & sinkronisasi cloud.",
+    "leaderboard.error": "Gagal memuat papan peringkat.",
+    "leaderboard.signIn": "Masuk untuk melihat posisimu minggu ini.",
+    "leaderboard.player": "Pemain",
+    "leaderboard.you": "Kamu",
+    "leaderboard.hint": "Peringkat dihitung dari XP aplikasi + XP gym yang tersinkron ke cloud (Senin–Minggu).",
     "stats.title": "Statistik",
     "stats.subtitle":
       "Progress harian, mingguan, bulanan, dan tahunan.",
@@ -1109,6 +1119,16 @@ const dict: Record<Locale, Record<string, string>> = {
     "word.wrong": "Answer: {answer}",
     "word.next": "Next",
 
+    "leaderboard.title": "Weekly Leaderboard",
+    "leaderboard.subtitle": "Compare your weekly XP with other players.",
+    "leaderboard.loading": "Loading leaderboard…",
+    "leaderboard.empty": "No data this week yet. Practice and sync first!",
+    "leaderboard.disabled": "Leaderboard requires sign-in & cloud sync.",
+    "leaderboard.error": "Failed to load the leaderboard.",
+    "leaderboard.signIn": "Sign in to see your rank this week.",
+    "leaderboard.player": "Player",
+    "leaderboard.you": "You",
+    "leaderboard.hint": "Ranking is based on app + gym XP synced to the cloud (Monday–Sunday).",
     "stats.title": "Statistics",
     "stats.subtitle":
       "Daily, weekly, monthly, and yearly progress.",
