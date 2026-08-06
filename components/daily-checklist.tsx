@@ -6,10 +6,12 @@ import { useLanguage } from "@/components/language-provider";
 import { useSettings } from "@/components/settings-provider";
 import { useGym } from "@/components/gym/use-gym";
 import { useWater } from "@/components/water/use-water";
+import { useSleep } from "@/components/sleep/use-sleep";
 import { Icon } from "@/components/icons";
 import { todayKey } from "@/lib/date";
 import { workoutDoneOn } from "@/lib/gym";
 import { isWaterTargetMet } from "@/lib/water";
+import { isSleepTargetMet } from "@/lib/sleep";
 
 export function DailyChecklist() {
   const { progress } = useProgress();
@@ -17,6 +19,7 @@ export function DailyChecklist() {
   const { settings } = useSettings();
   const { gym } = useGym();
   const { water } = useWater();
+  const { sleep } = useSleep();
 
   const activity = progress?.activityByDate ?? {};
   const today = activity[todayKey()] ?? { xp: 0, reviews: 0, tests: 0, newWords: 0 };
@@ -28,7 +31,7 @@ export function DailyChecklist() {
     metaKey: string;
     done: boolean;
     href: string;
-    icon: "book" | "pen" | "chart" | "dumbbell" | "water";
+    icon: "book" | "pen" | "chart" | "dumbbell" | "water" | "sleep";
   }[] = [
     {
       labelKey: "checklist.learn.label",
@@ -77,6 +80,14 @@ export function DailyChecklist() {
       done: isWaterTargetMet(water, todayKey()),
       href: "/#water",
       icon: "water" as const,
+    },
+    {
+      labelKey: "checklist.sleep.label",
+      vars: { n: Math.round((sleep.targetMin / 60) * 2) / 2 },
+      metaKey: "checklist.sleep.meta",
+      done: isSleepTargetMet(sleep, todayKey()),
+      href: "/#sleep",
+      icon: "sleep" as const,
     },
   ];
   const doneCount = tasks.filter((task) => task.done).length;

@@ -3,6 +3,7 @@ import { DailyChecklist } from "@/components/daily-checklist";
 import { Greeting } from "@/components/greeting";
 import { HomeStats } from "@/components/home-stats";
 import { WaterTracker } from "@/components/water/water-tracker";
+import { SleepTracker } from "@/components/sleep/sleep-tracker";
 import { Icon } from "@/components/icons";
 import { T } from "@/components/translate";
 
@@ -47,6 +48,7 @@ export default function Home() {
       <DailyChecklist />
 
       <WaterTracker />
+      <SleepTracker />
 
       <section>
         <h2 className="mb-3 text-base font-semibold">
