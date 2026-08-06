@@ -149,10 +149,10 @@ Status: **MVP selesai (0.9.0) + paritas inti (0.10.0: DB latihan, rest timer, gr
 - **Streak gym** terpisah dari streak belajar, tapi XP-nya masuk satu akun (10/sesi, maks 30/hari).
 
 ⏭️ **Berikutnya (V2 lanjutan):**
-- Sync gym ke cloud (Supabase) bersama XP-nya.
-- Item "Gym" di Daily Checklist + reminder "Jangan lupa workout hari ini 🔥".
-- Program workout terstruktur (durasi, jumlah set/reps target).
-- Grafik volume mingguan per muscle group di dashboard gym.
+- [x] Sync gym ke cloud (Supabase) bersama XP-nya.
+- [x] Item "Gym" di Daily Checklist + reminder "Jangan lupa workout hari ini 🔥".
+- [x] Program workout terstruktur (durasi, jumlah set/reps target) — PPL 4 minggu, Upper/Lower 4 minggu, Full Body 4 minggu.
+- [x] Grafik volume mingguan per muscle group di dashboard gym (minggu ini + tren 8 minggu).
 
 Contoh flow:
 1. Buka dashboard → lihat checklist hari ini

@@ -11,6 +11,7 @@ import { useGym } from "@/components/gym/use-gym";
 import { GymLog } from "@/components/gym/gym-log";
 import { GymSessionForm } from "@/components/gym/gym-session-form";
 import { GymVolume } from "@/components/gym/gym-volume";
+import { GymVolumeTrend } from "@/components/gym/gym-volume-trend";
 import { TemplatePicker } from "@/components/gym/template-picker";
 import { GymProgram } from "@/components/gym/gym-program";
 import { gymStreak, sessionsThisWeek } from "@/lib/gym";
@@ -136,6 +137,7 @@ export default function GymPage() {
       )}
 
       <GymVolume gym={gym} />
+      <GymVolumeTrend gym={gym} />
       <GymProgram gym={gym} onStart={handleProgramPick} />
       <GymLog gym={gym} onDelete={(session) => removeSession(session.id)} />
 
