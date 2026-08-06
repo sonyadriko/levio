@@ -29,6 +29,7 @@ import {
   toggleMuscle,
   updateSet,
   weeklyVolume,
+  weeklyVolumeTrend,
   workoutDoneOn,
   programCompletedCount,
   programDayDone,
@@ -40,6 +41,8 @@ import {
 } from "../lib/gym";
 import { GYM_XP_PER_SESSION } from "../lib/gym";
 import { getExerciseDef } from "../lib/gym-exercises";
+import { GYM_PROGRAMS, programTotalWorkouts } from "../lib/gym-programs";
+import { dateKeyOf, mondayOf } from "../lib/date";
 
 function exercise(name: string, sets: Partial<GymSet>[] = []): GymExerciseLog {
   return {
@@ -523,5 +526,89 @@ describe("normalizeSession", () => {
     expect(session.programId).toBeUndefined();
     expect(session.programWeek).toBeUndefined();
     expect(session.programDay).toBeUndefined();
+  });
+});
+
+describe("weeklyVolumeTrend", () => {
+  it("menghasilkan N minggu terakhir terurut kronologis", () => {
+    const trend = weeklyVolumeTrend(emptyGym(), 8);
+    expect(trend).toHaveLength(8);
+    const keys = trend.map((w) => w.weekKey);
+    expect(keys).toEqual([...keys].sort());
+    expect(keys[keys.length - 1]).toBe(dateKeyOf(mondayOf(new Date())));
+  });
+
+  it("mengagregasi volume per muscle group pada minggu sesi", () => {
+    const base: GymState = {
+      activeSession: null,
+      xpByDate: {},
+      sessions: [
+        {
+          id: makeId(),
+          title: "A",
+          date: d(0),
+          startedAt: 0,
+          completedAt: 0,
+          exercises: [
+            {
+              ...exercise("Bench Press", [{ weightKg: 60, reps: 10, done: true }]),
+              muscles: ["chest", "arms"],
+              exerciseId: "bench-press",
+            },
+          ],
+        },
+      ],
+    };
+    const trend = weeklyVolumeTrend(base, 4);
+    const current = trend[trend.length - 1];
+    expect(current.muscles.chest).toBe(60 * 10);
+    expect(current.muscles.arms).toBe(60 * 10);
+    expect(current.total).toBe(60 * 10 * 2);
+  });
+
+  it("mengabaikan sesi di luar jendela minggu", () => {
+    const base: GymState = {
+      activeSession: null,
+      xpByDate: {},
+      sessions: [
+        {
+          id: makeId(),
+          title: "Lama",
+          date: d(-400),
+          startedAt: 0,
+          completedAt: 0,
+          exercises: [
+            { ...exercise("Bench Press", [{ weightKg: 60, reps: 10, done: true }]), exerciseId: "bench-press" },
+          ],
+        },
+      ],
+    };
+    const trend = weeklyVolumeTrend(base, 8);
+    expect(trend.every((w) => w.total === 0)).toBe(true);
+  });
+});
+
+describe("GYM_PROGRAMS", () => {
+  it("setiap program punya exercise yang ada di database latihan", () => {
+    for (const program of GYM_PROGRAMS) {
+      expect(program.weeks).toBeGreaterThan(0);
+      expect(program.workouts.length).toBeGreaterThan(0);
+      for (const workout of program.workouts) {
+        expect(workout.durationMin).toBeGreaterThan(0);
+        for (const ex of workout.exercises) {
+          expect(getExerciseDef(ex.exerciseId), ex.exerciseId).toBeDefined();
+          expect(ex.targetSets).toBeGreaterThan(0);
+          expect(ex.targetReps).toBeGreaterThan(0);
+        }
+      }
+    }
+  });
+
+  it("total latihan = minggu × hari", () => {
+    for (const program of GYM_PROGRAMS) {
+      expect(programTotalWorkouts(program)).toBe(
+        program.weeks * program.workouts.length,
+      );
+    }
   });
 });

@@ -24,6 +24,8 @@ selalu disinkronkan saat rilis (lihat `docs/CONTRIBUTING` tidak ada; aturan ada 
 
 ### Ditambahkan
 - **Papan peringkat mingguan:** `/leaderboard` menampilkan total XP minggu ini (XP aplikasi + gym) antar pemain yang tersinkron ke cloud, dengan posisi & penanda "Kamu", medali 3 besar, dan fallback nama profil.
+- **Program gym Upper/Lower & Full Body:** dua program terstruktur baru (4 minggu, target set/reps per latihan, estimasi durasi) melengkapi PPL.
+- **Tren volume mingguan:** grafik stacked-bar di dashboard gym menampilkan volume per muscle group untuk 8 minggu terakhir.
 - **English listening:** latihan mendengarkan untuk modul English (CEFR) — dengar kata lalu pilih artinya, memakai proxy TTS dengan suara `en-US` (fallback Web Speech).
 - **English grammar:** latihan melengkapi kalimat (cloze) dari kalimat contoh kosakata CEFR — pilih kata yang tepat di antara opsi satu level.
 
@@ -41,6 +43,9 @@ selalu disinkronkan saat rilis (lihat `docs/CONTRIBUTING` tidak ada; aturan ada 
 - Teks sekunder kecil `text-stone-400` → `text-stone-500` di seluruh UI agar kontrasnya lulus AA (pada latar terang).
 
 ### Teknis
+- **Program gym baru:** Upper/Lower 4 minggu (4 hari: Upper A/B, Lower A/B) dan Full Body 4 minggu (3 hari) di `lib/gym-programs.ts` — target set/reps & durasi per sesi.
+- `lib/gym.ts`: `weeklyVolumeTrend(state, weeks)` — agregasi volume per muscle group per minggu (8 minggu terakhir, murni & dites).
+- `components/gym/gym-volume-trend.tsx`: stacked-bar chart tren volume mingguan di dashboard gym + legenda muscle group.
 - PWA iOS: `appleWebApp` (capable, title, status bar) + `apple-touch-icon` (`public/icon-180.png`) di metadata; manifest bertambah `id`, `lang`, `categories`.
 
 ---

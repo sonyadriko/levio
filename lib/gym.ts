@@ -1,4 +1,4 @@
-import { dateKeyOf, mondayOf, todayKey } from "./date";
+import { addDays, dateKeyOf, mondayOf, todayKey } from "./date";
 import { defaultRestSeconds, getExerciseDef } from "./gym-exercises";
 import { getProgram } from "./gym-programs";
 
@@ -632,6 +632,49 @@ export function sessionsThisWeek(state: GymState): number {
 // reminder: sesi di `sessions` selalu yang sudah selesai).
 export function workoutDoneOn(state: GymState, date: string): boolean {
   return state.sessions.some((s) => s.date === date);
+}
+
+export interface WeeklyMuscleVolume {
+  weekKey: string;
+  total: number;
+  muscles: Partial<Record<MuscleGroup, number>>;
+}
+
+function dateFromKey(key: string): Date {
+  const [y, m, d] = key.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
+// Total volume per muscle group untuk N minggu terakhir (termasuk minggu ini),
+// terurut kronologis (tertua → terbaru). Total per minggu = penjumlahan lintas
+// muscle group (semantik sama dengan `weeklyVolume`).
+export function weeklyVolumeTrend(
+  state: GymState,
+  weeks: number,
+): WeeklyMuscleVolume[] {
+  const count = Math.max(1, Math.min(weeks, 52));
+  const thisMonday = mondayOf(new Date());
+  const result: WeeklyMuscleVolume[] = [];
+  const indexByWeek = new Map<string, number>();
+  for (let i = count - 1; i >= 0; i -= 1) {
+    const weekKey = dateKeyOf(addDays(thisMonday, -7 * i));
+    indexByWeek.set(weekKey, result.length);
+    result.push({ weekKey, total: 0, muscles: {} });
+  }
+  for (const session of state.sessions) {
+    const idx = indexByWeek.get(dateKeyOf(mondayOf(dateFromKey(session.date))));
+    if (idx === undefined) continue;
+    const week = result[idx];
+    for (const exercise of session.exercises) {
+      const volume = exerciseVolume(exercise);
+      if (volume <= 0) continue;
+      for (const muscle of exercise.muscles) {
+        week.muscles[muscle] = (week.muscles[muscle] ?? 0) + volume;
+        week.total += volume;
+      }
+    }
+  }
+  return result;
 }
 
 // Hari kerja program (programId + week + day) sudah pernah diselesaikan bila
