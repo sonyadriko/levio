@@ -27,6 +27,7 @@ selalu disinkronkan saat rilis (lihat `docs/CONTRIBUTING` tidak ada; aturan ada 
 - **Program gym Upper/Lower & Full Body:** dua program terstruktur baru (4 minggu, target set/reps per latihan, estimasi durasi) melengkapi PPL.
 - **Tren volume mingguan:** grafik stacked-bar di dashboard gym menampilkan volume per muscle group untuk 8 minggu terakhir.
 - **Water tracker:** kartu "Minum Air" di beranda dengan tombol cepat (+250/+500 ml), progress ke target harian (default 2000 ml), pengatur target, dan item "Minum air" di Daily Checklist; memberi 5 XP saat target hari itu tercapai.
+- **Sleep tracker:** kartu "Tidur" di beranda — catat jam tidur & bangun (menghitung durasi, termasuk lintas tengah malam), target harian (default 8 jam), dan item "Tidur {n} jam" di Daily Checklist; memberi 5 XP saat target tercapai.
 - **English listening:** latihan mendengarkan untuk modul English (CEFR) — dengar kata lalu pilih artinya, memakai proxy TTS dengan suara `en-US` (fallback Web Speech).
 - **English grammar:** latihan melengkapi kalimat (cloze) dari kalimat contoh kosakata CEFR — pilih kata yang tepat di antara opsi satu level.
 
@@ -48,6 +49,7 @@ selalu disinkronkan saat rilis (lihat `docs/CONTRIBUTING` tidak ada; aturan ada 
 - `lib/gym.ts`: `weeklyVolumeTrend(state, weeks)` — agregasi volume per muscle group per minggu (8 minggu terakhir, murni & dites).
 - `components/gym/gym-volume-trend.tsx`: stacked-bar chart tren volume mingguan di dashboard gym + legenda muscle group.
 - `lib/water.ts`: `drinkWater`/`setWaterTarget`/`isWaterTargetMet` (murni, dites) + `components/water/use-water.ts` & `water-tracker.tsx`.
+- `lib/sleep.ts`: `logSleep`/`sleepDurationMinutes`/`setSleepTarget` (murni, dites) + `components/sleep/use-sleep.ts` & `sleep-tracker.tsx`.
 - PWA iOS: `appleWebApp` (capable, title, status bar) + `apple-touch-icon` (`public/icon-180.png`) di metadata; manifest bertambah `id`, `lang`, `categories`.
 
 ---
