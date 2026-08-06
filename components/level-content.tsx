@@ -36,12 +36,12 @@ export function LevelContent({
       <section className="flex flex-col gap-4">
         <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-6 text-center dark:border-stone-700 dark:bg-stone-950">
           <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-stone-100 dark:bg-stone-800">
-            <Icon name="lock" className="h-6 w-6 text-stone-400" />
+            <Icon name="lock" className="h-6 w-6 text-stone-500" />
           </span>
           <h2 className="mt-3 text-lg font-bold">
             {t("level.gateTitle", { name: languageModule.levelName(level) })}
           </h2>
-          <p className="mx-auto mt-1 max-w-sm text-sm text-stone-500 dark:text-stone-400">
+          <p className="mx-auto mt-1 max-w-sm text-sm text-stone-500 dark:text-stone-500">
             {t("level.gateDesc", {
               name: languageModule.levelName(level),
               prev: languageModule.levelName(prev),
@@ -81,7 +81,7 @@ export function LevelContent({
                   name: languageModule.levelName(level),
                 })}
               </h2>
-              <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
+              <p className="mt-1 text-xs text-stone-500 dark:text-stone-500">
                 {t("level.graduateDesc", {
                   name: languageModule.levelName(level),
                   next: languageModule.levelName(next),

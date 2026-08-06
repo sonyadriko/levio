@@ -97,7 +97,7 @@ export function SlidingTabs<T extends string>({
             className={`relative z-10 flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
               isActive
                 ? "text-teal-700 dark:text-teal-400"
-                : "text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200"
+                : "text-stone-500 hover:text-stone-700 dark:text-stone-500 dark:hover:text-stone-200"
             }`}
           >
             {opt.label}

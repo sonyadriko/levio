@@ -111,7 +111,7 @@ export default async function PracticePage({
               <p className="text-sm font-semibold">
                 <T id={card.titleKey} />
               </p>
-              <p className="text-xs text-stone-500 dark:text-stone-400">
+              <p className="text-xs text-stone-500 dark:text-stone-500">
                 <T id={card.descKey} />
               </p>
             </div>

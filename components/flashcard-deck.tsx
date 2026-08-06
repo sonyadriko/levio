@@ -188,7 +188,7 @@ export function FlashcardDeck({ moduleId }: { moduleId?: string }) {
           </div>
         ) : !hasDeck ? (
           <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-8 text-center dark:border-stone-700 dark:bg-stone-950">
-            <Icon name="pen" className="mx-auto h-8 w-8 text-stone-400" />
+            <Icon name="pen" className="mx-auto h-8 w-8 text-stone-500" />
             <p className="mt-3 text-sm font-medium text-stone-600 dark:text-stone-300">
               {t("deck.noDue", { level: levelName })}
             </p>
@@ -210,7 +210,7 @@ export function FlashcardDeck({ moduleId }: { moduleId?: string }) {
           </div>
         ) : (
           <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-8 text-center dark:border-stone-700 dark:bg-stone-950">
-            <Icon name="pen" className="mx-auto h-8 w-8 text-stone-400" />
+            <Icon name="pen" className="mx-auto h-8 w-8 text-stone-500" />
             <p className="mt-3 text-sm font-medium text-stone-600 dark:text-stone-300">
               {dueWords.length === 0
                 ? t("deck.newOnly", {
@@ -225,7 +225,7 @@ export function FlashcardDeck({ moduleId }: { moduleId?: string }) {
                     })
                   : t("deck.due", { n: dueWords.length, level: levelName })}
             </p>
-            <p className="mt-1 text-xs text-stone-400">{t("deck.tapHint")}</p>
+            <p className="mt-1 text-xs text-stone-500">{t("deck.tapHint")}</p>
             <button
               onClick={() => startSession()}
               className="mt-4 h-12 w-full rounded-xl bg-teal-700 text-sm font-semibold text-white transition-colors hover:bg-teal-800 btn-squish sm:w-auto sm:px-8"
@@ -259,7 +259,7 @@ export function FlashcardDeck({ moduleId }: { moduleId?: string }) {
         <p className="mt-2 text-lg font-bold">
           {session.drill ? t("deck.drillDone") : t("deck.done")}
         </p>
-        <p className="mt-2 text-sm text-stone-500 dark:text-stone-400">
+        <p className="mt-2 text-sm text-stone-500 dark:text-stone-500">
           {session.drill
             ? t("deck.drillSummary", { t: total, xp: session.xp })
             : t("deck.summary", {
@@ -285,7 +285,7 @@ export function FlashcardDeck({ moduleId }: { moduleId?: string }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between text-sm text-stone-500 dark:text-stone-400">
+      <div className="flex items-center justify-between text-sm text-stone-500 dark:text-stone-500">
         <span>
           {t("deck.card", { i: progressCount, t: total })}
         </span>
@@ -340,7 +340,7 @@ export function FlashcardDeck({ moduleId }: { moduleId?: string }) {
               <span className="text-5xl font-bold tracking-tight">
                 {word.term}
               </span>
-              <span className="mt-4 text-xs text-stone-400">
+              <span className="mt-4 text-xs text-stone-500">
                 {t("deck.tapFlip")}
               </span>
             </span>
@@ -352,7 +352,7 @@ export function FlashcardDeck({ moduleId }: { moduleId?: string }) {
                 {word.meaning}
               </span>
               {word.example && (
-                <p className="mt-4 text-sm text-stone-500 dark:text-stone-400">
+                <p className="mt-4 text-sm text-stone-500 dark:text-stone-500">
                   {word.example}
                   {word.exampleMeaning && (
                     <span className="block text-xs">
@@ -376,7 +376,7 @@ export function FlashcardDeck({ moduleId }: { moduleId?: string }) {
 
       {flipped && (
         <>
-          <p className="text-center text-xs text-stone-400">
+          <p className="text-center text-xs text-stone-500">
             {t("deck.swipeHint")}
           </p>
           <div className="grid grid-cols-2 gap-3">
@@ -389,7 +389,7 @@ export function FlashcardDeck({ moduleId }: { moduleId?: string }) {
           </button>
           <button
             onClick={() => answer(true)}
-            className="flex h-14 items-center justify-center gap-2 rounded-xl bg-emerald-600 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 btn-squish"
+            className="flex h-14 items-center justify-center gap-2 rounded-xl bg-emerald-700 text-sm font-semibold text-white transition-colors hover:bg-emerald-800 btn-squish"
           >
             <Icon name="check" className="h-5 w-5" />
             {t("deck.memorized")}

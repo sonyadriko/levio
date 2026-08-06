@@ -80,7 +80,7 @@ export function WordList({
   if (words.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-8 text-center dark:border-stone-700 dark:bg-stone-950">
-        <Icon name="book" className="mx-auto h-8 w-8 text-stone-400" />
+        <Icon name="book" className="mx-auto h-8 w-8 text-stone-500" />
         <p className="mt-3 text-sm font-medium text-stone-600 dark:text-stone-300">
           {t("word.empty")}
         </p>
@@ -107,8 +107,8 @@ export function WordList({
                 <span
                   className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
                     wp?.mastered
-                      ? "bg-emerald-600 text-white"
-                      : "bg-stone-100 text-stone-400 dark:bg-stone-900 dark:text-stone-600"
+                      ? "bg-emerald-700 text-white"
+                      : "bg-stone-100 text-stone-500 dark:bg-stone-900 dark:text-stone-600"
                   }`}
                 >
                   <Icon name="check" className="h-4 w-4" />
@@ -117,7 +117,7 @@ export function WordList({
                   <span className="block text-base font-semibold leading-tight">
                     {word.term}
                     {word.reading && (
-                      <span className="ml-2 text-sm font-medium text-stone-500 dark:text-stone-400">
+                      <span className="ml-2 text-sm font-medium text-stone-500 dark:text-stone-500">
                         {word.reading}
                       </span>
                     )}
@@ -126,7 +126,7 @@ export function WordList({
                     {word.meaning}
                   </span>
                 </span>
-                <span className="shrink-0 text-xs text-stone-400">
+                <span className="shrink-0 text-xs text-stone-500">
                   {wp && isLeech(wp) && (
                     <span
                       title={t("word.leechHint")}
@@ -152,7 +152,7 @@ export function WordList({
             className="animate-slide-up w-full max-w-md rounded-2xl border border-stone-200 bg-white p-5 shadow-xl dark:border-stone-800 dark:bg-stone-950"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="mb-4 flex items-center justify-between gap-3 text-sm text-stone-500 dark:text-stone-400">
+            <div className="mb-4 flex items-center justify-between gap-3 text-sm text-stone-500 dark:text-stone-500">
               <span>
                 {(() => {
                   const wp = progress?.words[selected.id];
@@ -178,7 +178,7 @@ export function WordList({
                   className={`h-8 rounded-lg px-3 text-xs font-semibold transition-colors ${
                     mode === "recognize"
                       ? "bg-white text-stone-900 shadow-sm dark:bg-stone-900 dark:text-stone-100"
-                      : "text-stone-500 dark:text-stone-400"
+                      : "text-stone-500 dark:text-stone-500"
                   }`}
                 >
                   {t("word.recognize")}
@@ -190,7 +190,7 @@ export function WordList({
                     className={`h-8 rounded-lg px-3 text-xs font-semibold transition-colors ${
                       mode === "type"
                         ? "bg-white text-stone-900 shadow-sm dark:bg-stone-900 dark:text-stone-100"
-                        : "text-stone-500 dark:text-stone-400"
+                        : "text-stone-500 dark:text-stone-500"
                     }`}
                   >
                     {t("word.type")}
@@ -201,7 +201,7 @@ export function WordList({
                 type="button"
                 onClick={closeWord}
                 aria-label={t("word.close")}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-600 dark:hover:bg-stone-900 dark:hover:text-stone-200"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-600 dark:hover:bg-stone-900 dark:hover:text-stone-200"
               >
                 <Icon name="check" className="h-4 w-4 rotate-45" />
               </button>
@@ -225,7 +225,7 @@ export function WordList({
                       <span className="text-5xl font-bold tracking-tight">
                         {selected.term}
                       </span>
-                      <span className="mt-4 text-xs text-stone-400">
+                      <span className="mt-4 text-xs text-stone-500">
                         {t("deck.tapFlip")}
                       </span>
                     </span>
@@ -239,7 +239,7 @@ export function WordList({
                         {selected.meaning}
                       </span>
                       {selected.example && (
-                        <span className="mt-4 text-sm text-stone-500 dark:text-stone-400">
+                        <span className="mt-4 text-sm text-stone-500 dark:text-stone-500">
                           {selected.example}
                           {selected.exampleMeaning && (
                             <span className="block text-xs">
@@ -273,7 +273,7 @@ export function WordList({
                     <button
                       type="button"
                       onClick={() => answer(true)}
-                      className="flex h-14 items-center justify-center gap-2 rounded-xl bg-emerald-600 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 active:scale-[0.97]"
+                      className="flex h-14 items-center justify-center gap-2 rounded-xl bg-emerald-700 text-sm font-semibold text-white transition-colors hover:bg-emerald-800 active:scale-[0.97]"
                     >
                       <Icon name="check" className="h-5 w-5" />
                       {t("deck.memorized")}
@@ -333,7 +333,7 @@ export function WordList({
                         placeholder={t("word.typePlaceholder")}
                         className="h-12 w-full rounded-xl border border-stone-200 bg-white px-3 text-center text-lg tracking-wide outline-none transition-colors focus:border-teal-400 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100"
                       />
-                      <p className="mt-2 text-center text-xs text-stone-400">
+                      <p className="mt-2 text-center text-xs text-stone-500">
                         {t("word.typeHint")}
                       </p>
                       <button
@@ -348,7 +348,7 @@ export function WordList({
               </div>
             )}
 
-            <p className="mt-3 text-center text-xs text-stone-400">
+            <p className="mt-3 text-center text-xs text-stone-500">
               {t("word.masterHint")}
             </p>
           </div>

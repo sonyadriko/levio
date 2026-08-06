@@ -68,7 +68,7 @@ function ResultView({
             t: result.total,
           })}
         </p>
-        <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
+        <p className="mt-1 text-sm text-stone-500 dark:text-stone-500">
           +<SpringCounter value={result.xp} duration={900} /> {t("common.xp")} ·{" "}
           {pct >= 60 ? t("mock.pass") : t("mock.fail")}
         </p>
@@ -86,7 +86,7 @@ function ResultView({
             key={type}
             className="rounded-xl border border-stone-200 bg-white p-3 text-center dark:border-stone-800 dark:bg-stone-950"
           >
-            <p className="text-xs font-medium text-stone-500 dark:text-stone-400">
+            <p className="text-xs font-medium text-stone-500 dark:text-stone-500">
               {t(`qtype.${type}`)}
             </p>
             <p className="mt-1 text-sm font-bold">
@@ -107,7 +107,7 @@ function ResultView({
               >
                 <p className="font-medium">
                   {q.word.term}{" "}
-                  <span className="text-xs font-normal text-stone-400">
+                  <span className="text-xs font-normal text-stone-500">
                     {q.word.reading && (
                       <>
                         {q.word.reading} ·{" "}
@@ -205,7 +205,7 @@ export function MockTest({ moduleId }: { moduleId?: string }) {
     return (
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium uppercase tracking-wide text-stone-400">
+          <label className="text-xs font-medium uppercase tracking-wide text-stone-500">
             {t("mock.level")}
           </label>
           <div className="flex flex-wrap gap-2">
@@ -226,7 +226,7 @@ export function MockTest({ moduleId }: { moduleId?: string }) {
         </div>
 
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium uppercase tracking-wide text-stone-400">
+          <label className="text-xs font-medium uppercase tracking-wide text-stone-500">
             {t("mock.questionCount")}
           </label>
           <div className="flex flex-wrap gap-2">
@@ -239,7 +239,7 @@ export function MockTest({ moduleId }: { moduleId?: string }) {
         </div>
 
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium uppercase tracking-wide text-stone-400">
+          <label className="text-xs font-medium uppercase tracking-wide text-stone-500">
             {t("mock.time")}
           </label>
           <div className="flex flex-wrap gap-2">
@@ -256,7 +256,7 @@ export function MockTest({ moduleId }: { moduleId?: string }) {
         </div>
 
         <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-8 text-center dark:border-stone-700 dark:bg-stone-950">
-          <Icon name="chart" className="mx-auto h-8 w-8 text-stone-400" />
+          <Icon name="chart" className="mx-auto h-8 w-8 text-stone-500" />
           <p className="mt-3 text-sm font-medium text-stone-600 dark:text-stone-300">
             {t("mock.summary", {
               n: count,
@@ -264,7 +264,7 @@ export function MockTest({ moduleId }: { moduleId?: string }) {
               level: activeModule.levelName(level),
             })}
           </p>
-          <p className="mt-1 text-xs text-stone-400">
+          <p className="mt-1 text-xs text-stone-500">
             {t("mock.typesHint", {
               types: activeModule.questionTypes
                 .map((qt) => t(`qtype.${qt}`))
@@ -291,7 +291,7 @@ export function MockTest({ moduleId }: { moduleId?: string }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between text-sm text-stone-500 dark:text-stone-400">
+      <div className="flex items-center justify-between text-sm text-stone-500 dark:text-stone-500">
         <span>
           {t("mock.question", { i: index + 1, t: questions.length })}
         </span>
@@ -309,7 +309,7 @@ export function MockTest({ moduleId }: { moduleId?: string }) {
 
       <div key={question.id} className="animate-card-in flex flex-col gap-4">
         <div className="rounded-2xl border border-stone-200 bg-white p-6 dark:border-stone-800 dark:bg-stone-950">
-          <p className="text-xs font-medium uppercase tracking-wide text-stone-400">
+          <p className="text-xs font-medium uppercase tracking-wide text-stone-500">
             {t(`qtype.${question.type}`)}
           </p>
           <p className="mt-3 text-center text-3xl font-bold tracking-tight">
@@ -332,7 +332,7 @@ export function MockTest({ moduleId }: { moduleId?: string }) {
                   "border-red-500 bg-red-50 text-red-600 dark:border-red-600 dark:bg-red-500/10 dark:text-red-400";
               else
                 style =
-                  "border-stone-200 bg-white text-stone-400 opacity-60 dark:border-stone-800 dark:bg-stone-950 dark:text-stone-500";
+                  "border-stone-200 bg-white text-stone-500 opacity-60 dark:border-stone-800 dark:bg-stone-950 dark:text-stone-500";
             }
             return (
               <li key={option}>

@@ -146,7 +146,7 @@ export function KanaTrace({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between text-xs text-stone-400">
+      <div className="flex items-center justify-between text-xs text-stone-500">
         <span>
           {Math.min(index + 1, queue.length)}/{queue.length}
         </span>
@@ -159,14 +159,14 @@ export function KanaTrace({
       </div>
 
       <div className="rounded-2xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-950">
-        <p className="text-center text-sm font-medium text-stone-500 dark:text-stone-400">
+        <p className="text-center text-sm font-medium text-stone-500 dark:text-stone-500">
           {current.romaji}
         </p>
-        <p className="mt-1 text-center text-xs text-stone-400">{t("kana.traceHint")}</p>
+        <p className="mt-1 text-center text-xs text-stone-500">{t("kana.traceHint")}</p>
         <div className="relative mx-auto mt-4 h-80 w-80 overflow-hidden rounded-2xl border border-dashed border-stone-300 bg-stone-50 dark:border-stone-700 dark:bg-stone-900">
           <span
             aria-hidden
-            className="pointer-events-none absolute inset-0 flex select-none items-center justify-center text-[130px] font-bold leading-none text-stone-400/40"
+            className="pointer-events-none absolute inset-0 flex select-none items-center justify-center text-[130px] font-bold leading-none text-stone-500/40"
           >
             {current.kana}
           </span>

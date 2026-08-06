@@ -22,11 +22,11 @@ export function ModuleHubCard({ module }: { module: LanguageModule }) {
           <p className="text-sm font-semibold">
             <T id={module.nameKey} />
           </p>
-          <p className="text-xs text-stone-500 dark:text-stone-400">
+          <p className="text-xs text-stone-500 dark:text-stone-500">
             <T id={module.descriptionKey} />
           </p>
         </div>
-        <span className="shrink-0 text-xs font-medium text-stone-400">
+        <span className="shrink-0 text-xs font-medium text-stone-500">
           <T id="learn.wordCount" vars={{ n: module.totalWordCount() }} />
         </span>
       </Link>
@@ -35,11 +35,11 @@ export function ModuleHubCard({ module }: { module: LanguageModule }) {
         open
         className="group border-t border-stone-200 dark:border-stone-800"
       >
-        <summary className="flex cursor-pointer select-none items-center justify-between px-4 py-3 text-xs font-semibold text-stone-500 transition-colors hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200">
+        <summary className="flex cursor-pointer select-none items-center justify-between px-4 py-3 text-xs font-semibold text-stone-500 transition-colors hover:text-stone-700 dark:text-stone-500 dark:hover:text-stone-200">
           <span>
             <T id="learn.methodsTitle" vars={{ n: methods.length }} />
           </span>
-          <span className="text-stone-400 transition-transform duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] group-open:rotate-180">
+          <span className="text-stone-500 transition-transform duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] group-open:rotate-180">
             ▾
           </span>
         </summary>
@@ -51,7 +51,7 @@ export function ModuleHubCard({ module }: { module: LanguageModule }) {
               className="rounded-xl border border-stone-200 p-3 dark:border-stone-800"
             >
               <div className="flex items-center gap-2">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-500 dark:bg-stone-800 dark:text-stone-400">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-500 dark:bg-stone-800 dark:text-stone-500">
                   <Icon name={method.icon} className="h-4 w-4" />
                 </span>
                 <p className="text-sm font-semibold">

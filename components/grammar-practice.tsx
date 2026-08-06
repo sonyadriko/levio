@@ -33,14 +33,14 @@ export function GrammarPractice({ moduleId }: { moduleId?: string }) {
         const sentence = q.passage?.[0];
         return (
           <div className="rounded-xl border border-stone-200 bg-stone-50 p-5 dark:border-stone-800 dark:bg-stone-900">
-            <p className="text-xs font-medium uppercase tracking-wide text-stone-400">
+            <p className="text-xs font-medium uppercase tracking-wide text-stone-500">
               {t("grammar.prompt")}
             </p>
             <p className="mt-3 text-center text-xl font-bold tracking-tight">
               {q.prompt}
             </p>
             {sentence?.meaning && (
-              <p className="mt-2 text-center text-sm text-stone-500 dark:text-stone-400">
+              <p className="mt-2 text-center text-sm text-stone-500 dark:text-stone-500">
                 {sentence.meaning}
               </p>
             )}

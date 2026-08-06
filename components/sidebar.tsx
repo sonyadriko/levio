@@ -41,7 +41,7 @@ export function Sidebar() {
               className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors active:scale-[0.98] ${
                 isActive
                   ? "bg-teal-50 text-teal-800 dark:bg-teal-600/10 dark:text-teal-600"
-                  : "text-stone-600 hover:bg-stone-100 dark:text-stone-400 dark:hover:bg-stone-900"
+                  : "text-stone-600 hover:bg-stone-100 dark:text-stone-500 dark:hover:bg-stone-900"
               }`}
             >
               <Icon name={item.icon} className="h-5 w-5" />
@@ -53,7 +53,7 @@ export function Sidebar() {
 
       <div className="mt-auto flex flex-col gap-3">
         <ThemeToggle compact />
-        <div className="rounded-lg bg-stone-50 p-3 text-xs text-stone-500 dark:bg-stone-900 dark:text-stone-400">
+        <div className="rounded-lg bg-stone-50 p-3 text-xs text-stone-500 dark:bg-stone-900 dark:text-stone-500">
         <span key={level} className="inline-block animate-pop">
           {t("common.level")} {level} · {progress.xp} {t("common.xp")}
         </span>

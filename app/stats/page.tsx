@@ -25,7 +25,7 @@ export default function StatsPage() {
           <p className="text-sm font-semibold">
             <T id="leaderboard.title" />
           </p>
-          <p className="text-xs text-stone-500 dark:text-stone-400">
+          <p className="text-xs text-stone-500 dark:text-stone-500">
             <T id="leaderboard.subtitle" />
           </p>
         </div>

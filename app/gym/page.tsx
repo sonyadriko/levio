@@ -81,7 +81,7 @@ export default function GymPage() {
         className="flex items-center justify-between rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm font-medium transition-colors hover:border-teal-300 dark:border-stone-800 dark:bg-stone-950 dark:hover:border-teal-700"
       >
         <span>{t("gym.exercises.title")}</span>
-        <span className="text-stone-400">→</span>
+        <span className="text-stone-500">→</span>
       </Link>
 
       {xpNote ? (

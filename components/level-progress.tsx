@@ -44,7 +44,7 @@ export function LevelProgress({
             title={`${mastered}/${total} dikuasai`}
           />
         </div>
-        <span className="text-xs font-medium text-stone-400">
+        <span className="text-xs font-medium text-stone-500">
           {reviewed}/{total}
         </span>
       </div>

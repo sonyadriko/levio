@@ -6,6 +6,9 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: "Levio",
     description:
       "Satu platform untuk semua rutinitas self-improvement: belajar HSK, bahasa lain, dan kesehatan.",
+    id: "/",
+    lang: "id",
+    categories: ["education", "health"],
     start_url: "/",
     display: "standalone",
     background_color: "#0c0a09",

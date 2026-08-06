@@ -166,7 +166,7 @@ export function Lesson({ level }: { level: HskLevel }) {
       <section className="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-950">
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-base font-semibold">{t("lesson.title")}</h2>
-          <span className="text-xs font-medium text-stone-400">
+          <span className="text-xs font-medium text-stone-500">
             <Icon name="check" className="mr-1 inline h-3.5 w-3.5" />
             {t("lesson.learnedCount", { n: learned, t: pool.length })}
           </span>
@@ -183,7 +183,7 @@ export function Lesson({ level }: { level: HskLevel }) {
             : t("lesson.newWordsLeft", { n: newWords.length })}
         </p>
         {!allLearned && (
-          <p className="mt-1 text-xs text-stone-400">
+          <p className="mt-1 text-xs text-stone-500">
             {t("lesson.batchIntro", { n: batch.length })}
           </p>
         )}
@@ -213,7 +213,7 @@ export function Lesson({ level }: { level: HskLevel }) {
     const progressCount = session.introIndex + 1;
     return (
       <section className="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-950">
-        <div className="flex items-center justify-between gap-3 text-sm text-stone-500 dark:text-stone-400">
+        <div className="flex items-center justify-between gap-3 text-sm text-stone-500 dark:text-stone-500">
           <span className="font-medium">{t("lesson.intro")}</span>
           <span className="flex items-center gap-3">
             <span>
@@ -222,7 +222,7 @@ export function Lesson({ level }: { level: HskLevel }) {
             <button
               type="button"
               onClick={exit}
-              className="text-xs font-medium text-stone-400 transition-colors hover:text-stone-600 dark:hover:text-stone-300"
+              className="text-xs font-medium text-stone-500 transition-colors hover:text-stone-600 dark:hover:text-stone-300"
             >
               {t("lesson.exit")}
             </button>
@@ -241,7 +241,7 @@ export function Lesson({ level }: { level: HskLevel }) {
             {current.meaning}
           </span>
         </div>
-        <p className="mt-3 text-center text-xs text-stone-400">
+        <p className="mt-3 text-center text-xs text-stone-500">
           {t("lesson.introHint")}
         </p>
         <button
@@ -273,13 +273,13 @@ export function Lesson({ level }: { level: HskLevel }) {
           />
         </div>
         <p className="mt-4 text-lg font-bold">{t("lesson.doneTitle")}</p>
-        <p className="mt-2 text-sm text-stone-500 dark:text-stone-400">
+        <p className="mt-2 text-sm text-stone-500 dark:text-stone-500">
           {t("lesson.doneScore", {
             c: firstTryCorrect,
             t: session.words.length,
           })}
         </p>
-        <p className="mx-auto mt-1 max-w-sm text-xs text-stone-400">
+        <p className="mx-auto mt-1 max-w-sm text-xs text-stone-500">
           {t("lesson.doneNote")}
         </p>
         <div className="mx-auto mt-5 max-w-xs space-y-2">
@@ -309,7 +309,7 @@ export function Lesson({ level }: { level: HskLevel }) {
 
   return (
     <section className="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-950">
-      <div className="flex items-center justify-between gap-3 text-sm text-stone-500 dark:text-stone-400">
+      <div className="flex items-center justify-between gap-3 text-sm text-stone-500 dark:text-stone-500">
         <span className="font-medium">{t("lesson.quiz")}</span>
         <span className="flex items-center gap-3">
           <span>
@@ -318,7 +318,7 @@ export function Lesson({ level }: { level: HskLevel }) {
           <button
             type="button"
             onClick={exit}
-            className="text-xs font-medium text-stone-400 transition-colors hover:text-stone-600 dark:hover:text-stone-300"
+            className="text-xs font-medium text-stone-500 transition-colors hover:text-stone-600 dark:hover:text-stone-300"
           >
             {t("lesson.exit")}
           </button>
@@ -329,11 +329,11 @@ export function Lesson({ level }: { level: HskLevel }) {
       </div>
 
       <div className="mt-5 text-center">
-        <p className="text-xs font-medium uppercase tracking-wide text-stone-400">
+        <p className="text-xs font-medium uppercase tracking-wide text-stone-500">
           {t("lesson.quizHint")}
         </p>
         <p className="mt-2 text-4xl font-bold tracking-tight">{word.hanzi}</p>
-        <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
+        <p className="mt-1 text-sm text-stone-500 dark:text-stone-500">
           {t("lesson.meaningOf", { hanzi: word.hanzi })}
         </p>
       </div>
@@ -353,7 +353,7 @@ export function Lesson({ level }: { level: HskLevel }) {
                 "border-red-500 bg-red-50 text-red-600 dark:border-red-600 dark:bg-red-500/10 dark:text-red-400";
             else
               style =
-                "border-stone-200 bg-white text-stone-400 opacity-60 dark:border-stone-800 dark:bg-stone-950 dark:text-stone-500";
+                "border-stone-200 bg-white text-stone-500 opacity-60 dark:border-stone-800 dark:bg-stone-950 dark:text-stone-500";
           }
           return (
             <button

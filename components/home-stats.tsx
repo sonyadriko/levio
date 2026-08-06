@@ -29,7 +29,7 @@ export function HomeStats() {
           <Icon name="flame" className="h-4 w-4 animate-flame" />
           {t("homeStats.streak", { n: streak })}
         </div>
-        <span className="text-sm font-medium text-stone-500 dark:text-stone-400">
+        <span className="text-sm font-medium text-stone-500 dark:text-stone-500">
           <SpringCounter value={xp} duration={800} /> {t("common.xp")}
         </span>
       </div>

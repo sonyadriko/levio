@@ -87,12 +87,12 @@ export function SentencePractice({ level }: { level: HskLevel }) {
       <section className="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-950">
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-base font-semibold">{t("sentence.title")}</h2>
-          <span className="text-xs font-medium text-stone-400">
+          <span className="text-xs font-medium text-stone-500">
             <Icon name="pen" className="mr-1 inline h-3.5 w-3.5" />
             {t("sentence.count", { n: all.length })}
           </span>
         </div>
-        <p className="mt-2 text-sm text-stone-500 dark:text-stone-400">
+        <p className="mt-2 text-sm text-stone-500 dark:text-stone-500">
           {t("sentence.subtitle")}
         </p>
         {done ? (
@@ -100,7 +100,7 @@ export function SentencePractice({ level }: { level: HskLevel }) {
             <p className="text-sm font-bold text-emerald-700 dark:text-emerald-400">
               {t("sentence.done")}
             </p>
-            <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
+            <p className="mt-1 text-xs text-stone-500 dark:text-stone-500">
               {t("sentence.score", {
                 c: correct,
                 t: session?.length ?? 0,
@@ -109,7 +109,7 @@ export function SentencePractice({ level }: { level: HskLevel }) {
             </p>
           </div>
         ) : (
-          <p className="mt-1 text-xs text-stone-400">
+          <p className="mt-1 text-xs text-stone-500">
             {t("sentence.sessionHint", {
               n: Math.min(SESSION_SIZE, all.length),
             })}
@@ -133,7 +133,7 @@ export function SentencePractice({ level }: { level: HskLevel }) {
 
   return (
     <section className="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-950">
-      <div className="flex items-center justify-between text-sm text-stone-500 dark:text-stone-400">
+      <div className="flex items-center justify-between text-sm text-stone-500 dark:text-stone-500">
         <h2 className="text-base font-semibold text-stone-900 dark:text-white">
           {t("sentence.title")}
         </h2>
@@ -148,7 +148,7 @@ export function SentencePractice({ level }: { level: HskLevel }) {
       <div key={current.id} className="animate-card-in mt-4 flex flex-col gap-4">
         <div className="rounded-xl border border-stone-200 bg-stone-50 p-6 text-center dark:border-stone-800 dark:bg-stone-900">
           <p className="text-2xl font-bold tracking-tight">{current.hanzi}</p>
-          <p className="mt-2 text-sm text-stone-500 dark:text-stone-400">
+          <p className="mt-2 text-sm text-stone-500 dark:text-stone-500">
             {current.pinyin}
           </p>
         </div>
@@ -171,7 +171,7 @@ export function SentencePractice({ level }: { level: HskLevel }) {
                   "border-red-500 bg-red-50 text-red-600 dark:border-red-600 dark:bg-red-500/10 dark:text-red-400";
               else
                 style =
-                  "border-stone-200 bg-white text-stone-400 opacity-60 dark:border-stone-800 dark:bg-stone-950 dark:text-stone-500";
+                  "border-stone-200 bg-white text-stone-500 opacity-60 dark:border-stone-800 dark:bg-stone-950 dark:text-stone-500";
             }
             return (
               <li key={option}>

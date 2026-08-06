@@ -116,7 +116,7 @@ function ResultView({
         <p className="mt-2 text-sm font-medium">
           {t("mock.score", { p: pct, c: correct, t: total })}
         </p>
-        <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
+        <p className="mt-1 text-sm text-stone-500 dark:text-stone-500">
           {pct >= 60 ? t("mock.pass") : t("mock.fail")}
         </p>
         <button
@@ -165,7 +165,7 @@ function FlashcardMode({
             {Math.round((correct / deck.length) * 100)}%
           </p>
           <p className="mt-2 text-lg font-bold">{t("deck.done")}</p>
-          <p className="mt-2 text-sm text-stone-500 dark:text-stone-400">
+          <p className="mt-2 text-sm text-stone-500 dark:text-stone-500">
             {t("deck.summary", {
               c: correct,
               t: deck.length,
@@ -194,7 +194,7 @@ function FlashcardMode({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between text-sm text-stone-500 dark:text-stone-400">
+      <div className="flex items-center justify-between text-sm text-stone-500 dark:text-stone-500">
         <span>{t("deck.card", { i: index + 1, t: deck.length })}</span>
         <button onClick={onExit} className="text-xs font-medium transition-colors hover:text-stone-600">
           {t("lesson.exit")}
@@ -213,17 +213,17 @@ function FlashcardMode({
         >
           <span className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-2xl border border-stone-200 bg-white p-8 text-center [backface-visibility:hidden] dark:border-stone-800 dark:bg-stone-950">
             <span className="text-4xl font-bold tracking-tight">{word.term}</span>
-            <span className="mt-2 text-xl text-stone-500 dark:text-stone-400">
+            <span className="mt-2 text-xl text-stone-500 dark:text-stone-500">
               {word.reading}
             </span>
-            <span className="mt-4 text-xs text-stone-400">{t("deck.tapFlip")}</span>
+            <span className="mt-4 text-xs text-stone-500">{t("deck.tapFlip")}</span>
           </span>
           <span className="absolute inset-0 flex flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border border-teal-300 bg-teal-50 p-8 text-center [backface-visibility:hidden] [transform:rotateY(180deg)] dark:border-teal-700 dark:bg-teal-600/10">
             <span className="text-2xl font-bold text-stone-700 dark:text-stone-200">
               {word.meaning}
             </span>
             {word.example && (
-              <p className="mt-2 text-sm text-stone-500 dark:text-stone-400">
+              <p className="mt-2 text-sm text-stone-500 dark:text-stone-500">
                 {word.example}
                 {word.exampleMeaning && (
                   <span className="block text-xs">{word.exampleMeaning}</span>
@@ -245,7 +245,7 @@ function FlashcardMode({
           </button>
           <button
             onClick={() => answer(true)}
-            className="flex h-14 items-center justify-center rounded-xl bg-emerald-600 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 btn-squish"
+            className="flex h-14 items-center justify-center rounded-xl bg-emerald-700 text-sm font-semibold text-white transition-colors hover:bg-emerald-800 btn-squish"
           >
             <Icon name="check" className="mr-2 h-5 w-5" />
             {t("deck.memorized")}
@@ -300,7 +300,7 @@ function QuizMode({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between text-sm text-stone-500 dark:text-stone-400">
+      <div className="flex items-center justify-between text-sm text-stone-500 dark:text-stone-500">
         <span>{t("deck.card", { i: index + 1, t: words.length })}</span>
         <button onClick={onExit} className="text-xs font-medium transition-colors hover:text-stone-600">
           {t("lesson.exit")}
@@ -308,12 +308,12 @@ function QuizMode({
       </div>
       <ProgressBar value={((index + 1) / words.length) * 100} />
       <div className="rounded-2xl border border-stone-200 bg-white p-6 text-center dark:border-stone-800 dark:bg-stone-950">
-        <p className="text-xs font-medium uppercase tracking-wide text-stone-400">
+        <p className="text-xs font-medium uppercase tracking-wide text-stone-500">
           {t("theme.quiz.ask")}
         </p>
         <p className="mt-3 text-3xl font-bold tracking-tight">{word.term}</p>
         {word.reading && (
-          <p className="mt-1 text-lg text-stone-500 dark:text-stone-400">{word.reading}</p>
+          <p className="mt-1 text-lg text-stone-500 dark:text-stone-500">{word.reading}</p>
         )}
       </div>
       <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -331,7 +331,7 @@ function QuizMode({
                 "border-red-500 bg-red-50 text-red-600 dark:border-red-600 dark:bg-red-500/10 dark:text-red-400";
             else
               style =
-                "border-stone-200 bg-white text-stone-400 opacity-60 dark:border-stone-800 dark:bg-stone-950 dark:text-stone-500";
+                "border-stone-200 bg-white text-stone-500 opacity-60 dark:border-stone-800 dark:bg-stone-950 dark:text-stone-500";
           }
           return (
             <li key={option}>
@@ -402,7 +402,7 @@ function TypeMode({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between text-sm text-stone-500 dark:text-stone-400">
+      <div className="flex items-center justify-between text-sm text-stone-500 dark:text-stone-500">
         <span>{t("deck.card", { i: index + 1, t: words.length })}</span>
         <button onClick={onExit} className="text-xs font-medium transition-colors hover:text-stone-600">
           {t("lesson.exit")}
@@ -410,12 +410,12 @@ function TypeMode({
       </div>
       <ProgressBar value={((index + 1) / words.length) * 100} />
       <div className="rounded-2xl border border-stone-200 bg-white p-6 text-center dark:border-stone-800 dark:bg-stone-950">
-        <p className="text-xs font-medium uppercase tracking-wide text-stone-400">
+        <p className="text-xs font-medium uppercase tracking-wide text-stone-500">
           {t("theme.type.ask")}
         </p>
         <p className="mt-3 text-3xl font-bold tracking-tight">{word.term}</p>
         {word.reading && (
-          <p className="mt-1 text-lg text-stone-500 dark:text-stone-400">{word.reading}</p>
+          <p className="mt-1 text-lg text-stone-500 dark:text-stone-500">{word.reading}</p>
         )}
       </div>
       <div className="flex flex-col gap-3">
@@ -537,14 +537,14 @@ function MatchMode({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between text-sm text-stone-500 dark:text-stone-400">
+      <div className="flex items-center justify-between text-sm text-stone-500 dark:text-stone-500">
         <span>{t("theme.match.moves", { n: moves })}</span>
         <button onClick={onExit} className="text-xs font-medium transition-colors hover:text-stone-600">
           {t("lesson.exit")}
         </button>
       </div>
       {!done && (
-        <p className="text-center text-xs text-stone-400">{t("theme.match.hint")}</p>
+        <p className="text-center text-xs text-stone-500">{t("theme.match.hint")}</p>
       )}
       <div className="grid grid-cols-4 gap-2 sm:gap-3">
         {cards.map((card) => {
@@ -559,7 +559,7 @@ function MatchMode({
                   ? "border-emerald-500 bg-emerald-50 text-emerald-700 dark:border-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400"
                   : isOpen
                     ? "border-teal-400 bg-white text-stone-800 dark:border-teal-700 dark:bg-stone-900 dark:text-stone-100"
-                    : "border-stone-200 bg-white text-stone-400 dark:border-stone-800 dark:bg-stone-950"
+                    : "border-stone-200 bg-white text-stone-500 dark:border-stone-800 dark:bg-stone-950"
               }`}
             >
               {isOpen ? card.label : "•"}
@@ -571,7 +571,7 @@ function MatchMode({
         <div className="animate-slide-up flex flex-col items-center gap-3 rounded-2xl border border-stone-200 bg-white p-6 text-center dark:border-stone-800 dark:bg-stone-950">
           <Confetti />
           <p className="text-lg font-bold">{t("theme.match.done")}</p>
-          <p className="text-sm text-stone-500 dark:text-stone-400">
+          <p className="text-sm text-stone-500 dark:text-stone-500">
             {t("theme.match.summary", { n: moves })}
           </p>
           <div className="flex flex-col gap-2 sm:flex-row">
@@ -652,7 +652,7 @@ function ListenMode({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between text-sm text-stone-500 dark:text-stone-400">
+      <div className="flex items-center justify-between text-sm text-stone-500 dark:text-stone-500">
         <span>{t("deck.card", { i: index + 1, t: words.length })}</span>
         <button onClick={onExit} className="text-xs font-medium transition-colors hover:text-stone-600">
           {t("lesson.exit")}
@@ -669,11 +669,11 @@ function ListenMode({
           <Icon name="volume" className="h-8 w-8" />
         </button>
         {!audioOk && (
-          <p className="text-sm font-semibold text-stone-500 dark:text-stone-400">
+          <p className="text-sm font-semibold text-stone-500 dark:text-stone-500">
             {word.reading ?? word.term}
           </p>
         )}
-        <p className="text-xs font-medium uppercase tracking-wide text-stone-400">
+        <p className="text-xs font-medium uppercase tracking-wide text-stone-500">
           {t("theme.listen.ask")}
         </p>
       </div>
@@ -692,7 +692,7 @@ function ListenMode({
                 "border-red-500 bg-red-50 text-red-600 dark:border-red-600 dark:bg-red-500/10 dark:text-red-400";
             else
               style =
-                "border-stone-200 bg-white text-stone-400 opacity-60 dark:border-stone-800 dark:bg-stone-950 dark:text-stone-500";
+                "border-stone-200 bg-white text-stone-500 opacity-60 dark:border-stone-800 dark:bg-stone-950 dark:text-stone-500";
           }
           return (
             <li key={option}>
@@ -855,7 +855,7 @@ function SpeakMode({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between text-sm text-stone-500 dark:text-stone-400">
+      <div className="flex items-center justify-between text-sm text-stone-500 dark:text-stone-500">
         <span>{t("deck.card", { i: index + 1, t: words.length })}</span>
         <button onClick={onExit} className="text-xs font-medium transition-colors hover:text-stone-600">
           {t("lesson.exit")}
@@ -864,12 +864,12 @@ function SpeakMode({
       <ProgressBar value={((index + 1) / words.length) * 100} />
 
       <div className="rounded-2xl border border-stone-200 bg-white p-6 text-center dark:border-stone-800 dark:bg-stone-950">
-        <p className="text-xs font-medium uppercase tracking-wide text-stone-400">
+        <p className="text-xs font-medium uppercase tracking-wide text-stone-500">
           {t("theme.speak.ask")}
         </p>
         <p className="mt-3 text-3xl font-bold tracking-tight">{word.term}</p>
         {word.reading && (
-          <p className="mt-1 text-lg text-stone-500 dark:text-stone-400">
+          <p className="mt-1 text-lg text-stone-500 dark:text-stone-500">
             {word.reading}
           </p>
         )}
@@ -877,7 +877,7 @@ function SpeakMode({
           <button
             onClick={() => speak(word.reading ?? word.term, speechLang)}
             aria-label={t("theme.speak.listen")}
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-500 transition-colors hover:border-teal-300 hover:text-teal-700 btn-squish dark:border-stone-800 dark:bg-stone-950 dark:text-stone-400"
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-500 transition-colors hover:border-teal-300 hover:text-teal-700 btn-squish dark:border-stone-800 dark:bg-stone-950 dark:text-stone-500"
           >
             <Icon name="volume" className="h-5 w-5" />
           </button>
@@ -894,7 +894,7 @@ function SpeakMode({
             <Icon name="mic" className="h-7 w-7" />
           </button>
         </div>
-        <p aria-live="polite" className="mt-3 min-h-4 text-xs text-stone-500 dark:text-stone-400">
+        <p aria-live="polite" className="mt-3 min-h-4 text-xs text-stone-500 dark:text-stone-500">
           {listening ? t("theme.speak.listening") : t("theme.speak.hint")}
         </p>
         {!supported && (
@@ -906,7 +906,7 @@ function SpeakMode({
 
       {graded === null ? (
         <div className="rounded-xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-950">
-          <p className="text-center text-xs font-medium text-stone-400">
+          <p className="text-center text-xs font-medium text-stone-500">
             {t("theme.speak.selfGrade")}
           </p>
           <div className="mt-3 grid grid-cols-2 gap-3">
@@ -919,7 +919,7 @@ function SpeakMode({
             </button>
             <button
               onClick={() => grade(true, "")}
-              className="flex h-12 items-center justify-center gap-2 rounded-xl bg-emerald-600 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 btn-squish"
+              className="flex h-12 items-center justify-center gap-2 rounded-xl bg-emerald-700 text-sm font-semibold text-white transition-colors hover:bg-emerald-800 btn-squish"
             >
               <Icon name="check" className="h-5 w-5" />
               {t("theme.speak.success")}
@@ -1002,7 +1002,7 @@ export function ThemePractice({
             setSessionKey((k) => k + 1);
           }}
         />
-        <p className="text-xs text-stone-500 dark:text-stone-400">
+        <p className="text-xs text-stone-500 dark:text-stone-500">
           <T id={MODE_META.find((m) => m.id === mode)!.descKey} />
         </p>
       </div>

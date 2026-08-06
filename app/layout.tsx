@@ -23,6 +23,15 @@ export const metadata: Metadata = {
   title: "Levio — Belajar HSK, Bahasa & Kesehatan",
   description:
     "Satu platform untuk semua rutinitas self-improvement: belajar HSK, bahasa lain, dan kesehatan.",
+  applicationName: "Levio",
+  appleWebApp: {
+    capable: true,
+    title: "Levio",
+    statusBarStyle: "default",
+  },
+  icons: {
+    apple: "/icon-180.png",
+  },
 };
 
 export const viewport: Viewport = {

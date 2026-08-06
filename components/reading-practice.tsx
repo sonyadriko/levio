@@ -47,14 +47,14 @@ export function ReadingPractice({ moduleId }: { moduleId?: string }) {
         const passage = q.passage ?? [];
         return (
           <div className="rounded-xl border border-stone-200 bg-stone-50 p-5 dark:border-stone-800 dark:bg-stone-900">
-            <p className="text-xs font-medium uppercase tracking-wide text-stone-400">
+            <p className="text-xs font-medium uppercase tracking-wide text-stone-500">
               {t("read.passageLabel")}
             </p>
             <div className="mt-3 flex flex-col gap-3">
               {passage.map((s, i) => (
                 <div key={i}>
                   <p className="text-lg font-bold tracking-tight">{s.hanzi}</p>
-                  <p className="mt-0.5 text-sm text-stone-500 dark:text-stone-400">
+                  <p className="mt-0.5 text-sm text-stone-500 dark:text-stone-500">
                     {s.pinyin}
                   </p>
                 </div>

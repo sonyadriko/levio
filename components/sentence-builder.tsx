@@ -82,7 +82,7 @@ export function SentenceBuilder() {
     return (
       <section className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium uppercase tracking-wide text-stone-400">
+          <label className="text-xs font-medium uppercase tracking-wide text-stone-500">
             {t("mock.level")}
           </label>
           <div className="flex flex-wrap gap-2">
@@ -104,10 +104,10 @@ export function SentenceBuilder() {
 
         <div className="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-950">
           <h2 className="text-base font-semibold">{t("builder.title")}</h2>
-          <p className="mt-2 text-sm text-stone-500 dark:text-stone-400">
+          <p className="mt-2 text-sm text-stone-500 dark:text-stone-500">
             {t("builder.subtitle")}
           </p>
-          <p className="mt-1 text-xs text-stone-400">
+          <p className="mt-1 text-xs text-stone-500">
             {t("builder.sessionHint", {
               n: Math.min(SESSION_SIZE, questionCount),
             })}
@@ -173,7 +173,7 @@ export function SentenceBuilder() {
         <p className="mt-2 text-4xl font-black tracking-tight text-teal-600 dark:text-teal-400">
           {pct}%
         </p>
-        <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
+        <p className="mt-1 text-xs text-stone-500 dark:text-stone-500">
           {t("builder.score", { c: shownCorrect, t: session.length, xp: shownXp })}
         </p>
         <button
@@ -188,7 +188,7 @@ export function SentenceBuilder() {
 
   return (
     <section className="flex flex-col gap-4">
-      <div className="flex items-center justify-between text-sm text-stone-500 dark:text-stone-400">
+      <div className="flex items-center justify-between text-sm text-stone-500 dark:text-stone-500">
         <h2 className="text-base font-semibold text-stone-900 dark:text-white">
           {t("builder.title")}
         </h2>
@@ -200,13 +200,13 @@ export function SentenceBuilder() {
 
       <div key={current.id} className="animate-card-in flex flex-col gap-4">
         <div className="rounded-xl border border-stone-200 bg-stone-50 p-6 text-center dark:border-stone-800 dark:bg-stone-900">
-          <p className="text-sm font-medium text-stone-500 dark:text-stone-400">
+          <p className="text-sm font-medium text-stone-500 dark:text-stone-500">
             {t("builder.prompt")}
           </p>
           {checked && (
             <div className="mt-3">
               <p className="text-xl font-bold tracking-tight">{current.sentence}</p>
-              <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
+              <p className="mt-1 text-sm text-stone-500 dark:text-stone-500">
                 {current.pinyin}
               </p>
               <p className="mt-1 text-sm text-emerald-600 dark:text-emerald-400">
@@ -218,7 +218,7 @@ export function SentenceBuilder() {
 
         <div className="flex min-h-16 flex-wrap items-center gap-2 rounded-xl border border-dashed border-stone-300 p-3 dark:border-stone-700">
           {placed.length === 0 && !checked && (
-            <span className="text-xs text-stone-400">{t("builder.tapHint")}</span>
+            <span className="text-xs text-stone-500">{t("builder.tapHint")}</span>
           )}
           {placed.map((p) => (
             <button
@@ -252,7 +252,7 @@ export function SentenceBuilder() {
           <div className="flex items-center justify-between gap-3">
             <button
               onClick={() => setPlaced([])}
-              className="h-11 shrink-0 rounded-xl border border-stone-200 px-4 text-sm font-medium text-stone-500 transition-colors hover:border-red-300 hover:text-red-500 dark:border-stone-800 dark:text-stone-400"
+              className="h-11 shrink-0 rounded-xl border border-stone-200 px-4 text-sm font-medium text-stone-500 transition-colors hover:border-red-300 hover:text-red-500 dark:border-stone-800 dark:text-stone-500"
             >
               {t("builder.clear")}
             </button>

@@ -28,7 +28,7 @@ function RankCell({ rank }: { rank: number }) {
     );
   }
   return (
-    <span className="w-7 shrink-0 text-center text-sm font-semibold tabular-nums text-stone-500 dark:text-stone-400">
+    <span className="w-7 shrink-0 text-center text-sm font-semibold tabular-nums text-stone-500 dark:text-stone-500">
       {rank}
     </span>
   );
@@ -63,7 +63,7 @@ export function Leaderboard() {
 
   if (error) {
     return (
-      <div className="rounded-2xl border border-stone-200 bg-white p-6 text-center text-sm text-stone-500 dark:border-stone-800 dark:bg-stone-950 dark:text-stone-400">
+      <div className="rounded-2xl border border-stone-200 bg-white p-6 text-center text-sm text-stone-500 dark:border-stone-800 dark:bg-stone-950 dark:text-stone-500">
         {t("leaderboard.error")}
       </div>
     );
@@ -71,7 +71,7 @@ export function Leaderboard() {
 
   if (!configured) {
     return (
-      <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-6 text-center text-sm text-stone-500 dark:border-stone-700 dark:bg-stone-950 dark:text-stone-400">
+      <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-6 text-center text-sm text-stone-500 dark:border-stone-700 dark:bg-stone-950 dark:text-stone-500">
         {t("leaderboard.disabled")}
       </div>
     );
@@ -79,7 +79,7 @@ export function Leaderboard() {
 
   if (rows === null) {
     return (
-      <div className="rounded-2xl border border-stone-200 bg-white p-6 text-center text-sm text-stone-500 dark:border-stone-800 dark:bg-stone-950 dark:text-stone-400">
+      <div className="rounded-2xl border border-stone-200 bg-white p-6 text-center text-sm text-stone-500 dark:border-stone-800 dark:bg-stone-950 dark:text-stone-500">
         {t("leaderboard.loading")}
       </div>
     );
@@ -87,7 +87,7 @@ export function Leaderboard() {
 
   if (rows.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-6 text-center text-sm text-stone-500 dark:border-stone-700 dark:bg-stone-950 dark:text-stone-400">
+      <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-6 text-center text-sm text-stone-500 dark:border-stone-700 dark:bg-stone-950 dark:text-stone-500">
         {user ? t("leaderboard.empty") : t("leaderboard.signIn")}
       </div>
     );
@@ -112,7 +112,7 @@ export function Leaderboard() {
               </p>
             </div>
             {row.is_me && (
-              <span className="rounded-full bg-teal-600 px-2.5 py-0.5 text-xs font-semibold text-white">
+              <span className="rounded-full bg-teal-700 px-2.5 py-0.5 text-xs font-semibold text-white">
                 {t("leaderboard.you")}
               </span>
             )}
@@ -122,7 +122,7 @@ export function Leaderboard() {
           </li>
         ))}
       </ol>
-      <p className="text-xs leading-relaxed text-stone-400">
+      <p className="text-xs leading-relaxed text-stone-500">
         {t("leaderboard.hint")}
       </p>
     </div>
