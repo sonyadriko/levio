@@ -52,7 +52,7 @@ export default function ResetPasswordPage() {
         <h1 className="mt-4 text-lg font-bold tracking-tight">
           {t("auth.resetTitle")}
         </h1>
-        <p className="mx-auto mt-1 max-w-sm text-sm text-stone-500 dark:text-stone-400">
+        <p className="mx-auto mt-1 max-w-sm text-sm text-stone-500 dark:text-stone-500">
           {t("auth.resetSubtitle")}
         </p>
 
@@ -71,7 +71,7 @@ export default function ResetPasswordPage() {
         ) : (
           <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-3 text-left">
             <label className="flex flex-col gap-1">
-              <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
+              <span className="text-xs font-medium text-stone-500 dark:text-stone-500">
                 {t("auth.newPassword")}
               </span>
               <input
@@ -85,7 +85,7 @@ export default function ResetPasswordPage() {
               />
             </label>
             <label className="flex flex-col gap-1">
-              <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
+              <span className="text-xs font-medium text-stone-500 dark:text-stone-500">
                 {t("auth.confirmPassword")}
               </span>
               <input
@@ -98,7 +98,7 @@ export default function ResetPasswordPage() {
                 className={inputClass}
               />
             </label>
-            <p className="text-xs text-stone-400">{t("auth.passwordHint")}</p>
+            <p className="text-xs text-stone-500">{t("auth.passwordHint")}</p>
 
             {error && (
               <p className="animate-slide-down rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-600 dark:bg-red-500/10 dark:text-red-400">

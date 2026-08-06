@@ -68,18 +68,18 @@ export default function ExerciseDetailPage({
 
       <div className="grid grid-cols-4 gap-2">
         <div className="rounded-xl border border-stone-200 bg-white p-3 dark:border-stone-800 dark:bg-stone-950">
-          <p className="text-[10px] uppercase tracking-wide text-stone-400">
+          <p className="text-[10px] uppercase tracking-wide text-stone-500">
             {t("gym.progress.pr")}
           </p>
           <p className="mt-1 text-sm font-semibold tabular-nums">
             {best1RM > 0 ? formatKg(best1RM) : "—"}
           </p>
-          <p className="text-[10px] text-stone-400">
+          <p className="text-[10px] text-stone-500">
             {bestDate ? shortDate(bestDate) : ""}
           </p>
         </div>
         <div className="rounded-xl border border-stone-200 bg-white p-3 dark:border-stone-800 dark:bg-stone-950">
-          <p className="text-[10px] uppercase tracking-wide text-stone-400">
+          <p className="text-[10px] uppercase tracking-wide text-stone-500">
             {t("gym.progress.sessionsLabel")}
           </p>
           <p className="mt-1 text-sm font-semibold tabular-nums">
@@ -87,19 +87,19 @@ export default function ExerciseDetailPage({
           </p>
         </div>
         <div className="rounded-xl border border-stone-200 bg-white p-3 dark:border-stone-800 dark:bg-stone-950">
-          <p className="text-[10px] uppercase tracking-wide text-stone-400">
+          <p className="text-[10px] uppercase tracking-wide text-stone-500">
             {t("gym.progress.setsLabel")}
           </p>
           <p className="mt-1 text-sm font-semibold tabular-nums">{totalSets}</p>
         </div>
         <div className="rounded-xl border border-stone-200 bg-white p-3 dark:border-stone-800 dark:bg-stone-950">
-          <p className="text-[10px] uppercase tracking-wide text-stone-400">
+          <p className="text-[10px] uppercase tracking-wide text-stone-500">
             {t("gym.progress.metric.volume")}
           </p>
           <p className="mt-1 text-sm font-semibold tabular-nums">
             {totalVolume > 0 ? Math.round(totalVolume) : "—"}
           </p>
-          <p className="text-[10px] text-stone-400">kg</p>
+          <p className="text-[10px] text-stone-500">kg</p>
         </div>
       </div>
 
@@ -115,7 +115,7 @@ export default function ExerciseDetailPage({
                 className={cn(
                   "rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors",
                   metric === key
-                    ? "bg-teal-600 text-white"
+                    ? "bg-teal-700 text-white"
                     : "bg-stone-100 text-stone-600 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700",
                 )}
               >
@@ -126,13 +126,13 @@ export default function ExerciseDetailPage({
         </div>
 
         {chartData.length === 0 ? (
-          <p className="py-8 text-center text-sm text-stone-400">
+          <p className="py-8 text-center text-sm text-stone-500">
             {t("gym.progress.empty")}
           </p>
         ) : (
           <>
             <LineChart data={chartData} formatValue={formatKg} />
-            <p className="mt-2 text-center text-[10px] text-stone-400">
+            <p className="mt-2 text-center text-[10px] text-stone-500">
               {metric === "1rm" ? t("gym.progress.chartHint") : ""}
             </p>
           </>
@@ -151,13 +151,13 @@ export default function ExerciseDetailPage({
                 <span className="text-xs font-medium tabular-nums">
                   {shortDate(point.date)}
                 </span>
-                <span className="text-xs tabular-nums text-stone-500 dark:text-stone-400">
+                <span className="text-xs tabular-nums text-stone-500 dark:text-stone-500">
                   {point.topWeight > 0 ? `${formatKg(point.topWeight)} top` : ""}
                 </span>
                 <span className="text-xs font-semibold tabular-nums text-teal-700 dark:text-teal-400">
                   {point.est1RM > 0 ? `1RM ${formatKg(point.est1RM)}` : ""}
                 </span>
-                <span className="text-xs tabular-nums text-stone-500 dark:text-stone-400">
+                <span className="text-xs tabular-nums text-stone-500 dark:text-stone-500">
                   {point.volume > 0 ? `${Math.round(point.volume)} kg` : ""} ·{" "}
                   {point.sets} {t("gym.set")}
                 </span>

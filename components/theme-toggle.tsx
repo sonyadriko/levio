@@ -51,12 +51,12 @@ export function ThemeToggle({
                 ? `flex h-8 flex-1 items-center justify-center rounded-lg transition-colors active:scale-95 ${
                     active
                       ? "bg-teal-700 text-white"
-                      : "text-stone-500 hover:bg-stone-200 dark:text-stone-400 dark:hover:bg-stone-800"
+                      : "text-stone-500 hover:bg-stone-200 dark:text-stone-500 dark:hover:bg-stone-800"
                   }`
                 : `flex h-9 items-center justify-between gap-2 rounded-lg px-4 text-sm font-medium transition-colors active:scale-[0.97] ${
                     active
                       ? "bg-teal-700 text-white"
-                      : "border border-stone-200 bg-white text-stone-600 hover:border-teal-300 dark:border-stone-800 dark:bg-stone-950 dark:text-stone-400"
+                      : "border border-stone-200 bg-white text-stone-600 hover:border-teal-300 dark:border-stone-800 dark:bg-stone-950 dark:text-stone-500"
                   }`
             }
           >
@@ -88,7 +88,7 @@ export function MobileThemeToggle() {
             onClick={() => setOpen(false)}
           />
           <div className="absolute bottom-full right-0 mb-3 w-44 rounded-xl border border-stone-200 bg-white p-3 shadow-xl dark:border-stone-800 dark:bg-stone-950">
-            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-stone-400">
+            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-stone-500">
               {t("profile.appearance")}
             </p>
             <ThemeToggle onClose={() => setOpen(false)} />

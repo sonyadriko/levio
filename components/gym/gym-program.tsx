@@ -36,7 +36,7 @@ function WorkoutSummary({
         {workout.exercises.map((ex) => {
           const def = getExerciseDef(ex.exerciseId);
           return (
-            <li key={ex.exerciseId} className="text-xs text-stone-500 dark:text-stone-400">
+            <li key={ex.exerciseId} className="text-xs text-stone-500 dark:text-stone-500">
               {def ? t(def.nameKey) : ex.exerciseId} · {ex.targetSets} × {ex.targetReps}
             </li>
           );
@@ -68,7 +68,7 @@ function ProgramCard({
             {completed}/{total}
           </span>
         </div>
-        <p className="text-xs text-stone-500 dark:text-stone-400">
+        <p className="text-xs text-stone-500 dark:text-stone-500">
           {t(program.descriptionKey)}
         </p>
       </CardHeader>
@@ -98,7 +98,7 @@ function ProgramCard({
                         <button
                           type="button"
                           onClick={() => onStart(week, day)}
-                          className="mt-0.5 flex shrink-0 items-center gap-1.5 rounded-lg bg-teal-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-teal-700"
+                          className="mt-0.5 flex shrink-0 items-center gap-1.5 rounded-lg bg-teal-700 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-teal-800"
                         >
                           <Play className="size-3.5" />
                           {t("gym.startWorkout")}
@@ -131,7 +131,7 @@ export function GymProgram({
     <section className="flex flex-col gap-3">
       <div>
         <h2 className="text-base font-semibold">{t("gym.program.title")}</h2>
-        <p className="text-xs text-stone-500 dark:text-stone-400">
+        <p className="text-xs text-stone-500 dark:text-stone-500">
           {t("gym.program.hint")}
         </p>
       </div>

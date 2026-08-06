@@ -99,7 +99,7 @@ export function LevelTest({
             t: result.total,
           })}
         </p>
-        <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
+        <p className="mt-1 text-sm text-stone-500 dark:text-stone-500">
           +{result.xp} {t("common.xp")}
         </p>
         <div
@@ -112,7 +112,7 @@ export function LevelTest({
           {passed ? t("levelTest.pass") : t("levelTest.fail", { p: MIN_PASS_PCT })}
         </div>
         {passed && (
-          <p className="mt-2 text-sm text-stone-500 dark:text-stone-400">
+          <p className="mt-2 text-sm text-stone-500 dark:text-stone-500">
             {t("levelTest.passNote", { next: nextName })}
           </p>
         )}
@@ -133,10 +133,10 @@ export function LevelTest({
         <h3 className="mt-3 text-base font-bold">
           {t("levelTest.title", { name: levelName })}
         </h3>
-        <p className="mx-auto mt-2 max-w-sm text-sm text-stone-500 dark:text-stone-400">
+        <p className="mx-auto mt-2 max-w-sm text-sm text-stone-500 dark:text-stone-500">
           {introDescription}
         </p>
-        <p className="mt-1 text-xs text-stone-400">
+        <p className="mt-1 text-xs text-stone-500">
           {t("levelTest.count", { n: TEST_COUNT })}
         </p>
         <button
@@ -158,7 +158,7 @@ export function LevelTest({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between text-sm text-stone-500 dark:text-stone-400">
+      <div className="flex items-center justify-between text-sm text-stone-500 dark:text-stone-500">
         <span>
           {t("levelTest.question", { i: index + 1, t: questions.length })}
         </span>
@@ -170,7 +170,7 @@ export function LevelTest({
 
       <div key={question.id} className="animate-card-in flex flex-col gap-4">
         <div className="rounded-2xl border border-stone-200 bg-white p-6 dark:border-stone-800 dark:bg-stone-950">
-          <p className="text-xs font-medium uppercase tracking-wide text-stone-400">
+          <p className="text-xs font-medium uppercase tracking-wide text-stone-500">
             {t(`qtype.${question.type}`)}
           </p>
           <p className="mt-3 text-center text-3xl font-bold tracking-tight">
@@ -193,7 +193,7 @@ export function LevelTest({
                   "border-red-500 bg-red-50 text-red-600 dark:border-red-600 dark:bg-red-500/10 dark:text-red-400";
               else
                 style =
-                  "border-stone-200 bg-white text-stone-400 opacity-60 dark:border-stone-800 dark:bg-stone-950 dark:text-stone-500";
+                  "border-stone-200 bg-white text-stone-500 opacity-60 dark:border-stone-800 dark:bg-stone-950 dark:text-stone-500";
             }
             return (
               <li key={option}>

@@ -74,7 +74,7 @@ export function DailyChecklist() {
     <section>
       <h2 className="mb-3 text-base font-semibold">
         {t("checklist.title")}{" "}
-        <span className="ml-1 text-sm font-medium text-stone-400">
+        <span className="ml-1 text-sm font-medium text-stone-500">
           {doneCount}/{tasks.length}
         </span>
       </h2>
@@ -89,8 +89,8 @@ export function DailyChecklist() {
                   key={String(task.done)}
                   className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
                     task.done
-                      ? "animate-pop bg-emerald-600 text-white"
-                      : "bg-stone-100 text-stone-500 dark:bg-stone-900 dark:text-stone-400"
+                      ? "animate-pop bg-emerald-700 text-white"
+                      : "bg-stone-100 text-stone-500 dark:bg-stone-900 dark:text-stone-500"
                   }`}
                 >
                 <Icon
@@ -102,13 +102,13 @@ export function DailyChecklist() {
                 <p
                   className={`truncate text-sm font-medium ${
                     task.done
-                      ? "text-stone-400 line-through dark:text-stone-500"
+                      ? "text-stone-500 line-through dark:text-stone-500"
                       : ""
                   }`}
                 >
                   {t(task.labelKey, task.vars)}
                 </p>
-                <p className="text-xs text-stone-400">{t(task.metaKey)}</p>
+                <p className="text-xs text-stone-500">{t(task.metaKey)}</p>
               </div>
               <Icon
                 name="check"

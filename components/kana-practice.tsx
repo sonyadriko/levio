@@ -96,7 +96,7 @@ export function KanaPractice() {
             className={`flex h-10 items-center justify-center gap-2 rounded-lg text-sm font-semibold transition-colors ${
               alphabet === a
                 ? "bg-white text-stone-900 shadow-sm dark:bg-stone-900 dark:text-stone-100"
-                : "text-stone-500 dark:text-stone-400"
+                : "text-stone-500 dark:text-stone-500"
             }`}
           >
             <span className="text-base">{a === "hiragana" ? "あ" : "ア"}</span>
@@ -108,7 +108,7 @@ export function KanaPractice() {
       <div className="rounded-2xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-950">
         <div className="flex items-center justify-between text-sm">
           <span className="font-semibold">{t("kana.known")}</span>
-          <span className="text-stone-500 dark:text-stone-400">
+          <span className="text-stone-500 dark:text-stone-500">
             {known}/{total}
           </span>
         </div>
@@ -128,7 +128,7 @@ export function KanaPractice() {
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold">{t("kana.recognize")}</p>
-            <p className="text-xs text-stone-500 dark:text-stone-400">
+            <p className="text-xs text-stone-500 dark:text-stone-500">
               {t("kana.recognizeDesc")}
             </p>
           </div>
@@ -143,7 +143,7 @@ export function KanaPractice() {
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold">{t("kana.trace")}</p>
-            <p className="text-xs text-stone-500 dark:text-stone-400">
+            <p className="text-xs text-stone-500 dark:text-stone-500">
               {t("kana.traceDesc")}
             </p>
           </div>
@@ -169,10 +169,10 @@ export function KanaPractice() {
 
       <section>
         <div className="mb-2 flex items-center justify-between">
-          <p className="text-xs font-medium uppercase tracking-wide text-stone-400">
+          <p className="text-xs font-medium uppercase tracking-wide text-stone-500">
             {t(GROUP_KEYS[group])}
           </p>
-          <p className="text-xs text-stone-400">
+          <p className="text-xs text-stone-500">
             {t("kana.tapToToggle")}
           </p>
         </div>
@@ -196,7 +196,7 @@ export function KanaPractice() {
                   }`}
                 >
                   <span>{i.kana}</span>
-                  <span className="text-[10px] font-normal text-stone-400">
+                  <span className="text-[10px] font-normal text-stone-500">
                     {i.romaji}
                   </span>
                 </button>
@@ -212,7 +212,7 @@ export function KanaPractice() {
             change({ hiragana: [], katakana: [] });
           }
         }}
-        className="mx-auto flex h-10 items-center gap-2 rounded-xl px-4 text-xs font-semibold text-stone-400 transition-colors hover:text-red-500"
+        className="mx-auto flex h-10 items-center gap-2 rounded-xl px-4 text-xs font-semibold text-stone-500 transition-colors hover:text-red-500"
       >
         <Icon name="check" className="h-4 w-4 rotate-45" />
         {t("kana.reset")}

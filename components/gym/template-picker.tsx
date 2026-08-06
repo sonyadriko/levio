@@ -21,7 +21,7 @@ export function TemplatePicker({
     <section className="flex flex-col gap-3">
       <div>
         <h2 className="text-base font-semibold">{t("gym.startWorkout")}</h2>
-        <p className="text-xs text-stone-500 dark:text-stone-400">
+        <p className="text-xs text-stone-500 dark:text-stone-500">
           {t("gym.template.hint")}
         </p>
       </div>
@@ -43,7 +43,7 @@ export function TemplatePicker({
               <button
                 type="button"
                 onClick={() => onPick(template.id)}
-                className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg bg-teal-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-teal-700"
+                className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg bg-teal-700 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-teal-800"
               >
                 <Play className="size-3.5" />
                 {t("gym.startWorkout")}

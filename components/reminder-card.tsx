@@ -102,7 +102,7 @@ export function ReminderCard() {
       <div className="flex items-center justify-between gap-3">
         <div>
           <h2 className="text-sm font-semibold">{t("reminder.title")}</h2>
-          <p className="mt-1 text-xs text-stone-400">{t("reminder.desc")}</p>
+          <p className="mt-1 text-xs text-stone-500">{t("reminder.desc")}</p>
         </div>
         <button
           type="button"
@@ -141,7 +141,7 @@ export function ReminderCard() {
         <p className="mt-3 text-xs text-red-500">{t("reminder.denied")}</p>
       )}
       {permission === "unsupported" && (
-        <p className="mt-3 text-xs text-stone-400">{t("reminder.unsupported")}</p>
+        <p className="mt-3 text-xs text-stone-500">{t("reminder.unsupported")}</p>
       )}
     </section>
   );

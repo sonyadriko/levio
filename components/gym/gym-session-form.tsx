@@ -124,7 +124,7 @@ function SetRow({
   const { t } = useLanguage();
   return (
     <div className="grid grid-cols-[2rem_1fr_1fr_2.25rem_2rem] items-center gap-2">
-      <span className="text-xs tabular-nums text-stone-400">#{index + 1}</span>
+      <span className="text-xs tabular-nums text-stone-500">#{index + 1}</span>
       <Input
         type="number"
         inputMode="decimal"
@@ -220,7 +220,7 @@ function ExerciseCard({
                 className={cn(
                   "rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors",
                   selected
-                    ? "animate-pop bg-teal-600 text-white"
+                    ? "animate-pop bg-teal-700 text-white"
                     : "bg-stone-100 text-stone-600 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700",
                 )}
               >
@@ -247,7 +247,7 @@ function ExerciseCard({
       </div>
 
       {restRemaining !== null ? (
-        <div className="mt-2 flex items-center gap-2 rounded-lg bg-teal-600 px-3 py-2 text-sm font-semibold text-white">
+        <div className="mt-2 flex items-center gap-2 rounded-lg bg-teal-700 px-3 py-2 text-sm font-semibold text-white">
           <span className="tabular-nums">{formatTime(restRemaining)}</span>
           <span className="text-xs font-normal opacity-90">{t("gym.rest")}</span>
           <button
@@ -261,7 +261,7 @@ function ExerciseCard({
       ) : null}
 
       <div className="mt-3 flex flex-col gap-1.5">
-        <div className="grid grid-cols-[2rem_1fr_1fr_2.25rem_2rem] gap-2 text-[10px] font-semibold uppercase tracking-wide text-stone-400">
+        <div className="grid grid-cols-[2rem_1fr_1fr_2.25rem_2rem] gap-2 text-[10px] font-semibold uppercase tracking-wide text-stone-500">
           <span>#</span>
           <span>{t("gym.weightLabel")}</span>
           <span>{t("gym.repsLabel")}</span>
@@ -281,7 +281,7 @@ function ExerciseCard({
           />
         ))}
         {exercise.sets.length === 0 ? (
-          <p className="text-xs text-stone-400">{t("gym.exercise.noSets")}</p>
+          <p className="text-xs text-stone-500">{t("gym.exercise.noSets")}</p>
         ) : null}
         <Button
           variant="outline"
@@ -341,7 +341,7 @@ function AddExerciseSheet({
             className={cn(
               "rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors",
               muscle === null
-                ? "animate-pop bg-teal-600 text-white"
+                ? "animate-pop bg-teal-700 text-white"
                 : "bg-stone-100 text-stone-600 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700",
             )}
           >
@@ -355,7 +355,7 @@ function AddExerciseSheet({
               className={cn(
                 "rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors",
                 muscle === group
-                  ? "animate-pop bg-teal-600 text-white"
+                  ? "animate-pop bg-teal-700 text-white"
                   : "bg-stone-100 text-stone-600 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700",
               )}
             >
@@ -366,7 +366,7 @@ function AddExerciseSheet({
 
         <div className="flex max-h-64 flex-col gap-1 overflow-y-auto pr-1">
           {filtered.length === 0 ? (
-            <p className="py-4 text-center text-sm text-stone-400">
+            <p className="py-4 text-center text-sm text-stone-500">
               {t("gym.exercises.empty")}
             </p>
           ) : (
@@ -382,7 +382,7 @@ function AddExerciseSheet({
                   {def.muscles.map((group) => (
                     <span
                       key={group}
-                      className="rounded-full bg-stone-100 px-2 py-0.5 text-[10px] uppercase tracking-wide text-stone-500 dark:bg-stone-800 dark:text-stone-400"
+                      className="rounded-full bg-stone-100 px-2 py-0.5 text-[10px] uppercase tracking-wide text-stone-500 dark:bg-stone-800 dark:text-stone-500"
                     >
                       {t(`gym.muscle.${group}`)}
                     </span>
@@ -501,7 +501,7 @@ export function GymSessionForm({
 
           {session.exercises.length === 0 ? (
             <div className="rounded-xl border border-dashed border-stone-300 bg-white p-6 text-center dark:border-stone-700 dark:bg-stone-950">
-              <p className="text-sm text-stone-500 dark:text-stone-400">
+              <p className="text-sm text-stone-500 dark:text-stone-500">
                 {t("gym.session.empty")}
               </p>
             </div>

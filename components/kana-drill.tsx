@@ -147,7 +147,7 @@ export function KanaDrill({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between text-xs text-stone-400">
+      <div className="flex items-center justify-between text-xs text-stone-500">
         <span>
           {index + 1}/{queue.length}
         </span>
@@ -160,7 +160,7 @@ export function KanaDrill({
       </div>
 
       <div className="rounded-2xl border border-stone-200 bg-white p-6 text-center dark:border-stone-800 dark:bg-stone-950">
-        <p className="text-sm font-medium text-stone-500 dark:text-stone-400">
+        <p className="text-sm font-medium text-stone-500 dark:text-stone-500">
           {isKanaPrompt
             ? t("kana.whichRomaji", { romaji: current.kana })
             : t("kana.whichKana", { kana: current.romaji })}
@@ -181,7 +181,7 @@ export function KanaDrill({
               ? "border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
               : isSelected
                 ? "border-red-300 bg-red-50 text-red-700 dark:border-red-700 dark:bg-red-900/40 dark:text-red-300"
-                : "border-stone-200 bg-white text-stone-400 dark:border-stone-700 dark:bg-stone-950 dark:text-stone-500";
+                : "border-stone-200 bg-white text-stone-500 dark:border-stone-700 dark:bg-stone-950 dark:text-stone-500";
           return (
             <button
               key={option}

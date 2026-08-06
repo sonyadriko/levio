@@ -48,7 +48,7 @@ export default async function LanguageLevelPage({
           <h1 className="text-xl font-bold tracking-tight sm:text-2xl">
             {languageModule.levelName(level)}
           </h1>
-          <p className="text-sm text-stone-500 dark:text-stone-400">
+          <p className="text-sm text-stone-500 dark:text-stone-500">
             <T id={languageModule.levelDescriptionKey(level)} />
           </p>
         </div>

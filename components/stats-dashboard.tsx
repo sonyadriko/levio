@@ -60,7 +60,7 @@ function BarChart({
           className="flex flex-1 flex-col items-center gap-1"
           title={t("stats.xpTitle", { label: p.label, xp: p.totals.xp })}
         >
-          <span className="text-[10px] tabular-nums text-stone-400">
+          <span className="text-[10px] tabular-nums text-stone-500">
             {p.totals.xp > 0 ? p.totals.xp : ""}
           </span>
           <div
@@ -69,7 +69,7 @@ function BarChart({
               height: `${Math.max((p.totals.xp / max) * height, p.totals.xp > 0 ? 3 : 0)}px`,
             }}
           />
-          <span className="text-[10px] text-stone-500 dark:text-stone-400">
+          <span className="text-[10px] text-stone-500 dark:text-stone-500">
             {p.label}
           </span>
         </div>
@@ -94,7 +94,7 @@ function TotalsRow({ totals }: { totals: PeriodTotals }) {
           className="rounded-lg bg-stone-50 py-2 dark:bg-stone-900"
         >
           <p className="text-base font-bold tabular-nums">{item.value}</p>
-          <p className="text-[10px] uppercase tracking-wide text-stone-400">
+          <p className="text-[10px] uppercase tracking-wide text-stone-500">
             {item.label}
           </p>
         </div>
@@ -130,7 +130,7 @@ function ModuleLevelProgress({ module }: { module: LanguageModule }) {
 
   return (
     <div>
-      <h3 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+      <h3 className="text-xs font-semibold uppercase tracking-wide text-stone-500">
         {t(module.nameKey)}
       </h3>
       <div className="mt-2.5 flex flex-col gap-3">
@@ -138,7 +138,7 @@ function ModuleLevelProgress({ module }: { module: LanguageModule }) {
           const days = estimateDaysToMaster(progress, level.total, level.mastered);
           return (
             <div key={level.meta.index} className="flex items-center gap-3">
-              <span className="w-12 shrink-0 text-xs font-semibold text-stone-500 dark:text-stone-400">
+              <span className="w-12 shrink-0 text-xs font-semibold text-stone-500 dark:text-stone-500">
                 {level.meta.name}
               </span>
               <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-stone-100 dark:bg-stone-800">
@@ -152,13 +152,13 @@ function ModuleLevelProgress({ module }: { module: LanguageModule }) {
                 />
               </div>
               <div className="w-20 shrink-0 text-right">
-                <span className="block text-[11px] tabular-nums text-stone-500 dark:text-stone-400">
+                <span className="block text-[11px] tabular-nums text-stone-500 dark:text-stone-500">
                   {t("stats.masteredOf", {
                     mastered: level.mastered,
                     total: level.total,
                   })}
                 </span>
-                <span className="block text-[10px] tabular-nums text-stone-400">
+                <span className="block text-[10px] tabular-nums text-stone-500">
                   {days === null
                     ? "—"
                     : days === 0
@@ -256,14 +256,14 @@ export function StatsDashboard() {
           />
           <StatCard label={t("stats.leeches")} value={retention.leeches} icon="flame" />
         </div>
-        <p className="mt-3 text-[11px] leading-relaxed text-stone-400">
+        <p className="mt-3 text-[11px] leading-relaxed text-stone-500">
           {t("stats.retentionHint")}
         </p>
       </section>
 
       {summary.lastTest && (
         <div className="flex items-center gap-3 rounded-xl border border-teal-200 bg-teal-50 p-3.5 dark:border-teal-800 dark:bg-teal-500/10">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-teal-600 text-white">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-teal-700 text-white">
             <Icon name="chart" className="h-4 w-4" />
           </span>
           <p className="text-sm">
@@ -299,7 +299,7 @@ export function StatsDashboard() {
               className={`h-8 rounded-lg px-3 text-sm font-medium transition-colors ${
                 tab === tabItem.id
                   ? "bg-teal-700 text-white"
-                  : "bg-stone-100 text-stone-600 hover:bg-stone-200 dark:bg-stone-900 dark:text-stone-400 dark:hover:bg-stone-800"
+                  : "bg-stone-100 text-stone-600 hover:bg-stone-200 dark:bg-stone-900 dark:text-stone-500 dark:hover:bg-stone-800"
               }`}
             >
               {t(tabItem.labelKey)}
@@ -317,7 +317,7 @@ export function StatsDashboard() {
       <section className="rounded-2xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-950">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-sm font-semibold">{t("stats.perLevel")}</h2>
-          <div className="flex items-center gap-3 text-[11px] text-stone-500 dark:text-stone-400">
+          <div className="flex items-center gap-3 text-[11px] text-stone-500 dark:text-stone-500">
             <span className="flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-teal-200 dark:bg-teal-800" />
               {t("stats.perLevelReviewed")}

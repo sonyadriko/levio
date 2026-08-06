@@ -37,7 +37,7 @@ export function ModuleLevelList({ moduleId }: { moduleId: string }) {
 
       {themes.length > 0 && (
         <section className="flex flex-col gap-3">
-          <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+          <p className="text-xs font-semibold uppercase tracking-wide text-stone-500">
             <T id="theme.packs" />
           </p>
           {themes.map((theme) => (
@@ -53,11 +53,11 @@ export function ModuleLevelList({ moduleId }: { moduleId: string }) {
                 <p className="text-sm font-semibold">
                   <T id={theme.titleKey} />
                 </p>
-                <p className="text-xs text-stone-500 dark:text-stone-400">
+                <p className="text-xs text-stone-500 dark:text-stone-500">
                   <T id={theme.descKey} />
                 </p>
               </div>
-              <span className="shrink-0 text-xs font-medium text-stone-400">
+              <span className="shrink-0 text-xs font-medium text-stone-500">
                 <T id="learn.wordCount" vars={{ n: theme.words.length }} />
               </span>
               <span className="shrink-0 text-stone-300 dark:text-stone-700">→</span>
@@ -79,7 +79,7 @@ export function ModuleLevelList({ moduleId }: { moduleId: string }) {
               <p className="text-sm font-semibold">
                 <T id={languageModule.script.titleKey} />
               </p>
-              <p className="text-xs text-stone-500 dark:text-stone-400">
+              <p className="text-xs text-stone-500 dark:text-stone-500">
                 <T id={languageModule.script.descKey} />
               </p>
             </div>
@@ -99,7 +99,7 @@ export function ModuleLevelList({ moduleId }: { moduleId: string }) {
                   <span
                     className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-sm font-bold ${
                       locked
-                        ? "bg-stone-200 text-stone-400 dark:bg-stone-800 dark:text-stone-500"
+                        ? "bg-stone-200 text-stone-500 dark:bg-stone-800 dark:text-stone-500"
                         : "bg-teal-700 text-white"
                     }`}
                   >
@@ -108,13 +108,13 @@ export function ModuleLevelList({ moduleId }: { moduleId: string }) {
                   <div>
                     <p
                       className={`text-sm font-semibold ${
-                        locked ? "text-stone-400 dark:text-stone-500" : ""
+                        locked ? "text-stone-500 dark:text-stone-500" : ""
                       }`}
                     >
                       {meta.name}
                     </p>
                     {locked ? (
-                      <p className="text-xs text-stone-400">
+                      <p className="text-xs text-stone-500">
                         <T
                           id="level.unlockHint"
                           vars={{
@@ -123,13 +123,13 @@ export function ModuleLevelList({ moduleId }: { moduleId: string }) {
                         />
                       </p>
                     ) : (
-                      <p className="text-xs text-stone-500 dark:text-stone-400">
+                      <p className="text-xs text-stone-500 dark:text-stone-500">
                         <T id={languageModule.levelDescriptionKey(meta.index)} />
                       </p>
                     )}
                   </div>
                 </div>
-                <span className="shrink-0 text-sm font-medium text-stone-400">
+                <span className="shrink-0 text-sm font-medium text-stone-500">
                   <T
                     id="learn.wordCount"
                     vars={{ n: languageModule.countWordsByLevel(meta.index) }}

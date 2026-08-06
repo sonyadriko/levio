@@ -58,13 +58,13 @@ function SessionCard({
               })}
             </span>
           </div>
-          <p className="mt-1 text-xs tabular-nums text-stone-500 dark:text-stone-400">
+          <p className="mt-1 text-xs tabular-nums text-stone-500 dark:text-stone-500">
             {volume > 0 ? t("gym.session.volume", { v: volume }) : ""}
           </p>
         </button>
         <ChevronDown
           className={cn(
-            "size-4 shrink-0 text-stone-400 transition-transform duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]",
+            "size-4 shrink-0 text-stone-500 transition-transform duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]",
             expanded ? "rotate-180" : "",
           )}
         />
@@ -97,7 +97,7 @@ function SessionCard({
                 {exercise.muscles.map((muscle) => (
                   <span
                     key={muscle}
-                    className="rounded-full bg-stone-100 px-2 py-0.5 text-[10px] uppercase tracking-wide text-stone-500 dark:bg-stone-800 dark:text-stone-400"
+                    className="rounded-full bg-stone-100 px-2 py-0.5 text-[10px] uppercase tracking-wide text-stone-500 dark:bg-stone-800 dark:text-stone-500"
                   >
                     {t(`gym.muscle.${muscle}`)}
                   </span>
@@ -109,7 +109,7 @@ function SessionCard({
                   .map((set, index) => (
                   <span
                     key={index}
-                    className="text-xs tabular-nums text-stone-500 dark:text-stone-400"
+                    className="text-xs tabular-nums text-stone-500 dark:text-stone-500"
                   >
                     {set.weightKg > 0
                       ? t("gym.entry.sets", {
@@ -148,10 +148,10 @@ export function GymLog({
 
       {groups.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-8 text-center dark:border-stone-700 dark:bg-stone-950">
-          <p className="text-sm font-medium text-stone-500 dark:text-stone-400">
+          <p className="text-sm font-medium text-stone-500 dark:text-stone-500">
             {t("gym.history.empty.title")}
           </p>
-          <p className="mx-auto mt-1 max-w-sm text-xs text-stone-400">
+          <p className="mx-auto mt-1 max-w-sm text-xs text-stone-500">
             {t("gym.history.empty.desc")}
           </p>
         </div>
@@ -159,7 +159,7 @@ export function GymLog({
         <div className="flex flex-col gap-5">
           {groups.map((group) => (
             <div key={group.date} className="flex flex-col gap-2">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-stone-500">
                 {group.date === today ? t("gym.today") : formatDate(group.date)}
                 <span className="ml-2 font-normal normal-case">
                   {t("gym.count", { n: group.sessions.length })}

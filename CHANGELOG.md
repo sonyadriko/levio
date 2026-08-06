@@ -37,6 +37,11 @@ selalu disinkronkan saat rilis (lihat `docs/CONTRIBUTING` tidak ada; aturan ada 
 
 ### Diperbaiki
 - Layar hasil latihan mendengarkan/membaca/grammar tidak pernah tampil (kondisi `done` tertutup cabang awal `!session`) — kini skor + XP ditampilkan saat sesi selesai.
+- Kontras warna tombol teks putih di atas latar teal/emerald (mis. "Mulai Latihan", tombol primernya) dinaikkan `600 → 700` (hover `800`) agar lulus AA (4.5:1) di modus terang.
+- Teks sekunder kecil `text-stone-400` → `text-stone-500` di seluruh UI agar kontrasnya lulus AA (pada latar terang).
+
+### Teknis
+- PWA iOS: `appleWebApp` (capable, title, status bar) + `apple-touch-icon` (`public/icon-180.png`) di metadata; manifest bertambah `id`, `lang`, `categories`.
 
 ---
 

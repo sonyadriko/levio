@@ -36,7 +36,7 @@ export default function Home() {
         <h1 className="text-xl font-bold tracking-tight sm:text-2xl">
           <Greeting />
         </h1>
-        <p className="text-sm text-stone-500 dark:text-stone-400">
+        <p className="text-sm text-stone-500 dark:text-stone-500">
           <T id="home.subtitle" />
         </p>
       </header>
@@ -65,7 +65,7 @@ export default function Home() {
                 <p className="text-sm font-semibold">
                   <T id={action.titleKey} />
                 </p>
-                <p className="text-xs text-stone-500 dark:text-stone-400">
+                <p className="text-xs text-stone-500 dark:text-stone-500">
                   <T id={action.descKey} />
                 </p>
               </div>

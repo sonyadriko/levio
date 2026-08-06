@@ -24,7 +24,7 @@ export function PageHeader({
           {title}
         </h1>
         {subtitle ? (
-          <p className="text-sm text-stone-500 dark:text-stone-400">{subtitle}</p>
+          <p className="text-sm text-stone-500 dark:text-stone-500">{subtitle}</p>
         ) : null}
       </div>
     </header>

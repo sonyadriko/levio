@@ -205,7 +205,7 @@ export function ProfileView() {
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white px-4 py-3 dark:border-stone-800 dark:bg-stone-950">
         <div className="flex min-w-0 items-center gap-3">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-600 text-white">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-700 text-white">
             <Icon name="check" className="h-4 w-4" />
           </span>
           <p className="truncate text-sm text-stone-600 dark:text-stone-300">
@@ -329,7 +329,7 @@ function AuthCard({
       <h2 className="mt-4 text-center text-lg font-bold tracking-tight">
         {t(mode === "forgot" ? "auth.resetTitle" : "auth.title")}
       </h2>
-      <p className="mx-auto mt-1 max-w-sm text-center text-sm text-stone-500 dark:text-stone-400">
+      <p className="mx-auto mt-1 max-w-sm text-center text-sm text-stone-500 dark:text-stone-500">
         {t(mode === "forgot" ? "auth.resetSubtitle" : "auth.subtitle")}
       </p>
 
@@ -341,7 +341,7 @@ function AuthCard({
             className={`h-9 flex-1 rounded-lg text-sm font-semibold transition-colors ${
               mode === "login"
                 ? "bg-white text-stone-900 shadow-sm dark:bg-stone-900 dark:text-stone-100"
-                : "text-stone-500 dark:text-stone-400"
+                : "text-stone-500 dark:text-stone-500"
             }`}
           >
             {t("auth.loginTab")}
@@ -352,7 +352,7 @@ function AuthCard({
             className={`h-9 flex-1 rounded-lg text-sm font-semibold transition-colors ${
               mode === "register"
                 ? "bg-white text-stone-900 shadow-sm dark:bg-stone-900 dark:text-stone-100"
-                : "text-stone-500 dark:text-stone-400"
+                : "text-stone-500 dark:text-stone-500"
             }`}
           >
             {t("auth.registerTab")}
@@ -399,14 +399,14 @@ function AuthCard({
       {mode !== "forgot" && (
         <div className="mx-auto mt-5 flex max-w-xs items-center gap-3">
           <span className="h-px flex-1 bg-stone-200 dark:bg-stone-800" />
-          <span className="text-xs text-stone-400">{t("auth.or")}</span>
+          <span className="text-xs text-stone-500">{t("auth.or")}</span>
           <span className="h-px flex-1 bg-stone-200 dark:bg-stone-800" />
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="mx-auto mt-5 flex max-w-xs flex-col gap-3">
         <label className="flex flex-col gap-1">
-          <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
+          <span className="text-xs font-medium text-stone-500 dark:text-stone-500">
             {t("auth.email")}
           </span>
           <input
@@ -420,7 +420,7 @@ function AuthCard({
         </label>
         {mode !== "forgot" && (
           <label className="flex flex-col gap-1">
-            <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
+            <span className="text-xs font-medium text-stone-500 dark:text-stone-500">
               {t("auth.password")}
             </span>
             <input
@@ -435,7 +435,7 @@ function AuthCard({
           </label>
         )}
         {mode === "register" && (
-          <p className="text-xs text-stone-400">{t("auth.passwordHint")}</p>
+          <p className="text-xs text-stone-500">{t("auth.passwordHint")}</p>
         )}
 
         {error && (
@@ -482,7 +482,7 @@ function AuthCard({
         </p>
       )}
 
-      <p className="mt-4 text-center text-xs text-stone-400">
+      <p className="mt-4 text-center text-xs text-stone-500">
         {mode === "forgot" ? (
           <>
             <button
@@ -510,7 +510,7 @@ function AuthCard({
           </>
         )}
       </p>
-      <p className="mt-4 text-center text-xs text-stone-400">{t("auth.migrate")}</p>
+      <p className="mt-4 text-center text-xs text-stone-500">{t("auth.migrate")}</p>
     </div>
   );
 }
@@ -532,11 +532,11 @@ function ProfilePreviewPlaceholder({
       <div className="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-950">
         <div className="flex items-center gap-3">
           <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-stone-100 dark:bg-stone-800">
-            <Icon name="lock" className="h-5 w-5 text-stone-400" />
+            <Icon name="lock" className="h-5 w-5 text-stone-500" />
           </span>
           <div>
             <h3 className="text-sm font-semibold">{t("profile.previewTitle")}</h3>
-            <p className="text-xs text-stone-400">{t("profile.previewDesc")}</p>
+            <p className="text-xs text-stone-500">{t("profile.previewDesc")}</p>
           </div>
         </div>
 
@@ -548,7 +548,7 @@ function ProfilePreviewPlaceholder({
             >
               <Icon name={stat.icon} className="h-4 w-4 text-stone-300 dark:text-stone-600" />
               <p className="mt-2 text-lg font-bold text-stone-300 dark:text-stone-600">—</p>
-              <p className="text-[11px] text-stone-400">{t(stat.labelKey)}</p>
+              <p className="text-[11px] text-stone-500">{t(stat.labelKey)}</p>
             </div>
           ))}
         </div>
@@ -557,7 +557,7 @@ function ProfilePreviewPlaceholder({
       <div className="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-950">
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-sm font-semibold">{t("badge.title")}</h3>
-          <span className="text-xs text-stone-400">0/10</span>
+          <span className="text-xs text-stone-500">0/10</span>
         </div>
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
@@ -592,7 +592,7 @@ function ProfilePreviewPlaceholder({
             ),
           )}
         </div>
-        <p className="mt-3 text-center text-xs text-stone-400">
+        <p className="mt-3 text-center text-xs text-stone-500">
           {t("profile.previewCta")}
         </p>
       </div>
@@ -663,9 +663,9 @@ function ProfileSections({
               onChange={(e) => setName(e.target.value)}
               placeholder={t("profile.namePlaceholder")}
               maxLength={24}
-              className="w-full bg-transparent text-lg font-bold tracking-tight outline-none placeholder:text-stone-400"
+              className="w-full bg-transparent text-lg font-bold tracking-tight outline-none placeholder:text-stone-500"
             />
-            <p className="text-sm text-stone-500 dark:text-stone-400">
+            <p className="text-sm text-stone-500 dark:text-stone-500">
               {t("profile.role")}
             </p>
           </div>
@@ -673,13 +673,13 @@ function ProfileSections({
             <p className="text-lg font-bold leading-tight">
               {t("common.level")} {level}
             </p>
-            <p className="text-xs text-stone-400">
+            <p className="text-xs text-stone-500">
               {xp} {t("common.xp")}
             </p>
           </div>
         </div>
 
-        <p className="mt-4 text-xs font-medium text-stone-400">
+        <p className="mt-4 text-xs font-medium text-stone-500">
           {t("profile.today")}{" "}
           <span className="font-semibold text-stone-600 dark:text-stone-300">
             {today.xp} {t("common.xp")} · {today.reviews} {t("stats.review")} ·{" "}
@@ -714,7 +714,7 @@ function ProfileSections({
       <section className="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-950">
         <div className="mb-4 flex items-baseline justify-between gap-3">
           <h2 className="text-sm font-semibold">{t("badge.title")}</h2>
-          <p className="text-xs text-stone-400">
+          <p className="text-xs text-stone-500">
             {t("badge.subtitle", {
               earned: badges.filter((b) => b.earned).length,
               total: badges.length,
@@ -748,7 +748,7 @@ function ProfileSections({
               <p className="text-sm font-semibold leading-tight">
                 {t(badge.titleKey, badge.titleVars)}
               </p>
-              <p className="text-[11px] leading-snug text-stone-500 dark:text-stone-400">
+              <p className="text-[11px] leading-snug text-stone-500 dark:text-stone-500">
                 {t(badge.descKey, badge.descVars)}
               </p>
               <div className="mt-auto flex items-center gap-1.5">
@@ -760,7 +760,7 @@ function ProfileSections({
                     style={{ width: `${(badge.current / badge.target) * 100}%` }}
                   />
                 </div>
-                <span className="text-[10px] tabular-nums text-stone-400">
+                <span className="text-[10px] tabular-nums text-stone-500">
                   {t("badge.progress", {
                     current: badge.current,
                     target: badge.target,
@@ -776,7 +776,7 @@ function ProfileSections({
         <h2 className="mb-4 text-sm font-semibold">{t("profile.prefs")}</h2>
         <div className="flex flex-col gap-4">
           <div>
-            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-stone-400">
+            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-stone-500">
               {t("profile.language")}
             </p>
             <div className="flex flex-wrap gap-2">
@@ -788,7 +788,7 @@ function ProfileSections({
                   className={`flex h-9 items-center gap-2 rounded-lg px-4 text-sm font-medium transition-colors active:scale-[0.97] ${
                     locale === option.locale
                       ? "bg-teal-700 text-white"
-                      : "border border-stone-200 bg-white text-stone-600 hover:border-teal-300 dark:border-stone-800 dark:bg-stone-950 dark:text-stone-400"
+                      : "border border-stone-200 bg-white text-stone-600 hover:border-teal-300 dark:border-stone-800 dark:bg-stone-950 dark:text-stone-500"
                   }`}
                 >
                   {t(option.labelKey)}
@@ -801,7 +801,7 @@ function ProfileSections({
           </div>
 
           <div>
-            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-stone-400">
+            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-stone-500">
               {t("profile.dailyTarget")}
             </p>
             <div className="flex flex-col gap-2">
@@ -810,7 +810,7 @@ function ProfileSections({
                 value={settings.dailyTargets.vocab}
                 onChange={(value) => setDailyTargets({ vocab: value })}
               />
-              <p className="px-1 text-xs text-stone-400">
+              <p className="px-1 text-xs text-stone-500">
                 {t("profile.targetVocabHint")}
               </p>
               <TargetStepper
@@ -864,7 +864,7 @@ function ProfileSections({
 
       <section className="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-950">
         <h2 className="mb-1 text-sm font-semibold">{t("profile.data")}</h2>
-        <p className="mb-4 text-xs text-stone-400">{t("profile.dataNote")}</p>
+        <p className="mb-4 text-xs text-stone-500">{t("profile.dataNote")}</p>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <button
             type="button"
@@ -950,7 +950,7 @@ function ProfileSections({
 
       <section className="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-950">
         <h2 className="mb-2 text-sm font-semibold">{t("profile.about")}</h2>
-        <p className="text-sm text-stone-500 dark:text-stone-400">
+        <p className="text-sm text-stone-500 dark:text-stone-500">
           Levio · {t("profile.version", { version: APP_VERSION })}
         </p>
         <button
@@ -968,7 +968,7 @@ function ProfileSections({
         </button>
         {showWhatsNew && (
           <div className="animate-slide-down mt-3 rounded-xl border border-stone-200 bg-stone-50 p-4 dark:border-stone-800 dark:bg-stone-900">
-            <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+            <p className="text-xs font-semibold uppercase tracking-wide text-stone-500">
               v{release.version} · {release.date}
             </p>
             <ul className="mt-2 flex list-disc flex-col gap-1.5 pl-4 text-sm text-stone-600 dark:text-stone-300">
@@ -978,7 +978,7 @@ function ProfileSections({
             </ul>
           </div>
         )}
-        <p className="mt-3 text-xs text-stone-400">{t("profile.localNote")}</p>
+        <p className="mt-3 text-xs text-stone-500">{t("profile.localNote")}</p>
       </section>
     </>
   );

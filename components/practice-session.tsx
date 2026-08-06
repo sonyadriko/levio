@@ -108,7 +108,7 @@ export function ChoicePracticeSession({
     return (
       <section className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium uppercase tracking-wide text-stone-400">
+          <label className="text-xs font-medium uppercase tracking-wide text-stone-500">
             {t("mock.level")}
           </label>
           <div className="flex flex-wrap gap-2">
@@ -130,10 +130,10 @@ export function ChoicePracticeSession({
 
         <div className="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-950">
           <h2 className="text-base font-semibold">{t(titleKey)}</h2>
-          <p className="mt-2 text-sm text-stone-500 dark:text-stone-400">
+          <p className="mt-2 text-sm text-stone-500 dark:text-stone-500">
             {t(subtitleKey)}
           </p>
-          <p className="mt-1 text-xs text-stone-400">
+          <p className="mt-1 text-xs text-stone-500">
             {t(sessionHintKey, { n: Math.min(SESSION_SIZE, questionCount) })}
           </p>
           <button
@@ -178,7 +178,7 @@ export function ChoicePracticeSession({
         <p className="mt-2 text-4xl font-black tracking-tight text-teal-600 dark:text-teal-400">
           {pct}%
         </p>
-        <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
+        <p className="mt-1 text-xs text-stone-500 dark:text-stone-500">
           {t(scoreKey, { c: shownCorrect, t: session.length, xp: shownXp })}
         </p>
         <button
@@ -193,7 +193,7 @@ export function ChoicePracticeSession({
 
   return (
     <section className="flex flex-col gap-4">
-      <div className="flex items-center justify-between text-sm text-stone-500 dark:text-stone-400">
+      <div className="flex items-center justify-between text-sm text-stone-500 dark:text-stone-500">
         <h2 className="text-base font-semibold text-stone-900 dark:text-white">
           {t(titleKey)}
         </h2>
@@ -221,7 +221,7 @@ export function ChoicePracticeSession({
                   "border-red-500 bg-red-50 text-red-600 dark:border-red-600 dark:bg-red-500/10 dark:text-red-400";
               else
                 style =
-                  "border-stone-200 bg-white text-stone-400 opacity-60 dark:border-stone-800 dark:bg-stone-950 dark:text-stone-500";
+                  "border-stone-200 bg-white text-stone-500 opacity-60 dark:border-stone-800 dark:bg-stone-950 dark:text-stone-500";
             }
             return (
               <li key={option}>
