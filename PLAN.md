@@ -129,7 +129,7 @@ Levio
 ### Future / Nice-to-have
 - App store native (via Capacitor/PWA), offline mode penuh
 - AI tutor / pengoreksi jawaban
-- Modul kesehatan lain: step counter, water tracker, sleep
+- Modul kesehatan lain: step counter, sleep (water tracker ✅ terpasang: target harian, log, XP, item di checklist)
 - Komunitas & belajar bareng (group challenge)
 - Marketplace premium content / subscription
 - **Integrasi donasi mayar.id (V3/Future):** halaman "Dukung Levio" + redirect ke

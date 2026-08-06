@@ -61,6 +61,9 @@ const paths: Record<IconName, React.ReactNode> = {
       <path d="M5 11a7 7 0 0 0 14 0M12 18v4M8 22h8" />
     </>
   ),
+  water: (
+    <path d="M12 3c3 4 6 7.5 6 11a6 6 0 0 1-12 0c0-3.5 3-7 6-11Z" />
+  ),
 };
 
 export function Icon({

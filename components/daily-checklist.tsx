@@ -5,15 +5,18 @@ import { useProgress } from "@/components/progress-provider";
 import { useLanguage } from "@/components/language-provider";
 import { useSettings } from "@/components/settings-provider";
 import { useGym } from "@/components/gym/use-gym";
+import { useWater } from "@/components/water/use-water";
 import { Icon } from "@/components/icons";
 import { todayKey } from "@/lib/date";
 import { workoutDoneOn } from "@/lib/gym";
+import { isWaterTargetMet } from "@/lib/water";
 
 export function DailyChecklist() {
   const { progress } = useProgress();
   const { t } = useLanguage();
   const { settings } = useSettings();
   const { gym } = useGym();
+  const { water } = useWater();
 
   const activity = progress?.activityByDate ?? {};
   const today = activity[todayKey()] ?? { xp: 0, reviews: 0, tests: 0, newWords: 0 };
@@ -25,7 +28,7 @@ export function DailyChecklist() {
     metaKey: string;
     done: boolean;
     href: string;
-    icon: "book" | "pen" | "chart" | "dumbbell";
+    icon: "book" | "pen" | "chart" | "dumbbell" | "water";
   }[] = [
     {
       labelKey: "checklist.learn.label",
@@ -66,6 +69,14 @@ export function DailyChecklist() {
       done: workoutDoneOn(gym, todayKey()),
       href: "/gym",
       icon: "dumbbell" as const,
+    },
+    {
+      labelKey: "checklist.water.label",
+      vars: { n: water.targetMl },
+      metaKey: "checklist.water.meta",
+      done: isWaterTargetMet(water, todayKey()),
+      href: "/#water",
+      icon: "water" as const,
     },
   ];
   const doneCount = tasks.filter((task) => task.done).length;

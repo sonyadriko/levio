@@ -44,6 +44,14 @@ const dict: Record<Locale, Record<string, string>> = {
     "checklist.test.meta": "Simulasi ujian",
     "checklist.gym.label": "Workout hari ini",
     "checklist.gym.meta": "Gym",
+    "checklist.water.label": "Minum {n} ml air",
+    "checklist.water.meta": "Kesehatan",
+
+    "water.title": "Minum Air",
+    "water.today": "{current}/{target} ml",
+    "water.done": "Target minum harian tercapai",
+    "water.targetLower": "Turunkan target",
+    "water.targetRaise": "Naikkan target",
 
     "learn.title": "Belajar HSK",
     "learn.subtitle": "Pilih level — {n} kosakata tersedia untuk saat ini.",
@@ -806,6 +814,14 @@ const dict: Record<Locale, Record<string, string>> = {
     "checklist.test.meta": "Exam simulation",
     "checklist.gym.label": "Workout today",
     "checklist.gym.meta": "Gym",
+    "checklist.water.label": "Drink {n} ml of water",
+    "checklist.water.meta": "Health",
+
+    "water.title": "Water Tracker",
+    "water.today": "{current}/{target} ml",
+    "water.done": "Daily water goal reached",
+    "water.targetLower": "Lower target",
+    "water.targetRaise": "Raise target",
 
     "learn.title": "Learn HSK",
     "learn.subtitle": "Pick a level — {n} words available so far.",
