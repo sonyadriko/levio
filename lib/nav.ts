@@ -13,7 +13,8 @@ export type IconName =
   | "trophy"
   | "star"
   | "volume"
-  | "mic";
+  | "mic"
+  | "water";
 
 export interface NavItem {
   labelKey: string;
