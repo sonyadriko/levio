@@ -31,7 +31,14 @@ selalu disinkronkan saat rilis (lihat `docs/CONTRIBUTING` tidak ada; aturan ada 
 - **English listening:** latihan mendengarkan untuk modul English (CEFR) — dengar kata lalu pilih artinya, memakai proxy TTS dengan suara `en-US` (fallback Web Speech).
 - **English grammar:** latihan melengkapi kalimat (cloze) dari kalimat contoh kosakata CEFR — pilih kata yang tepat di antara opsi satu level.
 
+### Diubah
+- **Confetti dengan fisika:** efek selebrasi di layar selesai (pelajaran, flashcard, mock test, latihan, sentence builder, theme) kini memakai **anime.js v4** — tiap kepingan punya gravitasi, hanyut menyamping acak, dan putaran sendiri, bukan lagi jatuh lurus seragam.
+
 ### Teknis
+- Dependensi baru: `animejs ^4.5.0` (ESM, tree-shakeable). Aturan pemakaian ada di `docs/motion.md` — CSS keyframe tetap default; anime.js hanya untuk efek yang butuh nilai & timing per elemen.
+- `components/confetti.tsx`: `animate()` + `stagger(25, { from: "center" })`, cleanup lewat `animation.revert()` di `useEffect`.
+- **Guard `prefers-reduced-motion` manual** untuk animasi JS: guard global di `globals.css` hanya menyentuh CSS, jadi anime.js melewatinya. Container dirender `visibility: hidden` dan baru ditampilkan setelah `matchMedia` dicek.
+- `app/globals.css`: token `--animate-confetti` + `@keyframes confetti-fall` dihapus (tidak terpakai).
 - `supabase/migrations/0009_add_leaderboard.sql`: fungsi `get_weekly_leaderboard()` (SECURITY DEFINER) mengagregasi `daily_activity` + `gym_xp_by_date` minggu ini; RPC via `/api/leaderboard`.
 - `lib/leaderboard.ts`: `leaderName` & `rankMedal` (murni, dites) + `components/leaderboard.tsx`.
 - `components/practice-session.tsx`: `ChoicePracticeSession` kini module-aware (pilih level per modul seperti mock test).

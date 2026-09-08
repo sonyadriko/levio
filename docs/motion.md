@@ -83,6 +83,52 @@ unlayered agar menang atas `transition-colors` Tailwind pada tombol.
 
 Plus guard reduced-motion global (nonaktifkan semua animasi/transisi).
 
+## anime.js — kapan boleh keluar dari CSS
+
+CSS keyframe tetap **default** di Levio. anime.js (v4, `animate`/`stagger`)
+dipakai hanya bila efeknya tidak bisa diekspresikan satu keyframe, yaitu saat
+tiap elemen butuh nilai & timing sendiri.
+
+### ✅ Dipakai — `components/confetti.tsx` (Unreleased)
+
+Keyframe `confetti-fall` lama membuat semua kepingan jatuh **lurus, linear,
+putaran seragam** — beda antar kepingan hanya `left`, `delay`, dan `duration`
+lewat inline style. Sekarang tiap kepingan punya:
+
+- **gravitasi** — `y` dengan `ease: "in(1.7)"` (makin ke bawah makin cepat),
+- **drift** menyamping acak (`x`, `ease: "inOut(2)"`) seperti kertas ketiup angin,
+- **spin** 1–3 putaran, arah acak,
+- `scale` pop-in `out(4)` + `delay: stagger(25, { from: "center" })`.
+
+Token `--animate-confetti` dan keyframe `confetti-fall` dihapus dari
+`app/globals.css` (sudah tak terpakai).
+
+> ⚠️ **Guard reduced-motion wajib manual.** Guard global di `globals.css` hanya
+> menyentuh `animation-duration`/`transition-duration` CSS — animasi JS
+> **melewatinya**. Pola di `confetti.tsx`: container di-render
+> `visibility: hidden`, dan efek baru men-set `visible` setelah
+> `matchMedia("(prefers-reduced-motion: reduce)")` dicek. Saat reduce, tak ada
+> animasi yang dijalankan sama sekali. Setiap pemakaian anime.js berikutnya
+> **harus** mengulang guard ini.
+
+Cleanup: simpan hasil `animate()` lalu `animation.revert()` di cleanup
+`useEffect` — mengembalikan style inline dan membatalkan animasi saat unmount.
+
+### ❌ Tidak dipindah ke anime.js
+`sliding-tabs`, `progress-bar`, `progress-ring`, `pop`/`shake`, `toast`,
+`count-bump` — semua sudah murni `transform`/`opacity` dengan satu kurva
+seragam. Memindahkannya ke JS menambah kerja main-thread tanpa tambahan
+ekspresi, dan melepaskan guard reduced-motion gratis dari CSS.
+
+### 🔜 Kandidat berikutnya (belum dikerjakan)
+- **Stroke order kana** (`kana-trace.tsx`) — `svg.createDrawable` untuk
+  menganimasikan urutan coretan sebelum user menelusuri. Nilai belajar tertinggi;
+  terhambat karena belum ada data path SVG per kana.
+- **Timeline layar hasil** (`mock-test.tsx`) — `createTimeline()` untuk
+  mengurutkan ring → count-up skor → confetti.
+- **Stagger masuk** untuk daftar (leaderboard, word-list) — `stagger(40)`.
+
 ## Referensi
 - Kinetics: <https://kinetics.colorion.co/> — pustaka spring + copy-paste CSS/React/prompt.
-- Kode: `docs/motion.md` (ini), `components/toast.tsx`, `components/sliding-tabs.tsx`, `components/spring-counter.tsx`.
+- anime.js: <https://animejs.com/documentation> — v4 ESM (`animate`, `stagger`, `spring`, `svg`).
+- Kode: `docs/motion.md` (ini), `components/toast.tsx`, `components/sliding-tabs.tsx`, `components/spring-counter.tsx`, `components/confetti.tsx`.

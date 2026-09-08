@@ -305,7 +305,8 @@ Semua animasi murni CSS + sedikit React hook, **tanpa dependensi eksternal**:
 
 - `app/globals.css` `@theme` → keyframe: `fade-in`, `card-in`, `slide-up/down`,
   `pop`, `shake`, `pulse-soft`, `bar-grow`, plus `shimmer` (loading skeleton),
-  `flame` (streak), `ring-fill` (progress ring), `confetti-fall`.
+  `flame` (streak), `ring-fill` (progress ring). Confetti dipindah ke anime.js
+  (`components/confetti.tsx`) karena butuh gravitasi + drift + spin per kepingan.
 - `components/confetti.tsx` → efek selebrasi pada layar selesai latihan.
 - `components/progress-ring.tsx` → lingkaran progress SVG (`stroke-dashoffset`
   animasi `ring-fill`); dipakai di layar selesai pelajaran.

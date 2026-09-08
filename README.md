@@ -32,6 +32,7 @@ Menu: **Home · Belajar · Gym · Statistik · Profil** (flashcard & mock test b
 
 - **Next.js 16** (App Router, Turbopack) + **TypeScript**
 - **Tailwind CSS v4** — mobile-first responsive
+- **anime.js v4** — hanya untuk motion yang butuh nilai per elemen (confetti); selebihnya CSS keyframe
 - **Supabase** — backend (PostgreSQL + Auth email/password, sync cloud); berjalan offline bila belum dikonfigurasi
 - Deploy: **Vercel**
 
@@ -43,6 +44,7 @@ Menu: **Home · Belajar · Gym · Statistik · Profil** (flashcard & mock test b
 | [`docs/data-model.md`](./docs/data-model.md) | Skema DB (target) & state localStorage |
 | [`docs/hsk-curriculum.md`](./docs/hsk-curriculum.md) | Standar & cara menambah kosakata HSK |
 | [`docs/modules.md`](./docs/modules.md) | Pola menambah bahasa/modul baru |
+| [`docs/motion.md`](./docs/motion.md) | Prinsip motion, efek yang diadopsi/ditolak, aturan anime.js |
 | [`docs/BUGS.md`](./docs/BUGS.md) | Analisis potensi bug (audit kode) |
 | [`docs/SECURITY.md`](./docs/SECURITY.md) | Analisis & checklist keamanan |
 | [`docs/DEPLOY.md`](./docs/DEPLOY.md) | Runbook deploy (Supabase + Vercel) |
