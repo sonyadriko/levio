@@ -14,7 +14,8 @@ export type IconName =
   | "star"
   | "volume"
   | "mic"
-  | "water";
+  | "water"
+  | "sleep";
 
 export interface NavItem {
   labelKey: string;
