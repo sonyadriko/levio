@@ -82,13 +82,14 @@ components/
 ├── flashcard-deck.tsx    → sesi latihan flashcards (client)
 ├── mock-test.tsx         → quiz mock test: config, timer, hasil (client)
 ├── stats-dashboard.tsx   → statistik: tab periode + heatmap + bar chart + progress per level (client)
-├── profile-view.tsx      → ringkasan, badge, bahasa UI, pengingat, ekspor/impor/reset data (client)
+├── profile-view.tsx      → hero level+XP, statistik, bahasa UI, pengingat, ekspor/impor/reset data (client)
+├── badge-grid.tsx        → grid penghargaan: urut & reveal bertahap (anime.js) (client)
 ├── reminder-card.tsx     → pengaturan pengingat harian (toggle + jam) (client)
 ├── daily-reminder.tsx    → mesin pengingat: polling & kirim Notification API (client)
 ├── sync-banner.tsx       → banner status sinkronisasi cloud (client)
 ├── listening-practice.tsx → latihan listening: audio native (/api/tts) + fallback Web Speech (client)
 ├── service-worker-register.tsx → daftarkan /sw.js untuk offline (client, production only)
-├── confetti.tsx          → efek confetti ringan (CSS keyframe, tanpa dependensi)
+├── confetti.tsx          → efek confetti dengan fisika (anime.js: gravitasi, drift, spin)
 ├── progress-ring.tsx     → lingkaran progress SVG (stroke-dashoffset)
 └── gym/
     ├── use-gym.ts        → hook state gym (useSyncExternalStore localStorage `levio.gym.v2`)
@@ -243,8 +244,10 @@ selalu konsisten dengan data nyata dan tidak bisa "curang":
   (`earned`, `current`, `target`).
 - Contoh: streak 7/30 hari, XP 100/1000/5000, 100 kata direview, seluruh kosakata
   HSK 1/2 dikuasai, lulus tes kelulusan HSK 1, 10 tes selesai.
-- UI: bagian "Penghargaan" di `components/profile-view.tsx` — badge diraih tampil
-  berwarna amber, yang belum tampil redup + progress bar.
+- UI: `components/badge-grid.tsx` (dipakai `profile-view.tsx`) — badge diraih
+  tampil berwarna amber, yang belum tampil redup + ikon gembok + progress bar.
+  Urutan: sudah diraih dulu, sisanya dari yang paling dekat terbuka, supaya
+  badge "tinggal sedikit lagi" terlihat tanpa scroll penuh.
 - Menambah badge baru = tambah satu `BadgeDef` + 2 kunci i18n (id/en). Ikon baru
   harus ditambahkan ke whitelist `IconName` (`lib/nav.ts`) + path SVG
   (`components/icons.tsx`).
@@ -301,13 +304,17 @@ selalu konsisten dengan data nyata dan tidak bisa "curang":
 
 ## Animasi
 
-Semua animasi murni CSS + sedikit React hook, **tanpa dependensi eksternal**:
+Default animasi tetap **CSS + sedikit React hook**; anime.js dipakai hanya bila
+tiap elemen butuh nilai & timing sendiri (aturan lengkap: `docs/motion.md`):
 
 - `app/globals.css` `@theme` → keyframe: `fade-in`, `card-in`, `slide-up/down`,
   `pop`, `shake`, `pulse-soft`, `bar-grow`, plus `shimmer` (loading skeleton),
   `flame` (streak), `ring-fill` (progress ring). Confetti dipindah ke anime.js
   (`components/confetti.tsx`) karena butuh gravitasi + drift + spin per kepingan.
-- `components/confetti.tsx` → efek selebrasi pada layar selesai latihan.
+- `components/confetti.tsx` → efek selebrasi pada layar selesai latihan (anime.js).
+- `components/badge-grid.tsx` → reveal grid penghargaan (anime.js): delay tiap
+  kartu dihitung runtime dari posisi grid (kolom berubah per breakpoint), bar
+  tiap badge dianimasikan `scaleX` ke rasionya dengan durasi sendiri.
 - `components/progress-ring.tsx` → lingkaran progress SVG (`stroke-dashoffset`
   animasi `ring-fill`); dipakai di layar selesai pelajaran.
 - `lib/use-count-up.ts` → hook counter angka (rAF, easing easeOutCubic); dipakai

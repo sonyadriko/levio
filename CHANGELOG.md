@@ -33,11 +33,20 @@ selalu disinkronkan saat rilis (lihat `docs/CONTRIBUTING` tidak ada; aturan ada 
 
 ### Diubah
 - **Confetti dengan fisika:** efek selebrasi di layar selesai (pelajaran, flashcard, mock test, latihan, sentence builder, theme) kini memakai **anime.js v4** — tiap kepingan punya gravitasi, hanyut menyamping acak, dan putaran sendiri, bukan lagi jatuh lurus seragam.
+- **Profil dirombak:** kartu identitas jadi hero bergradasi (teal→emerald) selaras kartu beranda — cincin progress mengelilingi inisial, pil level yang memantul saat naik, bar `XP level / 500`, dan teks "{xp} XP lagi ke level {next}" yang sebelumnya hanya ada di beranda. Total "hari ini" dipecah jadi tiga chip berikon (XP, review, tes) dengan angka count-up, dan kartu statistik "kata dikuasai" + "tes selesai" ikut count-up.
+- **Grid penghargaan:** dipindah ke `components/badge-grid.tsx` dengan reveal bertahap berbasis anime.js dan bar progres yang terisi beranimasi. Urutan badge berubah: sudah diraih dulu, sisanya dari yang paling dekat terbuka — badge "tinggal sedikit lagi" terlihat tanpa scroll penuh. Badge terkunci memakai ikon gembok, yang diraih memakai gradasi amber.
+
+### Diperbaiki
+- **Jumlah badge di pratinjau profil:** kartu pratinjau (saat belum masuk) menampilkan `0/10` hardcode padahal jumlah badge bertambah tiap modul bahasa baru; sekarang diturunkan dari `getBadges()`.
 
 ### Teknis
 - Dependensi baru: `animejs ^4.5.0` (ESM, tree-shakeable). Aturan pemakaian ada di `docs/motion.md` — CSS keyframe tetap default; anime.js hanya untuk efek yang butuh nilai & timing per elemen.
 - `components/confetti.tsx`: `animate()` + `stagger(25, { from: "center" })`, cleanup lewat `animation.revert()` di `useEffect`.
 - **Guard `prefers-reduced-motion` manual** untuk animasi JS: guard global di `globals.css` hanya menyentuh CSS, jadi anime.js melewatinya. Container dirender `visibility: hidden` dan baru ditampilkan setelah `matchMedia` dicek.
+- `components/badge-grid.tsx`: `stagger(38, { grid: [cols, rows], from: "center" })` dengan jumlah kolom **diukur runtime** dari `offsetTop` (grid responsif 2/3/4 kolom), bar memakai `scaleX` + `transform-origin: left` (GPU-composited) dengan durasi per bar `420ms + rasio × 520ms`. Reveal kartu hanya jalan sekali saat mount; bar dianimasikan ulang hanya saat rasio progres berubah.
+- Guard reduced-motion di `badge-grid` **kebalikan** dari confetti: confetti murni dekorasi jadi tidak dirender sama sekali, badge adalah konten jadi langsung dipasang ke keadaan akhir.
+- `components/stat-card.tsx`: tipe `value` dilebarkan ke `React.ReactNode` agar bisa menerima `<SpringCounter />`.
+- Kunci i18n baru: `profile.toNextLevel` (id/en). `profile.today` kehilangan titik dua karena kini jadi label seksi.
 - `app/globals.css`: token `--animate-confetti` + `@keyframes confetti-fall` dihapus (tidak terpakai).
 - `supabase/migrations/0009_add_leaderboard.sql`: fungsi `get_weekly_leaderboard()` (SECURITY DEFINER) mengagregasi `daily_activity` + `gym_xp_by_date` minggu ini; RPC via `/api/leaderboard`.
 - `lib/leaderboard.ts`: `leaderName` & `rankMedal` (murni, dites) + `components/leaderboard.tsx`.
