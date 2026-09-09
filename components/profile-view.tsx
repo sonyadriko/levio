@@ -8,9 +8,12 @@ import { useSettings } from "@/components/settings-provider";
 import { Icon } from "@/components/icons";
 import { ChevronDown } from "lucide-react";
 import { StatCard } from "@/components/stat-card";
+import { SpringCounter } from "@/components/spring-counter";
+import { ProgressRing } from "@/components/progress-ring";
+import { BadgeGrid } from "@/components/badge-grid";
 import { ReminderCard } from "@/components/reminder-card";
 import { todayKey } from "@/lib/date";
-import { XP_PER_LEVEL } from "@/lib/progress";
+import { emptyProgress, XP_PER_LEVEL } from "@/lib/progress";
 import { summarize, suggestDailyTarget, totalsToday } from "@/lib/stats";
 import { getBadges } from "@/lib/badges";
 import { APP_VERSION, latestRelease } from "@/lib/version";
@@ -520,6 +523,9 @@ function ProfilePreviewPlaceholder({
 }: {
   t: (key: string, vars?: Record<string, string | number>) => string;
 }) {
+  // Jumlah badge ikut definisi di lib/badges.ts (bertambah tiap modul bahasa
+  // baru), bukan angka hardcode yang cepat basi.
+  const totalBadges = getBadges(emptyProgress()).length;
   const stats = [
     { labelKey: "stats.streak", icon: "flame" as const },
     { labelKey: "stats.bestStreak", icon: "flame" as const },
@@ -557,7 +563,7 @@ function ProfilePreviewPlaceholder({
       <div className="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-950">
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-sm font-semibold">{t("badge.title")}</h3>
-          <span className="text-xs text-stone-500">0/10</span>
+          <span className="text-xs text-stone-500">0/{totalBadges}</span>
         </div>
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
@@ -645,132 +651,130 @@ function ProfileSections({
 }) {
   const [showWhatsNew, setShowWhatsNew] = useState(false);
   const release = latestRelease();
+  const levelXp = xp % XP_PER_LEVEL;
+  const levelPct = Math.round((levelXp / XP_PER_LEVEL) * 100);
   return (
     <>
-      <section className="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-950">
-        <div className="flex items-center gap-4">
-          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-teal-700 to-emerald-700 text-xl font-bold text-white shadow-lg shadow-teal-700/20">
-            {initial}
-          </span>
-          <div className="min-w-0 flex-1">
-            <label className="sr-only" htmlFor="profile-name">
-              {t("profile.name")}
-            </label>
-            <input
-              id="profile-name"
-              type="text"
-              value={settings.name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder={t("profile.namePlaceholder")}
-              maxLength={24}
-              className="w-full bg-transparent text-lg font-bold tracking-tight outline-none placeholder:text-stone-500"
-            />
-            <p className="text-sm text-stone-500 dark:text-stone-500">
-              {t("profile.role")}
-            </p>
-          </div>
-          <div className="shrink-0 text-right">
-            <p className="text-lg font-bold leading-tight">
-              {t("common.level")} {level}
-            </p>
-            <p className="text-xs text-stone-500">
-              {xp} {t("common.xp")}
-            </p>
-          </div>
-        </div>
-
-        <p className="mt-4 text-xs font-medium text-stone-500">
-          {t("profile.today")}{" "}
-          <span className="font-semibold text-stone-600 dark:text-stone-300">
-            {today.xp} {t("common.xp")} · {today.reviews} {t("stats.review")} ·{" "}
-            {today.tests} {t("stats.test")}
-          </span>
-        </p>
-
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <StatCard
-            label={t("stats.streak")}
-            value={t("stats.days", { n: summary.streak })}
-            icon="flame"
-          />
-          <StatCard
-            label={t("stats.bestStreak")}
-            value={t("stats.days", { n: summary.bestStreak })}
-            icon="flame"
-          />
-          <StatCard
-            label={t("stats.mastered")}
-            value={summary.mastered}
-            icon="book"
-          />
-          <StatCard
-            label={t("stats.completedTests")}
-            value={summary.completedTests}
-            icon="chart"
-          />
-        </div>
-      </section>
-
-      <section className="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-950">
-        <div className="mb-4 flex items-baseline justify-between gap-3">
-          <h2 className="text-sm font-semibold">{t("badge.title")}</h2>
-          <p className="text-xs text-stone-500">
-            {t("badge.subtitle", {
-              earned: badges.filter((b) => b.earned).length,
-              total: badges.length,
-            })}
-          </p>
-        </div>
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-          {badges.map((badge) => (
-            <div
-              key={badge.id}
-              className={`flex flex-col gap-1.5 rounded-xl border p-3 transition-colors ${
-                badge.earned
-                  ? "animate-pop border-amber-200 bg-amber-50/70 dark:border-amber-800 dark:bg-amber-500/10"
-                  : "border-stone-200 bg-stone-50/70 dark:border-stone-800 dark:bg-stone-900/40"
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <span
-                  className={`flex h-8 w-8 items-center justify-center rounded-lg ${
-                    badge.earned
-                      ? "bg-amber-400 text-stone-900"
-                      : "bg-stone-200 text-stone-500 dark:bg-stone-800 dark:text-stone-500"
-                  }`}
-                >
-                  <Icon name={badge.icon} className="h-4 w-4" />
-                </span>
-                {badge.earned && (
-                  <Icon name="check" className="h-4 w-4 text-amber-600" />
-                )}
-              </div>
-              <p className="text-sm font-semibold leading-tight">
-                {t(badge.titleKey, badge.titleVars)}
-              </p>
-              <p className="text-[11px] leading-snug text-stone-500 dark:text-stone-500">
-                {t(badge.descKey, badge.descVars)}
-              </p>
-              <div className="mt-auto flex items-center gap-1.5">
-                <div className="h-1 flex-1 overflow-hidden rounded-full bg-stone-200 dark:bg-stone-800">
-                  <div
-                    className={`h-full rounded-full ${
-                      badge.earned ? "bg-amber-500" : "bg-teal-600"
-                    }`}
-                    style={{ width: `${(badge.current / badge.target) * 100}%` }}
-                  />
-                </div>
-                <span className="text-[10px] tabular-nums text-stone-500">
-                  {t("badge.progress", {
-                    current: badge.current,
-                    target: badge.target,
-                  })}
-                </span>
-              </div>
+      <section className="overflow-hidden rounded-2xl border border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-950">
+        <div className="bg-gradient-to-br from-teal-700 to-emerald-700 p-5 text-white">
+          <div className="flex items-center gap-4">
+            <div className="relative shrink-0">
+              <ProgressRing
+                value={levelPct}
+                size={60}
+                stroke={5}
+                className="text-white"
+                trackClassName="text-white/25"
+              />
+              <span className="absolute inset-0 flex items-center justify-center text-lg font-bold">
+                {initial}
+              </span>
             </div>
-          ))}
+            <div className="min-w-0 flex-1">
+              <label className="sr-only" htmlFor="profile-name">
+                {t("profile.name")}
+              </label>
+              <input
+                id="profile-name"
+                type="text"
+                value={settings.name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder={t("profile.namePlaceholder")}
+                maxLength={24}
+                className="w-full bg-transparent text-lg font-bold tracking-tight text-white outline-none placeholder:text-teal-100/70"
+              />
+              <p className="text-sm text-teal-100">{t("profile.role")}</p>
+            </div>
+            <span
+              key={level}
+              className="animate-pop shrink-0 rounded-full bg-white/15 px-3 py-1 text-sm font-semibold"
+            >
+              {t("common.level")} {level}
+            </span>
+          </div>
+
+          <div className="mt-4 flex items-baseline justify-between text-xs text-teal-100">
+            <span>
+              <SpringCounter value={levelXp} duration={800} /> / {XP_PER_LEVEL}{" "}
+              {t("common.xp")}
+            </span>
+            <span>
+              {t("profile.toNextLevel", {
+                xp: XP_PER_LEVEL - levelXp,
+                next: level + 1,
+              })}
+            </span>
+          </div>
+          <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/20">
+            <div
+              className="h-full rounded-full bg-white transition-all duration-700 ease-out"
+              style={{ width: `${levelPct}%` }}
+            />
+          </div>
+        </div>
+
+        <div className="p-5">
+          <p className="mb-3 text-xs font-medium uppercase tracking-wide text-stone-500">
+            {t("profile.today")}
+          </p>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { label: t("common.xp"), value: today.xp, icon: "chart" as const },
+              {
+                label: t("stats.review"),
+                value: today.reviews,
+                icon: "pen" as const,
+              },
+              {
+                label: t("stats.test"),
+                value: today.tests,
+                icon: "check" as const,
+              },
+            ].map((chip) => (
+              <div
+                key={chip.label}
+                className="rounded-xl border border-stone-200 bg-stone-50/70 p-3 text-center dark:border-stone-800 dark:bg-stone-900/40"
+              >
+                <Icon
+                  name={chip.icon}
+                  className="mx-auto h-4 w-4 text-teal-700 dark:text-teal-500"
+                />
+                <p className="mt-1.5 text-lg font-bold tabular-nums leading-none">
+                  <SpringCounter value={chip.value} duration={700} />
+                </p>
+                <p className="mt-1 text-[11px] text-stone-500">{chip.label}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <StatCard
+              label={t("stats.streak")}
+              value={t("stats.days", { n: summary.streak })}
+              icon="flame"
+            />
+            <StatCard
+              label={t("stats.bestStreak")}
+              value={t("stats.days", { n: summary.bestStreak })}
+              icon="flame"
+            />
+            <StatCard
+              label={t("stats.mastered")}
+              value={<SpringCounter value={summary.mastered} duration={800} />}
+              icon="book"
+            />
+            <StatCard
+              label={t("stats.completedTests")}
+              value={
+                <SpringCounter value={summary.completedTests} duration={800} />
+              }
+              icon="chart"
+            />
+          </div>
         </div>
       </section>
+
+      <BadgeGrid badges={badges} t={t} />
 
       <section className="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-950">
         <h2 className="mb-4 text-sm font-semibold">{t("profile.prefs")}</h2>

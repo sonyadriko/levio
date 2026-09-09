@@ -114,6 +114,29 @@ Token `--animate-confetti` dan keyframe `confetti-fall` dihapus dari
 Cleanup: simpan hasil `animate()` lalu `animation.revert()` di cleanup
 `useEffect` — mengembalikan style inline dan membatalkan animasi saat unmount.
 
+### ✅ Dipakai — `components/badge-grid.tsx` (Unreleased)
+
+Grid penghargaan di `/profile` sebelumnya statis: semua kartu muncul sekaligus
+dan bar progres tergambar lewat `style.width` tanpa transisi. Sekarang:
+
+- **reveal bertahap** — `delay: stagger(38, { grid: [cols, rows], from: "center" })`.
+  Jumlah kolom (2/3/4) tergantung breakpoint, jadi delay tiap kartu **hanya bisa
+  dihitung saat runtime** dari posisi grid sebenarnya (`countColumns()` membaca
+  `offsetTop`). Satu keyframe CSS tidak bisa mengekspresikan delay yang
+  bergantung baris+kolom.
+- **bar per badge** — `scaleX` ke rasio masing-masing dengan **durasi sendiri**
+  (`420ms + rasio × 520ms`) supaya kecepatan isian terasa seragam antar badge.
+  `scaleX` + `transform-origin: left`, bukan `width` (GPU-composited, prinsip #4).
+
+Urutan kartu juga diubah: yang sudah diraih dulu, sisanya diurut dari yang
+paling dekat terbuka — badge "tinggal sedikit lagi" terlihat tanpa scroll penuh.
+
+> ⚠️ Guard reduced-motion sama seperti confetti, tapi **kebalikannya**: confetti
+> murni dekorasi jadi saat reduce tidak dirender sama sekali; badge adalah
+> konten, jadi saat reduce kartu langsung dipasang ke keadaan akhir
+> (`opacity: 1`, `scaleX(rasio)`) tanpa animasi. Cleanup `revert()` diikuti
+> pemulihan `opacity: 1` agar kartu tidak tertinggal tersembunyi saat remount.
+
 ### ❌ Tidak dipindah ke anime.js
 `sliding-tabs`, `progress-bar`, `progress-ring`, `pop`/`shake`, `toast`,
 `count-bump` — semua sudah murni `transform`/`opacity` dengan satu kurva
